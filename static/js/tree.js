@@ -606,6 +606,10 @@
     row("place", p.birth_place);
     row("died", p.died);
     row("work", p.occupation);
+    if (p.account) {  // a relative with an account: "@name", linking to their own family tree
+      f("account").textContent = p.account.name;
+      if (p.account.url) f("account").href = p.account.url;
+    } else frag.querySelector('[data-row="account"]').remove();
     f("url").href = p.url;
     if (p.edit_url) f("edit").href = p.edit_url; else f("edit").remove();
     var centreBtn = frag.querySelector('[data-act="centre"]');

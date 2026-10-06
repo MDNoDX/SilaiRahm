@@ -16,6 +16,10 @@ Hammasi Django’ning rasmiy i18n tizimi orqali ishlaydi (`gettext`, `.po` → `
 - **Birgalikda tuzish** — qarindoshni havola orqali taklif qilasiz (koʻrish yoki tahrirlash huquqi bilan);
   u shajarani oʻz oʻrnidan nomlangan holda koʻradi. **Oʻzgarishlar tarixi**: kim nimani qoʻshgani koʻrinadi,
   xato oʻzgarish yoki oʻchirish ortga qaytariladi.
+- **Bogʻlanishlar** — saytdagi odamlarni ism, foydalanuvchi nomi yoki email boʻyicha topish, «u menga kim» deb belgilab
+  soʻrov yuborish; qabul qilinganda har biri boshqasining shajarasida joylashadi, shajaralar koʻrinadi, xohlasa doʻstlar
+  roʻyxatiga qoʻshiladi. **Solishtirish va birlashtirish**: ikki shajaradagi bir xil odamlar topiladi, farqlar haqida
+  ogohlantiriladi, yetishmayotgan qarindoshlar va maʼlumotlar bir bosishda qoʻshiladi (har biri «Tarix»da qaytariladi).
 - **Dublikatlar** — qoʻshayotganda ogohlantirish, topilgan juftlarni birlashtirish (maʼlumot yoʻqolmaydi).
 - **Albom** — har bir odamga suratlar, hujjatlar (PDF) va ovozli yozuvlar; suratlar yuklashda kichraytiriladi.
 - **Hayot yoʻli va vaqt chizigʻi** — odam sahifasida tugʻilish, toʻy, farzandlar; butun oila boʻyicha oʻn yilliklar.
@@ -30,7 +34,8 @@ Hammasi Django’ning rasmiy i18n tizimi orqali ishlaydi (`gettext`, `.po` → `
   Bosh sahifadagi «Bugun» blokidan bir bosishda tabrik yuboriladi.
 - **Kim kimga kim?** — ikki odam orasidagi qarindoshlik va bogʻlanish zanjiri.
 - **Familiya taklifi** — oʻgʻil nevaraga ota tarafdagi bobosining ismidan (Madaminjon → Madaminov).
-- **Chop etish** — muqovali **shajara kitobi**, **devoriy plakat** (balandligi 42 yoki 59 sm, uzunligi oilaga qarab),
+- **Chop etish** — muqovali **shajara kitobi** (butun oila, ota yoki ona tomoni, hikoyalari bilan), bitta odam uchun
+  **«Hayot kitobi»**, **devoriy plakat** (balandligi 42 yoki 59 sm, uzunligi oilaga qarab),
   tarjimai hol va daraxt PDF; PNG.
 - **GEDCOM** — eksport va **import** (MyHeritage, Ancestry, Gramps va boshqalardan).
 - **Xavfsizlik** — ikki bosqichli kirish (autentifikator ilovasi + tiklash kodlari), Google orqali kirish,

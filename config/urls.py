@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import RedirectView
-from django.views.i18n import JavaScriptCatalog
 
 from apps.accounts import app_bridge
 from apps.core import views as core_views
@@ -10,10 +9,10 @@ urlpatterns = [
     path("", core_views.home, name="home"),
     path("til/", core_views.set_language, name="set_language"),
     # Translations for static/js, from locale/*/LC_MESSAGES/djangojs.po.
-    path("jsi18n/", JavaScriptCatalog.as_view(packages=["apps.core"]), name="javascript-catalog"),
     path("", include("apps.accounts.urls")),
     path("", include("apps.genealogy.urls")),
     path("dostlar/", include("apps.friends.urls")),
+    path("boglanishlar/", include("apps.network.urls")),
     path("", include("apps.notify.urls")),
     path("salomatlik/", core_views.health, name="health"),
     path("media/<path:name>", core_views.media, name="media"),

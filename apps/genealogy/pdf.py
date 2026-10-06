@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.utils.translation import ngettext, pgettext
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
 from reportlab.lib.utils import ImageReader
 from reportlab.lib.pagesizes import A1, A2, A3, A4, landscape
 from reportlab.lib.styles import ParagraphStyle
@@ -95,6 +95,12 @@ def _styles():
         "label": ParagraphStyle("label", fontName=FONT, fontSize=9, leading=12, textColor=MUTED),
         "center": ParagraphStyle("center", fontName=FONT, fontSize=9, leading=12, textColor=MUTED, alignment=TA_CENTER),
         "toc": ParagraphStyle("toc", fontName=FONT, fontSize=11, leading=19, textColor=INK),
+        # Long texts (life stories, stories): book-like paragraphs.
+        "story": ParagraphStyle("story", fontName=FONT, fontSize=10.5, leading=16.5, textColor=INK,
+                                alignment=TA_JUSTIFY, firstLineIndent=6 * mm, spaceAfter=5),
+        "story_title": ParagraphStyle("story_title", fontName=FONT_BOLD, fontSize=14, leading=19, textColor=ACCENT,
+                                      spaceBefore=14, spaceAfter=2),
+        "milestone": ParagraphStyle("milestone", fontName=FONT, fontSize=10, leading=14, textColor=INK),
     }
 
 
@@ -195,6 +201,35 @@ class _NumberedCanvas(pdf_canvas.Canvas):
         self.drawString(15 * mm, 9.5 * mm, self._footer)
         page = _("Page %(page)d of %(total)d") % {"page": self._pageNumber, "total": total}
         self.drawRightString(w - 15 * mm, 9.5 * mm, page)
+
+
+def _paragraphs(text, style):
+    """A long text as book paragraphs: a blank line (or a single line break
+    between full sentences) starts a new paragraph."""
+    import re
+
+    parts = [x.strip() for x in re.split(r"\n\s*\n|\n(?=\S)", str(text or "")) if x.strip()]
+    return [Paragraph(escape(x), style) for x in parts]
+
+
+def _ornament(width):
+    """A small gold diamond between sections."""
+    return Table([[_p("◆", ParagraphStyle("orn", fontName=FONT, fontSize=8, textColor=GOLD, alignment=TA_CENTER))]],
+                 colWidths=[width], style=[("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6)])
+
+
+def _story_items(stories, st, width):
+    """Stories, oldest first: a title, the year, the text as paragraphs."""
+    items = []
+    for story in stories:
+        block = [_p(story.title, st["story_title"])]
+        if story.year:
+            block.append(_p(pgettext("year only", "{year}").format(year=story.year), st["rel"]))
+        block.append(Spacer(1, 4))
+        paras = _paragraphs(story.body, st["story"])
+        items.append(KeepTogether(block + paras[:1]))
+        items.extend(paras[1:])
+    return items
 
 
 def _footer_text():
@@ -298,51 +333,71 @@ def _photo(person, size):
     return Image(BytesIO(_photo_bytes(person)), width=min(size * 1.1, size * iw / float(ih or 1)), height=size)
 
 
-def person_pdf(archive, person, focus_id=None, stories=()):
+def person_pdf(archive, person, focus_id=None, stories=(), life_path=()):
+    """The book of one life: a cover with the photo, the person, the milestones,
+    the life story, every story about them and their closest family."""
     st = _styles()
-    width = A4[0] - 36 * mm
-    items = []
-    head = [_p(person.full_name, st["title"])]
-    sub = [person.lifespan]
+    width = A4[0] - 36 * mm - 12
+    lines = [person.lifespan] if person.lifespan else []
     if focus_id and focus_id != person.pk:
         rel = archive.label(focus_id, person.pk)
         if rel:
-            sub.append(rel)
-    head.append(_p(" · ".join(s for s in sub if s), st["subtitle"]))
-    photo = _photo(person, 34 * mm)
-    if photo:
-        t = Table([[head, photo]], colWidths=[width - 40 * mm, 40 * mm])
-        t.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 0)]))
-        items.append(t)
-    else:
-        items.extend(head)
+            lines.append(rel)
+    if stories:
+        lines.append(ngettext("%(count)d story", "%(count)d stories", len(stories)) % {"count": len(stories)})
+    cover = _cover(_("Life book"), person.full_name, lines, photo=_photo_reader(person))
+    items = [Spacer(1, 1), PageBreak()]
 
+    items.append(_p(_("Life book").upper(), st["eyebrow"]))
+    items.append(_p(person.full_name, st["title"]))
+    if person.lifespan:
+        items.append(_p(person.lifespan, st["subtitle"]))
     facts = _facts_table(person, st, width)
     if facts:
         items.append(_p(_("Personal details"), st["h2"]))
         items.append(facts)
-
     family = _family_lines(archive, person)
     if family:
         items.append(_p(_("Family"), st["h2"]))
         for heading, names in family:
             items.append(KeepTogether([_p(heading, st["h3"])] + [_p(n, st["body"]) for n in names]))
 
-    if person.biography:
-        items.append(_p(_("Biography"), st["h2"]))
-        items.append(_p(person.biography, st["body"]))
-    if person.life_story:
-        items.append(_p(_("Life story"), st["h2"]))
-        items.append(_p(person.life_story, st["body"]))
+    if life_path:
+        items.append(_p(_("Life path"), st["h2"]))
+        rows = []
+        for step in life_path:
+            when = step["when"] + (f" · {step['age']}" if step.get("age") is not None and step["kind"] != "birth" else "")
+            rows.append([_p(when, st["label"]), _p(step["text"], st["milestone"])])
+        table = Table(rows, colWidths=[width * 0.3, width * 0.7])
+        table.setStyle(TableStyle([
+            ("VALIGN", (0, 0), (-1, -1), "TOP"), ("LINEBELOW", (0, 0), (-1, -2), 0.4, LINE),
+            ("TOPPADDING", (0, 0), (-1, -1), 4), ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ]))
+        items.append(table)
+
+    for heading, text in ((_("Biography"), person.biography), (_("Life story"), person.life_story)):
+        if text:
+            items.append(_p(heading, st["h2"]))
+            items.extend(_paragraphs(text, st["story"]))
+
     if stories:
-        items.append(_p(_("Stories"), st["h2"]))
-        for s in stories:
-            items.append(_p(s.title, st["h3"]))
-            if s.year:
-                items.append(_p(pgettext("year only", "{year}").format(year=s.year), st["small"]))
-            items.append(_p(s.body, st["body"]))
-            items.append(Spacer(1, 4))
-    return _build(items, title=person.full_name)
+        items.append(PageBreak())
+        items.append(_p(_("Stories"), st["chapter"]))
+        items.append(HRFlowable(width="100%", thickness=1.2, color=GOLD, spaceAfter=6))
+        for i, part in enumerate(_story_items(stories, st, width)):
+            items.append(part)
+        items.append(_ornament(width))
+
+    close = [pk for pk in [person.father_id, person.mother_id] + archive.spouses(person.pk)
+             + archive.children.get(person.pk, []) if pk in archive.people]
+    if close:
+        items.append(PageBreak())
+        items.append(_p(_("Closest family"), st["chapter"]))
+        items.append(HRFlowable(width="100%", thickness=1.2, color=GOLD, spaceAfter=10))
+        for pk in close:
+            items.append(_person_entry(archive, archive.people[pk], person.pk, st, width))
+    return _build(items, title=f"{_('Life book')} — {person.full_name}", cover=cover)
 
 
 def _generation_groups(archive, focus_id):
@@ -351,7 +406,8 @@ def _generation_groups(archive, focus_id):
     groups = {}
     for pk, g in gens.items():
         groups.setdefault(max(-3, min(3, g)), []).append(pk)
-    out = [(generation_label(g), sorted(groups[g], key=lambda pk: (archive.people[pk].birth_key or (9999,), pk)))
+    # Oldest generation first inside a chapter too ("great-grandparents and earlier").
+    out = [(generation_label(g), sorted(groups[g], key=lambda pk: (gens[pk], archive.people[pk].birth_key or (9999,), pk)))
            for g in sorted(groups)]
     unlinked = sorted((pk for pk in archive.people if pk not in gens), key=lambda pk: archive.people[pk].full_name)
     if unlinked:
@@ -359,8 +415,8 @@ def _generation_groups(archive, focus_id):
     return out
 
 
-def _cover(title, family, lines):
-    """Draws the cover of the family book on a canvas."""
+def _cover(title, family, lines, photo=None):
+    """Draws the cover of a book on a canvas (with a round photo, if given)."""
     def draw(c):
         w, h = c._pagesize
         c.setFillColor(ACCENT_DARK)
@@ -374,7 +430,22 @@ def _cover(title, family, lines):
         c.setLineWidth(0.5)
         c.rect(13 * mm, 13 * mm, w - 26 * mm, h - 26 * mm, stroke=1, fill=0)
         mark = 34 * mm
-        draw_mark(c, (w - mark) / 2, h * 0.64, mark, GOLD)
+        if photo is not None:
+            r = 25 * mm
+            cx, cy = w / 2, h * 0.64 + mark / 2
+            iw, ih = photo.getSize()
+            k = 2 * r / min(iw, ih)
+            c.saveState()
+            path = c.beginPath()
+            path.circle(cx, cy, r)
+            c.clipPath(path, stroke=0, fill=0)
+            c.drawImage(photo, cx - iw * k / 2, cy - ih * k / 2, iw * k, ih * k)
+            c.restoreState()
+            c.setStrokeColor(GOLD)
+            c.setLineWidth(2)
+            c.circle(cx, cy, r, stroke=1, fill=0)
+        else:
+            draw_mark(c, (w - mark) / 2, h * 0.64, mark, GOLD)
         c.setFillColor(colors.white)
         size = 40
         while size > 18 and pdfmetrics.stringWidth(family, FONT_BOLD, size) > w - 50 * mm:
@@ -393,34 +464,68 @@ def _cover(title, family, lines):
     return draw
 
 
-def family_book_pdf(archive, focus_id, owner_name, viewer_is_owner=True, family=""):
-    """The whole archive as a book: a cover, the contents, then everyone by
-    generation with photo, dates, family and life story."""
+def book_people(archive, focus_id, side=None):
+    """Everyone in the book: the whole tree, or the own family and one side
+    (with the husbands and wives who married into it)."""
+    if side not in ("paternal", "maternal"):
+        return set(archive.people)
+    branches = archive.branches(focus_id)
+    keep = {pk for pk, b in branches.items() if b in ("own", side)}
+    keep |= {sp for pk in list(keep) for sp in archive.spouses(pk) if branches.get(sp, "other") == "other"}
+    return keep
+
+
+def family_book_pdf(archive, focus_id, owner_name, viewer_is_owner=True, family="", side=None, stories=()):
+    """The family as a book: a cover, the contents, then everyone by
+    generation with photo, dates, family, life story and their stories;
+    stories about no one in particular close the book."""
     st = _styles()
     width = A4[0] - 36 * mm - 12  # the frame of the page has 6 pt of padding on each side
-    people_count = len(archive.people)
-    groups = _generation_groups(archive, focus_id)
-    cover = _cover(
-        _("Family book"), family or owner_name,
-        [ngettext("%(count)d person", "%(count)d people", people_count) % {"count": people_count},
-         ngettext("%(count)d generation", "%(count)d generations", len(groups)) % {"count": len(groups)},
-         format_date(timezone.now())],
-    )
+    keep = book_people(archive, focus_id, side)
+    groups = [(heading, [pk for pk in members if pk in keep]) for heading, members in _generation_groups(archive, focus_id)]
+    groups = [(heading, members) for heading, members in groups if members]
+    by_person, loose = {}, []
+    for story in stories:
+        if story.person_id in keep:
+            by_person.setdefault(story.person_id, []).append(story)
+        elif story.person_id is None and side is None:
+            loose.append(story)
+    count = sum(len(m) for _h, m in groups)
+    part = {"paternal": BRANCHES["paternal"], "maternal": BRANCHES["maternal"]}.get(side)
+    lines = [ngettext("%(count)d person", "%(count)d people", count) % {"count": count},
+             ngettext("%(count)d generation", "%(count)d generations", len(groups)) % {"count": len(groups)}]
+    if stories:
+        told = sum(len(v) for v in by_person.values()) + len(loose)
+        if told:
+            lines.append(ngettext("%(count)d story", "%(count)d stories", told) % {"count": told})
+    lines.append(format_date(timezone.now()))
+    title = _("Family book") + (f" · {part}" if part else "")
+    cover = _cover(title, family or owner_name, lines)
     items = [Spacer(1, 1), PageBreak()]  # the cover is drawn on the first page
-    items.append(_p(_("Family book").upper(), st["eyebrow"]))
+    items.append(_p(title.upper(), st["eyebrow"]))
     items.append(_p(family or owner_name, st["title"]))
     items.append(_p(_("Compiled by %(name)s") % {"name": owner_name}, st["subtitle"]))
     items.append(_p(_("Contents"), st["h2"]))
     for heading, members in groups:
         items.append(_p(f"{heading} — " + ngettext("%(count)d person", "%(count)d people", len(members))
                         % {"count": len(members)}, st["toc"]))
+    if loose:
+        items.append(_p(_("Family stories"), st["toc"]))
     for heading, members in groups:
         items.append(PageBreak())
         items.append(_p(heading, st["chapter"]))
         items.append(HRFlowable(width="100%", thickness=1.2, color=GOLD, spaceAfter=10))
         for pk in members:
             items.append(_person_entry(archive, archive.people[pk], focus_id, st, width, viewer_is_owner))
-    return _build(items, title=f"{_('Family book')} — {family or owner_name}", cover=cover)
+            if by_person.get(pk):
+                items.extend(_story_items(by_person[pk], st, width))
+                items.append(_ornament(width))
+    if loose:
+        items.append(PageBreak())
+        items.append(_p(_("Family stories"), st["chapter"]))
+        items.append(HRFlowable(width="100%", thickness=1.2, color=GOLD, spaceAfter=6))
+        items.extend(_story_items(loose, st, width))
+    return _build(items, title=f"{title} — {family or owner_name}", cover=cover)
 
 
 def _person_entry(archive, person, focus_id, st, width, viewer_is_owner=True):
@@ -438,7 +543,7 @@ def _person_entry(archive, person, focus_id, st, width, viewer_is_owner=True):
     for story in (person.biography, person.life_story):
         if story:
             text.append(Spacer(1, 3))
-            text.append(_p(story, st["body"]))
+            text.extend(_paragraphs(story, st["body"]))
     photo = _photo(person, 24 * mm)
     if photo is not None:
         col = photo.drawWidth + 5 * mm

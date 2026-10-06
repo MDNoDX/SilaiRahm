@@ -5,7 +5,7 @@
   <input id="{{ field.auto_id }}-name" type="search" value="{{ field|picked_name }}"
          placeholder="{% if placeholder %}{{ placeholder }}{% else %}{% translate 'Type a name…' %}{% endif %}" autocomplete="off"
          role="combobox" aria-expanded="false" aria-controls="{{ field.auto_id }}-results"
-         data-live-search="{% url 'genealogy:search_json' %}{% if gender %}?gender={{ gender }}{% endif %}"
+         data-live-search="{% url 'genealogy:search_json' %}?{% if owner %}owner={{ owner|urlencode }}&amp;{% endif %}{% if gender %}gender={{ gender }}{% endif %}"
          data-mode="pick" data-pick-target="{{ field.auto_id }}" data-pick-clear>
   <div class="live-results" id="{{ field.auto_id }}-results" role="listbox" hidden></div>
   </div>

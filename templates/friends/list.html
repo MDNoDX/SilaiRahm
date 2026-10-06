@@ -34,7 +34,7 @@
             <div class="pcard contact">
               <span class="avatar b-own" aria-hidden="true">{{ c.initials }}</span>
               <span class="who spacer">
-                <span class="name">{{ c.name }}</span>
+                <span class="name">{{ c.name }}{% if c.linked_user %} <span class="tag" title="@{{ c.linked_user.username }}">{% translate "on Shajara" %}</span>{% endif %}</span>
                 <span class="meta">{% if c.how_met %}{{ c.get_how_met_display }}{% endif %}{% if c.how_met and c.birth_date_display %} · {% endif %}{{ c.birth_date_display }}</span>
                 {% if c.phone %}<br><a class="small" href="tel:{{ c.phone }}">{{ c.phone }}</a>{% endif %}
               </span>

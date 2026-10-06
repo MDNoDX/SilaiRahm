@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% blocktranslate with name=connection.sender.display_name %}Request from {{ name }}{% endblocktranslate %}{% endblock %}
+{% block main_class %}narrow{% endblock %}
+{% block content %}
+<div class="pagehead"><div>
+  <h1>{% blocktranslate with name=connection.sender.display_name %}Request from {{ name }}{% endblocktranslate %}</h1>
+  <p>@{{ connection.sender.username }} · {{ connection.get_kind_display }}</p>
+</div></div>
+<div class="card">
+  {% if connection.message %}<p>“{{ connection.message }}”</p>{% endif %}
+  {% if said %}
+    <p>{% blocktranslate with name=connection.sender.first_name|default:connection.sender.username %}In {{ name }}’s family tree you are:{% endblocktranslate %} <b>{{ connection.sender_person.short_name }}</b> · {{ said }}</p>
+  {% elif connection.sender_anchor %}
+    <p>{% blocktranslate with name=connection.sender.first_name|default:connection.sender.username anchor=connection.sender_anchor.short_name %}{{ name }} will add you to their family tree next to {{ anchor }}.{% endblocktranslate %}</p>
+  {% endif %}
+</div>
+<form class="card" method="post" novalidate>{% csrf_token %}
+  {% for error in form.non_field_errors %}<ul class="errorlist"><li>{{ error }}</li></ul>{% endfor %}
+  <h2>{% blocktranslate with name=connection.sender.first_name|default:connection.sender.username %}Who is {{ name }} to you?{% endblocktranslate %}</h2>
+  {% include "network/_place_fields.html" %}
+  <div class="switch-row"><label for="{{ form.share.id_for_label }}">{{ form.share.label }}</label>{{ form.share }}</div>
+  <div class="switch-row"><label for="{{ form.befriend.id_for_label }}">{{ form.befriend.label }}</label>{{ form.befriend }}</div>
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">{% include "partials/icon.html" with name="check" %}{% translate "Accept" %}</button>
+    <button class="btn btn-ghost" type="submit" name="decline" value="1" formnovalidate>{% translate "Decline" %}</button>
+  </div>
+</form>
+{% endblock %}

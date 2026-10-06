@@ -15,7 +15,7 @@ family/
 ├── Dockerfile, docker-compose.yml, deploy/Caddyfile     oʻz serveringiz uchun (muqobil)
 │
 ├── config/                sozlamalar: settings.py, urls.py (bosh manzillar), wsgi.py, sana formatlari
-├── apps/                  saytning butun kodi — 5 ta ilova (2-boʻlim)
+├── apps/                  saytning butun kodi — 6 ta ilova (2-boʻlim)
 ├── templates/             HTML sahifalar (3-boʻlim)
 ├── static/                css/app.css · js/app.js, js/tree.js · img/ (belgilar) · manifest
 ├── locale/                tarjimalar: uz, uz_Cyrl, ru, en (django.po, djangojs.po)
@@ -110,6 +110,15 @@ Sahifalar — `views/` papkasida, har bir mavzu alohida faylda:
 | `django_messages.py` | Django’ning oʻz xabarlari (qayta tarjima uchun) |
 | `templatetags/uz.py` | Shablonlardagi yordamchi teglar |
 
+### `apps/network/` — bogʻlanishlar va shajaralarni birlashtirish
+
+| Fayl | Vazifasi |
+|---|---|
+| `models.py` | `Connection` (ikki hisob orasidagi soʻrov/bogʻlanish), `PersonMatch` («bu oʻsha odam») |
+| `services.py` | Saytdan odam qidirish, soʻrov yuborish, qabul qilish, rad etish, bogʻlanishni tugatish |
+| `merge.py` | Ikki shajarani solishtirish (mos odamlar, yetishmayotgan qarindoshlar, toʻldiriladigan maʼlumotlar, farqlar) va birlashtirish |
+| `views.py`, `forms.py` | «Bogʻlanishlar» sahifalari; shablonlari `templates/network/` |
+
 ### `apps/friends/` — doʻstlar
 
 `models.py` (`Contact`), `views.py`, `forms.py`; shablonlari `templates/friends/`.
@@ -154,6 +163,9 @@ Nomi `_` bilan boshlanadigan shablon — sahifa emas, boshqa sahifa ichiga qoʻy
 | `test_accounts.py` | Kirish, cheklov, Google, Mac ilovasi koʻprigi, ikki bosqichli kirish |
 | `test_reminders.py` | Eslatmalar, Telegram, push, cron, haftalik zaxira |
 | `test_import_export.py` | GEDCOM import va eksport |
+| `test_network.py` | Saytdan qidirish, bogʻlanish, shajaralarni birlashtirish, kitoblar, kichik suratlar |
+| `test_crawl.py` | Har bir sahifani har xil foydalanuvchi nomidan ochib chiqadi: server xatosi boʻlmasligi kerak |
+| `test_code.py` | Ishlatilmagan import va aniqlanmagan nomlar yoʻqligi |
 | `test_i18n.py` | Har bir sahifa toʻrt tilda toza ekani, til tanlash, kataloglar |
 | `helpers.py` | Testlar uchun namuna oila |
 
@@ -170,7 +182,9 @@ Hammasini ishga tushirish: `.venv/bin/python manage.py test` · bittasini: `… 
 | Logotip va ilova belgilari | `tools/make_icons.py` (hammasini qayta yaratadi) |
 | Qarindoshlik nomi (masalan «pochcha») | `apps/genealogy/terminology.py`; mantigʻi — `kinship.py` |
 | Shajara chizmasi koʻrinishi | joylashuv — `apps/genealogy/tree.py`; chizish, masshtab, yon panel — `static/js/tree.js` |
-| PDF kitob, plakat | `apps/genealogy/pdf.py` |
+| PDF kitob (butun oila / ota yoki ona tomoni / bitta odamning «Hayot kitobi»), plakat | `apps/genealogy/pdf.py`; tanlash sahifasi `views/tree.py` (`book_page`) |
+| Shajaralarni solishtirish va birlashtirish qoidalari | `apps/network/merge.py` |
+| Jinsni ismdan taxmin qilish | `apps/core/names.py` |
 | Odam sahifasi | `apps/genealogy/views/people.py` + `templates/genealogy/people/detail.html` |
 | Bosh sahifa («Bugun», yaqin sanalar) | `apps/core/views.py` (`home`) + `templates/core/dashboard.html` |
 | Eslatma matni | `apps/notify/messages.py` |

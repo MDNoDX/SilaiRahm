@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{{ other.display_name }}{% endblock %}
+{% block content %}
+<div class="pagehead">
+  <div>
+    <h1>{{ other.display_name }}</h1>
+    <p>@{{ other.username }} · {{ connection.get_kind_display }}{% if label %} · {{ label }}{% endif %}</p>
+  </div>
+  <div class="row">
+    {% if their_tree %}<a class="btn" href="{% url 'genealogy:tree_for' their_tree.username %}{% if their_person %}?person={{ their_person.pk }}{% endif %}">{% include "partials/icon.html" with name="tree" %}{% translate "Their family tree" %}</a>{% endif %}
+    {% if record %}<a class="btn" href="{{ record.get_absolute_url }}">{% include "partials/icon.html" with name="user" %}{% translate "In my family tree" %}</a>{% endif %}
+  </div>
+</div>
+
+{% if plan %}
+<section class="card merge-summary">
+  <h2>{% include "partials/icon.html" with name="merge" %}{% translate "Our family trees side by side" %}</h2>
+  {% include "network/_plan_summary.html" %}
+  <div class="form-actions">
+    <a class="btn btn-primary" href="{% url 'network:merge' %}?from={{ their_tree.username }}&amp;to={{ my_tree.username }}">{% translate "Compare and merge" %}</a>
+  </div>
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>{% translate "End the connection" %}</h2>
+  <p class="muted small">{% translate "The family trees are no longer shared through it. The people stay in both trees." %}</p>
+  <form method="post" action="{% url 'network:disconnect' connection.pk %}">{% csrf_token %}
+    <button class="btn btn-danger btn-sm" type="submit" data-confirm="{% translate 'End this connection?' %}">{% translate "End the connection" %}</button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Family book" %}{% endblock %}
+{% block main_class %}narrow{% endblock %}
+{% block content %}
+<div class="pagehead"><div>
+  <h1>{% translate "Family book" %}</h1>
+  <p>{% translate "A book ready to print: a cover, the contents, every person with photo, dates, family, life story and stories." %}</p>
+</div></div>
+<form class="card book-form" method="get" action="{% url 'genealogy:family_book' %}" data-no-busy>
+  <div class="field">
+    <label for="book-person-name">{% translate "Centred on" %}</label>
+    <div class="picker picker-field">{% include "partials/icon.html" with name="search" %}
+      <input id="book-person-name" type="search" autocomplete="off" value="{{ focus.short_name|default:'' }}" placeholder="{% translate 'Type a name…' %}"
+             role="combobox" aria-expanded="false" aria-controls="book-person-results" data-mode="pick" data-pick-target="book-person"
+             data-live-search="{% url 'genealogy:search_json' %}?owner={{ owner.username|urlencode }}">
+      <div class="live-results" id="book-person-results" role="listbox" hidden></div></div>
+    <input type="hidden" name="person" id="book-person" value="{{ focus.pk|default:'' }}">
+    <div class="help">{% translate "Relationship names in the book are given as seen from this person." %}</div>
+  </div>
+  <div class="field">
+    <label>{% translate "What the book is about" %}</label>
+    <div class="book-choices" role="radiogroup">
+      <label><input type="radio" name="qism" value="" checked><span><b>{% translate "The whole family" %}</b><small>{% translate "Everyone in the family tree, generation by generation." %}</small></span></label>
+      <label><input type="radio" name="qism" value="ota"><span><b>{{ branches.paternal }}</b><small>{% translate "The own family and the father's side, with those who married into it." %}</small></span></label>
+      <label><input type="radio" name="qism" value="ona"><span><b>{{ branches.maternal }}</b><small>{% translate "The own family and the mother's side, with those who married into it." %}</small></span></label>
+      <label><input type="radio" name="qism" value="odam"><span><b>{% translate "One person’s life" %}</b><small>{% translate "A book about the chosen person: milestones, life story, all their stories and closest family." %}</small></span></label>
+    </div>
+  </div>
+  {% if stories %}<p class="muted small">{% blocktranslate count counter=stories %}{{ counter }} story is placed next to the person it is about.{% plural %}{{ counter }} stories are placed next to the people they are about.{% endblocktranslate %}</p>{% endif %}
+  <div class="form-actions"><button class="btn btn-primary" type="submit">{% include "partials/icon.html" with name="download" %}{% translate "Download the book (PDF)" %}</button></div>
+</form>
+{% endblock %}

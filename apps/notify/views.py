@@ -15,6 +15,7 @@ from django.views.decorators.http import require_POST
 
 from . import service, telegram
 from .forms import NotificationSettingsForm
+from .middleware import SESSION_KEY
 from .models import Notification, NotificationSettings
 
 
@@ -60,6 +61,7 @@ def notification_settings(request):
         form.save()
         prefs.last_generated = None  # re-check today's reminders with the new choices
         prefs.save(update_fields=["last_generated"])
+        request.session.pop(SESSION_KEY, None)
         messages.success(request, _("The information has been saved."))
         return redirect("notify:settings")
     link = {}

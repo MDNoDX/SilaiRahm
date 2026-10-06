@@ -32,6 +32,8 @@ def render_parts(kind, params, days_left=0):
     grammar needs.
     """
     w = when(days_left)
+    # A stored notification may predate a field: missing values must not break the page.
+    params = {"name": "", "names": "", "whose": "", **(params or {})}
     age, years = params.get("age"), params.get("years")
     n = {"when": w, "age": age, "years": years,
          "age_phrase": years_phrase(age) if age else "", "years_phrase": years_phrase(years) if years else ""}
@@ -66,15 +68,22 @@ def render_parts(kind, params, days_left=0):
         body = _("{when}.").format(when=w)
         if years:
             # Translators: placeholders {when} {years} {years_phrase}
-        # xgettext:no-python-brace-format
+            # xgettext:no-python-brace-format
             body = _("{when} it will be {years_phrase} since then.").format(**n)
         if params.get("place"):
             body += " " + _("Place: {place}.").format(place=params["place"])
-    elif kind == "muchal":
+    elif kind == "muchal" and isinstance(params.get("animal"), int) and 0 <= params["animal"] < len(ANIMALS):
         animal = str(ANIMALS[params["animal"]][1])
         title = _("Muchal year: {animal}").format(animal=animal)
         body = _("A {animal} year begins at Navroʻz. It is the muchal year of: {names}.").format(
-            animal=animal, names=", ".join(params["names"]))
+            animal=animal, names=", ".join(params["names"] or []))
+    elif kind == "connection_request":
+        title = _("{name} wants to connect with you").format(name=params["name"])
+        body = _("Open Connections to answer.")
+    elif kind == "connection_accepted":
+        title = _("{name} accepted your request").format(name=params["name"])
+        body = (_("You are friends now.") if params.get("kind") == "friend"
+                else _("Your family trees are connected."))
     else:
         title, body = params.get("title", ""), ""
     return {"title": title, "body": body, "icon": ICONS.get(kind, "📅")}

@@ -10,7 +10,7 @@
       <span class="setting-icon">{% include "partials/icon.html" with name="database" %}</span>
       <span><b>{% translate "Complete archive (JSON)" %}</b><small>{% translate "Everything, with photos. For a backup or moving to another server." %}</small></span>
       {% include "partials/icon.html" with name="download" %}</a>
-    <a class="download-item" href="{% url 'genealogy:family_book' %}">
+    <a class="download-item" href="{% url 'genealogy:book' %}">
       <span class="setting-icon">{% include "partials/icon.html" with name="book" %}</span>
       <span><b>{% translate "Family book (PDF)" %}</b><small>{% translate "Every person with dates, family and life story, ready to print." %}</small></span>
       {% include "partials/icon.html" with name="download" %}</a>

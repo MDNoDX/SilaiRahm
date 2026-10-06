@@ -1,0 +1,16 @@
+{% load i18n %}
+<div class="plan-stats">
+  <div><b>{{ plan.matches|length|add:plan.anchors|length }}</b><span>{% translate "people in both trees" %}</span></div>
+  <div><b>{{ plan.additions|length }}</b><span>{% translate "relatives you do not have yet" %}</span></div>
+  <div><b>{{ plan.fills|length }}</b><span>{% translate "details to fill in" %}</span></div>
+  <div class="{% if plan.conflicts %}warn{% endif %}"><b>{{ plan.conflicts|length }}</b><span>{% translate "differences" %}</span></div>
+</div>
+{% if not plan.anchors and not plan.matches %}
+  <p class="notice warn">{% translate "No one is known to be in both family trees yet. Choose one person who is the same in both, and the rest is found from there." %}</p>
+{% elif plan.conflicts %}
+  <p class="notice warn">{% translate "The family trees disagree in a few places. Look at the differences before merging: nothing that differs is overwritten." %}</p>
+{% elif plan.empty %}
+  <p class="notice info">{% translate "The family trees agree, and yours already has everything the other one knows." %}</p>
+{% else %}
+  <p class="notice ok">{% translate "The family trees agree. Everything can be merged in one step." %}</p>
+{% endif %}

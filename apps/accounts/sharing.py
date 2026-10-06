@@ -82,8 +82,22 @@ def accept_invite(invite, user):
     invite.accepted_at = timezone.now()
     invite.save(update_fields=["accepted_by", "accepted_at"])
     user.__dict__.pop("_roles", None)
+    own = user.home_person_id
     switch_archive(user, invite.owner)
+    if membership.person_id and own:
+        remember_same_person(own, membership.person_id, user)
     return membership
+
+
+def remember_same_person(a_pk, b_pk, user):
+    """The joining relative's own record and their record in the shared tree are
+    one person: the two trees can then be compared and merged from there."""
+    from apps.genealogy.models import Person
+    from apps.network.merge import link_match
+
+    a, b = Person.objects.filter(pk=a_pk).first(), Person.objects.filter(pk=b_pk).first()
+    if a is not None and b is not None:
+        link_match(a, b, user)
 
 
 def leave(user, owner):

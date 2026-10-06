@@ -68,5 +68,5 @@ def search_json(request):
         "label": archive.label(focus, p.pk) if focus and p.pk != focus else "",
         "url": p.get_absolute_url(), "initials": p.initials, "gender": p.gender,
         "branch": branches.get(p.pk, "other"),
-        "photo": p.photo.url if p.photo else "",
+        "photo": f"{p.photo.url}?s=t" if p.photo else "",
     } for p in found], "all_url": f"{reverse('genealogy:search')}?q={quote(query)}"})

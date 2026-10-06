@@ -120,6 +120,34 @@ def send_pending_push(now=None, ignore_hour=False):
     return sent
 
 
+def deliver_now(notification):
+    """Send one notification to Telegram and to phones straight away (a
+    request from a relative should not wait for the morning reminders)."""
+    from . import push
+    from .messages import render
+
+    user = notification.user
+    prefs = NotificationSettings.for_user(user)
+    lang = normalize_language(user.preferred_language) or settings.LANGUAGE_CODE
+    now = timezone.now()
+    if telegram.configured() and prefs.telegram_enabled and prefs.telegram_chat_id:
+        with translation.override(lang):
+            text = telegram_text(notification)
+        try:
+            telegram.send_message(prefs.telegram_chat_id, text)
+            notification.telegram_sent_at = now
+        except telegram.TelegramError as exc:
+            log.warning("Telegram send failed for user %s: %s", user.pk, exc)
+    if push.configured():
+        with translation.override(lang):
+            parts = render(notification)
+        push.send_to_user(user, {"title": f"{parts['icon']} {parts['title']}", "body": parts["body"],
+                                 "url": notification.url or "/", "tag": f"n{notification.pk}"})
+    notification.push_sent_at = now  # nothing is left for the hourly job either way
+    notification.telegram_sent_at = notification.telegram_sent_at or now
+    notification.save(update_fields=["telegram_sent_at", "push_sent_at"])
+
+
 BACKUP_LIMIT = 45 * 1024 * 1024  # Telegram bots may upload 50 MB
 
 

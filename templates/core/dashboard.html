@@ -14,6 +14,16 @@
   </div>
 </div>
 
+{% if connection_requests %}
+<div class="notice info">
+  <div>
+    <b>{% blocktranslate count counter=connection_requests|length %}{{ counter }} person wants to connect with you{% plural %}{{ counter }} people want to connect with you{% endblocktranslate %}</b>
+    <p>{% for c in connection_requests %}{{ c.sender.display_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+  </div>
+  <a class="btn btn-primary btn-sm" href="{% url 'network:index' %}">{% include "partials/icon.html" with name="connect" %}{% translate "Answer" %}</a>
+</div>
+{% endif %}
+
 {% if today_items %}
 <section class="today">
   <span class="eyebrow">{% translate "Today" context "reminder" %}</span>
@@ -117,7 +127,7 @@
     <section class="card">
       <h2>{% translate "Print" %}</h2>
       <div class="download-list">
-        <a class="download-item" href="{% url 'genealogy:family_book' %}">
+        <a class="download-item" href="{% url 'genealogy:book' %}">
           <span class="setting-icon">{% include "partials/icon.html" with name="book" %}</span>
           <span><b>{% translate "Family book (PDF)" %}</b><small>{% translate "Every person with dates, family and life story, ready to print." %}</small></span>
           {% include "partials/icon.html" with name="download" %}</a>

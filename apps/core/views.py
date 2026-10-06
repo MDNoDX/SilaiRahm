@@ -27,13 +27,14 @@ def home(request):
 
     from apps.genealogy.access import viewer_person
     from apps.genealogy.models import Change
+    from apps.network.models import Connection
 
     user, owner = request.user, request.archive
     archive = Archive(owner)
     focus = viewer_person(request, archive)
     today = timezone.localdate()
     upcoming = [(o, render_parts(o.kind, o.params, (o.date - today).days), (o.date - today).days)
-                for o in occasions(owner, today, today + datetime.timedelta(days=30))]
+                for o in occasions(owner, today, today + datetime.timedelta(days=30), archive=archive)]
     todays = []
     for o, text, days in upcoming:
         if days:
@@ -60,6 +61,8 @@ def home(request):
         "soon": [row for row in upcoming if row[2]][:6],
         "changes": Change.objects.filter(owner=owner).select_related("actor", "person")[:6],
         "cycle_animal": muchal(current_cycle_year(), 6, 1),
+        "connection_requests": list(Connection.objects.filter(recipient=user, status=Connection.Status.PENDING)
+                                    .select_related("sender")[:5]),
     })
 
 
@@ -101,7 +104,19 @@ def media(request, name):
               or Media.objects.filter(file=name).select_related("owner").first())
     if holder is None or not can_view(request.user, holder.owner):
         raise Http404
-    obj = StoredFile.objects.filter(name=name).first()
+    obj = None
+    if request.GET.get("s") == "t":  # the small copy for avatars and cards, made once
+        from .images import thumbnail
+        from .storage import thumb_name
+
+        obj = StoredFile.objects.filter(name=thumb_name(name)).first()
+        if obj is None:
+            original = StoredFile.objects.filter(name=name).first()
+            small = thumbnail(bytes(original.content)) if original and original.content_type.startswith("image/") else None
+            if small is not None:
+                obj, _created = StoredFile.objects.update_or_create(
+                    name=thumb_name(name), defaults={"content": small, "size": len(small), "content_type": "image/jpeg"})
+    obj = obj or StoredFile.objects.filter(name=name).first()
     if obj is None:
         raise Http404
     response = HttpResponse(bytes(obj.content), content_type=obj.content_type)

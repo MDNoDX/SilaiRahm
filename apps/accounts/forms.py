@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from apps.core import timezones
 from apps.core.languages import LATIN, language_choices, normalize_language
+from apps.core.names import guess_gender
 from apps.core.text import normalize_apostrophes
 from apps.genealogy.models import Person
 
@@ -105,18 +106,12 @@ class LoginForm(auth_forms.AuthenticationForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "email", "gender")
-        labels = {
-            "first_name": _("First name"),
-            "last_name": _("Last name"),
-            "email": _("Email"),
-            "gender": _("Gender"),
-        }
-        widgets = {"gender": forms.RadioSelect}
+        # Gender is not asked again: it is in the person's own record in the tree.
+        fields = ("first_name", "last_name", "email")
+        labels = {"first_name": _("First name"), "last_name": _("Last name"), "email": _("Email")}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["gender"].choices = Gender.choices
         self.fields["email"].required = True
 
     def clean_first_name(self):
@@ -131,8 +126,10 @@ class PreferencesForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["preferred_language", "time_zone"]
-        labels = {"preferred_language": _("Language"), "time_zone": _("Time zone")}
+        fields = ["preferred_language", "time_zone", "discoverable"]
+        labels = {"preferred_language": _("Language"), "time_zone": _("Time zone"),
+                  "discoverable": _("Others on Shajara can find me by name")}
+        help_texts = {"discoverable": _("Off: only someone who knows your exact username or e-mail finds you.")}
         widgets = {"preferred_language": forms.RadioSelect}
 
     def __init__(self, *args, **kwargs):
@@ -199,6 +196,14 @@ class CompleteProfileForm(forms.Form):
     first_name = forms.CharField(label=_("First name"), max_length=100)
     last_name = forms.CharField(label=_("Last name"), max_length=100, required=False)
     gender = forms.ChoiceField(label=_("Gender"), choices=Gender.choices, widget=forms.RadioSelect)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Chosen in advance from the name Google gave (the person can change it).
+        initial = kwargs.get("initial") or {}
+        guess = guess_gender(initial.get("first_name", ""), initial.get("last_name", ""))
+        if guess and not self.is_bound:
+            self.fields["gender"].initial = guess
 
     def clean_first_name(self):
         return normalize_apostrophes(self.cleaned_data["first_name"].strip())

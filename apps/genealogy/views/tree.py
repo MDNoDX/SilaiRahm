@@ -9,9 +9,9 @@ from django.views.decorators.http import require_POST
 
 from apps.core.text import surname_from_name
 
-from .. import pdf
-from ..access import archive_owner, can_edit, person_for_edit, person_for_view, viewer_person
+from ..access import archive_owner, can_edit, can_view, person_for_edit, person_for_view, viewer_person
 from ..kinship import Archive
+from ..models import Story
 from ..terminology import ADD_RELATION, BRANCHES
 from ..tree import build_tree
 from ._common import _focus_for, _pdf_response, _tree_state
@@ -94,11 +94,16 @@ def person_card(request, pk):
         "died": person.death_date_display, "occupation": person.occupation,
         "label": archive.label(me, person.pk) if me and me != person.pk else "",
         "is_me": person.pk == request.user.person_id,
-        "photo": person.photo.url if person.photo else "", "url": person.get_absolute_url(),
+        "photo": f"{person.photo.url}?s=t" if person.photo else "", "url": person.get_absolute_url(),
         "edit_url": reverse("genealogy:person_edit", args=[person.pk]) if editable else "",
         "more_url": reverse("genealogy:relative_add", args=[person.pk]) if editable else "",
         "add_url": reverse("genealogy:quick_add", args=[person.pk]) if editable else "",
         "can_add": can_add, "last_name": person.last_name,
+        # A relative with an account of their own: their family tree is one click away.
+        "account": ({"name": f"@{person.linked_user.username}",
+                     "url": reverse("genealogy:tree_for", args=[person.linked_user.username])
+                     if can_view(request.user, person.linked_user) else ""}
+                    if person.linked_user_id else None),
         "child_surname": _child_surname(archive, person),
         "counts": {"children": len(archive.children.get(person.pk, [])),
                    "siblings": len(archive.siblings(person.pk)), "spouses": len(archive.spouses(person.pk))},
@@ -143,6 +148,8 @@ def quick_add(request, pk):
 
 @login_required
 def tree_pdf(request, username):
+    from .. import pdf  # reportlab loads only when a PDF is asked for
+
     owner = archive_owner(request, username)
     archive = Archive(owner)
     focus = _focus_for(request, archive, request.GET.get("person"))
@@ -172,12 +179,33 @@ def _family_name(archive, focus):
 
 @login_required
 def family_book(request, username=None):
+    from .. import pdf
+
     owner = archive_owner(request, username)
     archive = Archive(owner)
-    focus = _focus_for(request, archive)
+    focus = _focus_for(request, archive, request.GET.get("person"))
     if focus is None:
         raise Http404(_("The family tree is empty."))
+    part = request.GET.get("qism", "")
+    if part == "odam":  # the book of one life
+        from .people import person_pdf
+
+        return person_pdf(request, focus)
+    side = {"ota": "paternal", "ona": "maternal"}.get(part)
+    stories = sorted(Story.objects.filter(owner=owner), key=lambda s: (s.year or 9999, s.created_at))
     data = pdf.family_book_pdf(archive, focus, owner.display_name,
                                viewer_is_owner=viewer_person(request, archive) == focus,
-                               family=_family_name(archive, focus))
-    return _pdf_response(data, pgettext("file name", "family-book") + ".pdf")
+                               family=_family_name(archive, focus), side=side, stories=stories)
+    name = pgettext("file name", "family-book") + {"ota": "-1", "ona": "-2"}.get(part, "")
+    return _pdf_response(data, name + ".pdf")
+
+
+@login_required
+def book_page(request):
+    """Choose what the book is about: the whole family, one side of it, or one person."""
+    archive = Archive(request.archive)
+    focus = _focus_for(request, archive, request.GET.get("person"))
+    return render(request, "genealogy/book.html", {
+        "focus": archive.people.get(focus), "owner": request.archive,
+        "branches": BRANCHES, "stories": Story.objects.filter(owner=request.archive).count(),
+    })

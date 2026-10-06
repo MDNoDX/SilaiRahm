@@ -12,19 +12,11 @@ from apps.genealogy.models import Person
 from ..forms import ImportArchiveForm, PreferencesForm, ProfileForm
 
 
-@login_required
-def profile(request):
-    """The old "My profile" page: everything it showed now lives in Settings."""
-    return redirect("accounts:settings")
-
-
 def _save_person_name(user):
     """Keep the user's own record in the tree in step with the account."""
     if user.person:
         user.person.first_name = user.first_name
         user.person.last_name = user.last_name
-        if user.gender:
-            user.person.gender = user.gender
         user.person.save()
 
 

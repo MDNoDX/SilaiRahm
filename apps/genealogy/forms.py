@@ -10,6 +10,7 @@ from apps.core.dates import is_valid_partial_date, month_choices, partial_date_k
 from apps.core.text import normalize_apostrophes
 
 from .models import Event, Marriage, Person, Story
+from .relations import attach
 from .terminology import ADD_RELATION
 
 SHORT_TEXT_FIELDS = ("first_name", "last_name", "patronymic", "birth_place", "death_place", "burial_place",
@@ -277,34 +278,9 @@ class RelativeForm(PersonForm):
         super()._post_clean()
 
     def save(self, commit=True):
-        relation = self.cleaned_data["relation"]
-        anchor = self.anchor
         person = self.cleaned_data.get("existing") or super().save(commit=True)
-        if relation == "father":
-            anchor.father = person
-            anchor.save()
-        elif relation == "mother":
-            anchor.mother = person
-            anchor.save()
-        elif relation == "child":
-            if anchor.is_male:
-                person.father = anchor
-                spouse_field = "mother"
-            else:
-                person.mother = anchor
-                spouse_field = "father"
-            other = self.cleaned_data.get("other_parent")
-            if other and getattr(person, f"{spouse_field}_id") is None:
-                setattr(person, spouse_field, other)
-            person.save()
-        elif relation == "sibling":
-            person.father = person.father or anchor.father
-            person.mother = person.mother or anchor.mother
-            person.save()
-        elif relation == "spouse":
-            husband, wife = (anchor, person) if anchor.is_male else (person, anchor)
-            Marriage.objects.get_or_create(owner=self.owner, husband=husband, wife=wife)
-        return person
+        return attach(self.anchor, person, self.cleaned_data["relation"], self.owner,
+                      other_parent=self.cleaned_data.get("other_parent"))
 
 
 class RelativeWithSpouseForm(RelativeForm):

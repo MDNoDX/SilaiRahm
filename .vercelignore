@@ -5,9 +5,7 @@ __pycache__
 *.pyc
 db.sqlite3
 media
-staticfiles
-files
-macos
+staticmacos
 deploy
 Dockerfile
 docker-compose.yml

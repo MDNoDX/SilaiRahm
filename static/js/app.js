@@ -131,6 +131,18 @@
     }, 0);
   });
 
+  // Parts of a form shown for one choice of a radio group: data-show-when="name=value".
+  $all("[data-show-when]").forEach(function (el) {
+    var rule = el.getAttribute("data-show-when").split("="), form = el.closest("form");
+    if (!form) return;
+    var sync = function () {
+      var checked = form.querySelector('input[name="' + rule[0] + '"]:checked');
+      el.hidden = !checked || checked.value !== rule[1];
+    };
+    form.addEventListener("change", sync);
+    sync();
+  });
+
   // File fields: the browser's own button speaks the browser's language, so
   // it is replaced by ours (the album's drop zone has its own).
   $all("input[type=file]").forEach(function (input) {

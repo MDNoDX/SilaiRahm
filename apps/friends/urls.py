@@ -9,5 +9,4 @@ urlpatterns = [
     path("yangi/", views.contact_create, name="create"),
     path("<int:pk>/tahrirlash/", views.contact_edit, name="edit"),
     path("<int:pk>/ochirish/", views.contact_delete, name="delete"),
-    path("ulashish/", views.sharing, name="sharing"),
 ]

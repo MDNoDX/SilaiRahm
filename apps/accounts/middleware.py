@@ -4,7 +4,7 @@ from django.urls import reverse
 from .sharing import role_in
 
 # Paths a user without a profile may still open.
-ALLOWED_PREFIXES = ("/profilni-toldirish/", "/chiqish/", "/til/", "/jsi18n/", "/static/", "/media/",
+ALLOWED_PREFIXES = ("/profilni-toldirish/", "/chiqish/", "/til/", "/static/", "/media/",
                     "/accounts/", "/admin/", "/salomatlik/", "/cron/", "/telegram/", "/ilova/", "/taklif/",
                     "/sw.js", "/sozlamalar/oila/")
 

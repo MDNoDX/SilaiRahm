@@ -28,3 +28,9 @@ def picked_name(bound_field):
     queryset = getattr(bound_field.field, "queryset", None)
     person = queryset.filter(pk=value).first() if queryset is not None and str(value).isdigit() else None
     return person.short_name if person else ""
+
+
+@register.filter
+def thumb(file):
+    """URL of the small copy of a photo (avatars, cards, album grid)."""
+    return f"{file.url}?s=t" if file else ""

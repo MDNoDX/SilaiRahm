@@ -17,7 +17,7 @@ from apps.genealogy.models import Event, Marriage, Person
 
 ICONS = {
     "birthday": "🎂", "friend_birthday": "🎈", "memorial": "🕯️", "anniversary": "💍",
-    "event": "📅", "muchal": "🌱",
+    "event": "📅", "muchal": "🌱", "connection_request": "🤝", "connection_accepted": "🤝",
 }
 
 
@@ -52,12 +52,14 @@ def _yearly(month, day, start, end):
             yield d
 
 
-def occasions(user, start, end, prefs=None):
+def occasions(user, start, end, prefs=None, archive=None):
     """All occasions in the archive owned by `user` from `start` to `end`
-    (inclusive), sorted by date."""
+    (inclusive), sorted by date. A page that has already loaded the archive
+    (`kinship.Archive`) passes it in, so the people are not read twice."""
     want = (lambda name: getattr(prefs, name, True)) if prefs else (lambda name: True)
     out = []
-    people = list(Person.objects.filter(owner=user))
+    people = list(archive.people.values()) if archive is not None else list(Person.objects.filter(owner=user))
+    by_pk = {p.pk: p for p in people}
 
     for p in people:
         if want("birthdays") and not p.is_deceased and p.birth_month and p.birth_day:
@@ -74,7 +76,13 @@ def occasions(user, start, end, prefs=None):
                                     {"name": p.short_name, "years": years}, p.get_absolute_url(), p.pk))
 
     if want("anniversaries"):
-        for m in Marriage.objects.filter(owner=user, is_divorced=False).select_related("husband", "wife"):
+        if archive is not None:
+            marriages = [m for m in archive.marriages if not m.is_divorced]
+            for m in marriages:  # the people are already here: no second query
+                m.husband, m.wife = by_pk.get(m.husband_id) or m.husband, by_pk.get(m.wife_id) or m.wife
+        else:
+            marriages = Marriage.objects.filter(owner=user, is_divorced=False).select_related("husband", "wife")
+        for m in marriages:
             if not (m.month and m.day) or m.husband.is_deceased or m.wife.is_deceased:
                 continue
             for d in _yearly(m.month, m.day, start, end):

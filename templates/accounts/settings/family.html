@@ -74,6 +74,8 @@
   <div class="member">
     <span class="setting-icon{% if archive.pk == m.owner.pk %} ok{% endif %}">{% include "partials/icon.html" with name="people" %}</span>
     <span class="spacer"><b>{{ m.owner.display_name }}</b> <span class="muted small"> · {{ m.get_role_display }}</span></span>
+    <a class="btn btn-sm" href="{% url 'network:merge' %}?from={{ m.owner.username }}&amp;to={{ user.username }}" title="{% translate 'Take over into my own family tree what this tree knows' %}">{% include "partials/icon.html" with name="merge" %}{% translate "Compare with mine" %}</a>
+    {% if m.role == "editor" %}<a class="btn btn-sm" href="{% url 'network:merge' %}?from={{ user.username }}&amp;to={{ m.owner.username }}">{% translate "Add my tree to it" %}</a>{% endif %}
     {% if archive.pk != m.owner.pk %}
     <form method="post" action="{% url 'accounts:archive_switch' m.owner.pk %}">{% csrf_token %}
       <button class="btn btn-sm" type="submit">{% translate "Open" %}</button></form>

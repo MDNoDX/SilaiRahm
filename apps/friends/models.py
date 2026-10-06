@@ -35,6 +35,9 @@ class Contact(models.Model):
     birth_day = models.PositiveSmallIntegerField(_("day of birth"), null=True, blank=True)
     note = models.TextField(_("notes"), blank=True)
     search_key = models.TextField(editable=False, blank=True, default="")
+    # The friend has an account on the site (added through Connections).
+    linked_user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+                                    related_name="+")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

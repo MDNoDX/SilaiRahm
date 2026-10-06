@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.genealogy",
     "apps.friends",
+    "apps.network",
     "apps.notify",
     "allauth",
     "allauth.account",

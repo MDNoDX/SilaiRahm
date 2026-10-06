@@ -70,8 +70,19 @@ def archive_owner(request, username=None):
 
 def viewer_person(request, archive):
     """The person relationship names are counted from: the viewer's own
-    record when it is in this archive, otherwise the archive owner's."""
-    if request.user.person_id in archive.people:
-        return request.user.person_id
+    record when it is in this archive (also the record a relative who joined
+    or connected is known by there), otherwise the archive owner's."""
+    user = request.user
+    if user.person_id in archive.people:
+        return user.person_id
+    if getattr(user, "is_authenticated", False) and archive.owner.pk != user.pk:
+        from apps.accounts.models import Membership
+
+        cache = user.__dict__.setdefault("_member_person", {})
+        if archive.owner.pk not in cache:
+            cache[archive.owner.pk] = (Membership.objects.filter(owner=archive.owner, member=user)
+                                       .values_list("person_id", flat=True).first())
+        if cache[archive.owner.pk] in archive.people:
+            return cache[archive.owner.pk]
     home = archive.owner.home_person_id
     return home if home in archive.people else None

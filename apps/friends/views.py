@@ -18,10 +18,6 @@ from .models import Contact
 
 
 @login_required
-def sharing(request):
-    """Old address of "share the family tree": now Settings → Family members."""
-    return redirect("accounts:family")
-
 
 # ---------------------------------------------------------------------------
 # Friends of people in the tree (no account needed)
@@ -29,7 +25,7 @@ def sharing(request):
 @login_required
 def friends_list(request):
     owner = request.archive
-    contacts = Contact.objects.filter(owner=owner).select_related("person")
+    contacts = Contact.objects.filter(owner=owner).select_related("person", "linked_user")
     whose = request.GET.get("kimning", "")
     query = request.GET.get("q", "").strip()
     if whose.isdigit():

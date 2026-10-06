@@ -13,6 +13,11 @@ from django.urls import reverse
 from django.utils.deconstruct import deconstructible
 
 
+def thumb_name(name):
+    """Where the small copy of a photo is kept (made on first request)."""
+    return f"thumbs/{name}"
+
+
 @deconstructible
 class DatabaseStorage(Storage):
     def _model(self):
@@ -38,7 +43,7 @@ class DatabaseStorage(Storage):
         return self._model().objects.filter(name=name).exists()
 
     def delete(self, name):
-        self._model().objects.filter(name=name).delete()
+        self._model().objects.filter(name__in=[name, thumb_name(name)]).delete()
 
     def size(self, name):
         obj = self._model().objects.filter(name=name).only("size").first()

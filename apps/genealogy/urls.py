@@ -30,6 +30,7 @@ urlpatterns = [
     # Family tree (views/tree.py)
     path("shajara/", views.tree_page, name="tree"),
     path("shajara/kitob.pdf", views.family_book, name="family_book"),
+    path("shajara/kitob/", views.book_page, name="book"),
     path("shajara/<str:username>/", views.tree_page, name="tree_for"),
     path("shajara/<str:username>/malumot.json", views.tree_data, name="tree_data_for"),
     path("shajara/<str:username>/yelpigich.json", views.fan_data, name="fan_data_for"),

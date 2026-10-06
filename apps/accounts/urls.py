@@ -18,14 +18,12 @@ urlpatterns = [
     path("parol/tiklash/tayyor/", views.password_reset_complete, name="password_reset_complete"),
 
     # Settings → General and Your data (views/profile.py)
-    path("profil/", views.profile, name="profile"),
     path("sozlamalar/", views.settings_view, name="settings"),
     path("sozlamalar/malumotlar/", views.data_view, name="data"),
     path("sozlamalar/hisobni-ochirish/", views.delete_account, name="delete_account"),
 
     # Settings → Security (views/security.py)
     path("sozlamalar/xavfsizlik/", views.security_view, name="security"),
-    path("sozlamalar/parol/", views.password_change, name="password_change"),
     path("sozlamalar/xavfsizlik/ikki-bosqich/", views.two_factor_setup, name="two_factor_setup"),
     path("sozlamalar/xavfsizlik/ikki-bosqich/ochirish/", views.two_factor_off, name="two_factor_off"),
     path("sozlamalar/xavfsizlik/ikki-bosqich/kodlar/", views.two_factor_codes, name="two_factor_codes"),

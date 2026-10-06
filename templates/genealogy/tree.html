@@ -42,7 +42,7 @@
           <a id="tree-poster-a1" href="{{ pdf_url }}?person={{ focus.pk }}&amp;size=A1">{% include "partials/icon.html" with name="image" %}{% translate "Wall poster, 59 cm high (PDF)" %}</a>
           <button type="button" id="tree-png">{% include "partials/icon.html" with name="image" %}{% translate "Image (PNG)" %}</button>
           <hr>
-          <a href="{% if is_active_archive %}{% url 'genealogy:family_book' %}{% else %}{% url 'genealogy:family_book_for' owner.username %}{% endif %}">{% include "partials/icon.html" with name="book" %}{% translate "Family book (PDF)" %}</a>
+          <a href="{% if is_active_archive %}{% url 'genealogy:book' %}?person={{ focus.pk }}{% else %}{% url 'genealogy:family_book_for' owner.username %}{% endif %}">{% include "partials/icon.html" with name="book" %}{% translate "Family book (PDF)" %}</a>
         </div>
       </details>
     </div>
@@ -88,6 +88,7 @@
     <span data-row="place">{% include "partials/icon.html" with name="map" %}<span data-f="place"></span></span>
     <span data-row="died">{% include "partials/icon.html" with name="candle" %}<span data-f="died"></span></span>
     <span data-row="work">{% include "partials/icon.html" with name="star" %}<span data-f="work"></span></span>
+    <span data-row="account">{% include "partials/icon.html" with name="connect" %}<a data-f="account"></a></span>
   </div>
   <div class="row">
     <button class="btn btn-primary btn-sm" type="button" data-act="centre">{% include "partials/icon.html" with name="target" %}{% translate "Put in the centre" %}</button>

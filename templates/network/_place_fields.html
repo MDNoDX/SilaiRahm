@@ -1,0 +1,14 @@
+{% load i18n %}
+{# Where the other account stands in my family tree: a record that is already there, a new one, or none. #}
+<div class="field">
+  <label>{{ form.place.label }}</label>
+  <div class="choices" role="radiogroup">{% for radio in form.place %}<div><label for="{{ radio.id_for_label }}">{{ radio.tag }} {{ radio.choice_label }}</label></div>{% endfor %}</div>
+</div>
+<div data-show-when="place=existing">
+  {% translate "Type a name…" as hint %}
+  {% include "partials/person_picker.html" with field=form.person placeholder=hint owner=tree.username %}
+</div>
+<div class="grid grid-2" data-show-when="place=new">
+  {% include "partials/field.html" with field=form.relation %}
+  {% include "partials/person_picker.html" with field=form.anchor owner=tree.username %}
+</div>

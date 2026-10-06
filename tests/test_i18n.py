@@ -163,11 +163,18 @@ class PagePurityTests(TestCase):
             self.assert_pure(response.content.decode(), cyrillic)
 
     def test_javascript_catalogue(self):
+        """Pages load the static catalogue of their language, and the files match the .po files."""
+        from apps.core.management.commands.build_js_catalogs import OUT, catalogue
+
         for lang, expected in (("uz", "Rostdan ham oʻchirmoqchimisiz?"), ("uz-cyrl", "Ростдан ҳам ўчирмоқчимисиз?"),
                                ("ru", "Вы действительно хотите удалить?")):
             self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = lang
-            js = self.client.get(reverse("javascript-catalog")).content.decode()
+            self.assertIn(f"js/i18n/{lang}.js", self.client.get(reverse("accounts:login")).content.decode())
+            js = (OUT / f"{lang}.js").read_text(encoding="utf-8")
             self.assertTrue(expected in js or json.dumps(expected)[1:-1] in js, lang)
+        for lang, _name in settings.LANGUAGES:
+            self.assertEqual((OUT / f"{lang}.js").read_bytes(), catalogue(lang),
+                             f"static/js/i18n/{lang}.js is out of date: run manage.py build_js_catalogs")
 
     def test_tree_json_labels_follow_language(self):
         user, p = make_family()

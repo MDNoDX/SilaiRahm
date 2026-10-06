@@ -118,10 +118,24 @@ def invite_view(request, token):
         if membership is None:
             return render(request, "accounts/invite/invite.html", {"invite": None}, status=410)
         messages.success(request, _("You have joined the family tree."))
-        return redirect("home" if request.user.person_id else "accounts:who_am_i")
+        if not request.user.person_id:
+            return redirect("accounts:who_am_i")
+        return redirect(_merge_or_home(request.user, invite.owner))
     return render(request, "accounts/invite/invite.html", {
         "invite": invite, "own_people": Person.objects.filter(owner=request.user).count(),
     })
+
+
+def _merge_or_home(user, owner):
+    """After joining: a relative who already has a family tree of their own is
+    offered to merge it into the shared one (only what is ticked is taken)."""
+    from django.urls import reverse
+
+    from apps.accounts.sharing import can_edit
+
+    if can_edit(user, owner) and Person.objects.filter(owner=user).count() > 1:
+        return f"{reverse('network:merge')}?from={user.username}&to={owner.username}"
+    return reverse("home")
 
 
 @login_required
@@ -131,10 +145,15 @@ def who_am_i(request):
 
     owner = request.archive
     if request.method == "POST":
+        from ..sharing import remember_same_person
+
         person = Person.objects.filter(owner=owner, pk=request.POST.get("person") or 0).first()
         if person is not None and not hasattr(person, "account"):
             request.user.person = person
             request.user.save(update_fields=["person"])
             Membership.objects.filter(owner=owner, member=request.user).update(person=person)
+            if request.user.own_person_id:
+                remember_same_person(request.user.own_person_id, person.pk, request.user)
+            return redirect(_merge_or_home(request.user, owner))
         return redirect("home")
     return render(request, "accounts/invite/who_am_i.html", {"owner": owner})

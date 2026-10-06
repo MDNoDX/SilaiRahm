@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Compare and merge" %}{% endblock %}
+{% block content %}
+<div class="pagehead"><div>
+  <h1>{% translate "Compare and merge" %}</h1>
+  <p>{% blocktranslate with source=source.display_name target=target.display_name %}What {{ source }}’s family tree knows, taken over into the family tree of {{ target }}. Nothing that differs is overwritten, and every change can be undone in History.{% endblocktranslate %}</p>
+</div></div>
+
+<section class="card">{% include "network/_plan_summary.html" %}</section>
+
+{% if not plan.anchors and not plan.matches %}
+<form class="card" method="post" novalidate>{% csrf_token %}
+  <input type="hidden" name="from" value="{{ source.username }}"><input type="hidden" name="to" value="{{ target.username }}">
+  <h2>{% translate "Who is in both family trees?" %}</h2>
+  <div class="grid grid-2">
+    <div class="field">
+      <label for="anchor-source-name">{% blocktranslate with name=source.display_name %}In {{ name }}’s family tree{% endblocktranslate %}</label>
+      <div class="picker picker-field">{% include "partials/icon.html" with name="search" %}
+        <input id="anchor-source-name" type="search" autocomplete="off" value="{{ me_source.short_name|default:'' }}" placeholder="{% translate 'Type a name…' %}"
+               role="combobox" aria-expanded="false" aria-controls="anchor-source-results" data-mode="pick" data-pick-target="anchor-source"
+               data-live-search="{% url 'genealogy:search_json' %}?owner={{ source.username|urlencode }}">
+        <div class="live-results" id="anchor-source-results" role="listbox" hidden></div></div>
+      <input type="hidden" name="source_person" id="anchor-source" value="{{ me_source.pk|default:'' }}">
+    </div>
+    <div class="field">
+      <label for="anchor-target-name">{% translate "In your family tree" %}</label>
+      <div class="picker picker-field">{% include "partials/icon.html" with name="search" %}
+        <input id="anchor-target-name" type="search" autocomplete="off" value="{{ me_target.short_name|default:'' }}" placeholder="{% translate 'Type a name…' %}"
+               role="combobox" aria-expanded="false" aria-controls="anchor-target-results" data-mode="pick" data-pick-target="anchor-target"
+               data-live-search="{% url 'genealogy:search_json' %}?owner={{ target.username|urlencode }}">
+        <div class="live-results" id="anchor-target-results" role="listbox" hidden></div></div>
+      <input type="hidden" name="target_person" id="anchor-target" value="{{ me_target.pk|default:'' }}">
+    </div>
+  </div>
+  <div class="form-actions"><button class="btn btn-primary" type="submit" name="anchor" value="1">{% translate "This is the same person" %}</button></div>
+</form>
+{% endif %}
+
+{% if plan.conflicts %}
+<section class="card">
+  <h2>{% include "partials/icon.html" with name="sparkle" %}{% translate "Differences" %}</h2>
+  <ul class="plan-warnings">{% for text in plan.conflicts %}<li>{{ text }}</li>{% endfor %}</ul>
+</section>
+{% endif %}
+
+{% if not plan.empty %}
+<form method="post" novalidate data-no-busy>{% csrf_token %}
+  <input type="hidden" name="from" value="{{ source.username }}"><input type="hidden" name="to" value="{{ target.username }}">
+  {% if plan.matches %}
+  <section class="card">
+    <h2>{% translate "The same person in both trees" %}</h2>
+    {% for m in plan.matches %}
+    <label class="plan-item">
+      <input type="checkbox" name="item" value="{{ m.key }}" checked>
+      {% include "partials/avatar.html" with person=m.target size="sm" branch="own" %}
+      <span class="spacer"><b>{{ m.target.short_name }}</b>{% if m.target.lifespan %} <span class="muted small">{{ m.target.lifespan }}</span>{% endif %}
+        <span class="muted small"> = {{ m.source.short_name }}{% if m.source.lifespan %} ({{ m.source.lifespan }}){% endif %} · {{ m.why }}</span></span>
+    </label>
+    {% endfor %}
+  </section>
+  {% endif %}
+  {% if plan.additions %}
+  <section class="card">
+    <h2>{% translate "Relatives you do not have yet" %} <span class="muted">{{ plan.additions|length }}</span></h2>
+    {% for a in plan.additions %}
+    <label class="plan-item">
+      <input type="checkbox" name="item" value="{{ a.key }}" checked>
+      {% include "partials/avatar.html" with person=a.source size="sm" branch="other" %}
+      <span class="spacer"><b>{{ a.source.short_name }}</b>{% if a.source.lifespan %} <span class="muted small">{{ a.source.lifespan }}</span>{% endif %}
+        <span class="muted small"> · {{ a.relation_label }} — {{ a.anchor_name }}</span></span>
+    </label>
+    {% endfor %}
+  </section>
+  {% endif %}
+  {% if plan.fills %}
+  <section class="card">
+    <h2>{% translate "Details to fill in" %}</h2>
+    {% for f in plan.fills %}
+    <label class="plan-item">
+      <input type="checkbox" name="item" value="{{ f.key }}" checked>
+      <span class="spacer"><b>{{ f.target.short_name }}</b> <span class="muted small">· {{ f.label|capfirst }}{% if f.field != "photo" %}: {{ f.value|truncatechars:80 }}{% endif %}</span></span>
+    </label>
+    {% endfor %}
+  </section>
+  {% endif %}
+  {% if plan.unreached %}
+  <p class="muted small">{% blocktranslate count counter=plan.unreached %}{{ counter }} person of the other family tree is not related to anyone in both trees and stays out.{% plural %}{{ counter }} people of the other family tree are not related to anyone in both trees and stay out.{% endblocktranslate %}</p>
+  {% endif %}
+  <div class="form-actions sticky-actions">
+    <button class="btn btn-primary" type="submit">{% include "partials/icon.html" with name="merge" %}{% translate "Merge what is ticked" %}</button>
+    <a class="btn btn-ghost" href="{% url 'network:index' %}">{% translate "Cancel" %}</a>
+  </div>
+</form>
+{% endif %}
+{% endblock %}

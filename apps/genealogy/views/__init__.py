@@ -19,7 +19,7 @@ from .people import (
 )
 from .album import media_delete, media_portrait, media_upload
 from .changes import duplicates_page, history_page, history_undo, merge_people
-from .tree import family_book, fan_data, person_card, quick_add, tree_data, tree_page, tree_pdf
+from .tree import book_page, family_book, fan_data, person_card, quick_add, tree_data, tree_page, tree_pdf
 from .timeline import timeline
 from .stories import story_create, story_delete, story_detail, story_edit, story_list
 from .search import search, search_json

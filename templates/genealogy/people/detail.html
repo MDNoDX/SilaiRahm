@@ -3,7 +3,9 @@
 {% block title %}{{ person.full_name }}{% endblock %}
 {% block content %}
 <div class="card profile">
-  {% include "partials/avatar.html" with person=person size="lg" branch=branch %}
+  {% if person.photo %}
+  <button class="avatar-zoom" type="button" data-lightbox="{{ person.photo.url }}" data-caption="{{ person.full_name }}" aria-label="{% translate 'Open the photo' %}">{% include "partials/avatar.html" with person=person size="lg" branch=branch %}</button>
+  {% else %}{% include "partials/avatar.html" with person=person size="lg" branch=branch %}{% endif %}
   <div>
     <h1>{{ person.full_name }}</h1>
     <p class="sub" style="margin:0">
@@ -19,7 +21,7 @@
   </div>
   <div class="actions no-print">
     <a class="btn" href="{% url 'genealogy:tree_for' person.owner.username %}?person={{ person.pk }}">{% include "partials/icon.html" with name="tree" %}{% translate "Show in the family tree" %}</a>
-    <a class="btn" href="{% url 'genealogy:person_pdf' person.pk %}">{% include "partials/icon.html" with name="download" %}{% translate "Download as PDF" %}</a>
+    <a class="btn" href="{% url 'genealogy:person_pdf' person.pk %}">{% include "partials/icon.html" with name="book" %}{% translate "Life book (PDF)" %}</a>
     {% if is_owner %}<a class="btn btn-primary" href="{% url 'genealogy:person_edit' person.pk %}">{% include "partials/icon.html" with name="pencil" %}{% translate "Edit" %}</a>{% endif %}
     {% if can_be_me %}
     <form method="post" action="{% url 'genealogy:set_self' person.pk %}">{% csrf_token %}
@@ -28,14 +30,6 @@
     {% endif %}
   </div>
 </div>
-
-{% if prompts %}
-<div class="prompt-list no-print" style="margin-top:16px">
-  {% for kind, text in prompts %}
-    <a class="prompt" href="{% url 'genealogy:person_edit' person.pk %}">{% include "partials/icon.html" with name="sparkle" %}<span>{{ text }}</span><span class="go">{% include "partials/icon.html" with name="chevron" %}</span></a>
-  {% endfor %}
-</div>
-{% endif %}
 
 <div class="cols" style="margin-top:16px">
   <div>
@@ -91,7 +85,7 @@
       <div class="album">
         {% for m in photos %}
         <button type="button" class="shot" data-lightbox="{{ m.file.url }}" data-caption="{{ m.caption }}{% if m.year %}{% if m.caption %} · {% endif %}{{ m.year }}{% endif %}" data-tools="tools-{{ m.pk }}">
-          <img src="{{ m.file.url }}" alt="{{ m.caption }}" loading="lazy">
+          <img src="{{ m.file|thumb }}" alt="{{ m.caption }}" loading="lazy" decoding="async">
           {% if m.caption or m.year %}<small>{{ m.caption }}{% if m.year %} {{ m.year }}{% endif %}</small>{% endif %}
         </button>
         {% if is_owner %}
@@ -210,6 +204,43 @@
       {% if is_owner and father or is_owner and mother %}<a class="btn btn-sm" href="{% url 'genealogy:relative_add' person.pk %}?relation=sibling" style="margin-top:8px">{% include "partials/icon.html" with name="plus" %}{% translate "Add brother or sister" %}</a>
       {% elif not siblings %}<p class="muted small">{% translate "Not specified" %}</p>{% endif %}
     </section>
+
+    {% if account or matches or my_tree or find_url %}
+    <section class="card no-print">
+      <h2>{% include "partials/icon.html" with name="connect" %}{% translate "Across family trees" %}</h2>
+      {% if account %}
+      <div class="member">
+        {% include "partials/user_avatar.html" with account=account size="sm" %}
+        <span class="spacer"><b>{{ account.display_name }}</b> <span class="muted small">@{{ account.username }} · {% translate "on Shajara" %}</span></span>
+        {% if account_tree %}<a class="btn btn-sm" href="{% url 'genealogy:tree_for' account.username %}">{% translate "Their family tree" %}</a>{% endif %}
+      </div>
+      {% endif %}
+      {% for m in matches %}
+      <div class="member">
+        <span class="spacer"><a href="{{ m.person.get_absolute_url }}"><b>{{ m.person.short_name }}</b></a>
+          <span class="muted small">· {% blocktranslate with owner=m.owner.display_name %}in {{ owner }}’s family tree{% endblocktranslate %}</span></span>
+        {% if m.merge_url %}<a class="btn btn-sm" href="{{ m.merge_url }}">{% translate "Compare" %}</a>{% endif %}
+      </div>
+      {% endfor %}
+      {% if my_tree %}
+      <form method="post" action="{% url 'network:match' %}" novalidate>{% csrf_token %}
+        <input type="hidden" name="a" value="{{ person.pk }}"><input type="hidden" name="next" value="{{ request.path }}">
+        <div class="field">
+          <label for="same-name">{% translate "The same person in your family tree" %}</label>
+          <div class="picker picker-field">{% include "partials/icon.html" with name="search" %}
+            <input id="same-name" type="search" autocomplete="off" placeholder="{% translate 'Type a name…' %}" role="combobox" aria-expanded="false"
+                   aria-controls="same-results" data-mode="pick" data-pick-target="same-id"
+                   data-live-search="{% url 'genealogy:search_json' %}?owner={{ my_tree.username|urlencode }}">
+            <div class="live-results" id="same-results" role="listbox" hidden></div></div>
+          <input type="hidden" name="b" id="same-id">
+        </div>
+        <button class="btn btn-sm" type="submit">{% translate "This is the same person" %}</button>
+      </form>
+      {% endif %}
+      {% if find_url %}<p class="small muted" style="margin:10px 0 6px">{% translate "Has an account on Shajara? Connect, and your family trees are joined." %}</p>
+      <a class="btn btn-sm" href="{{ find_url }}">{% include "partials/icon.html" with name="search" %}{% translate "Find on Shajara" %}</a>{% endif %}
+    </section>
+    {% endif %}
 
     {% if is_owner %}
     <section class="card no-print">

@@ -43,6 +43,8 @@ class User(AbstractUser):
     totp_enabled = models.BooleanField(default=False)
     recovery_codes = models.JSONField(default=list, blank=True, editable=False)
     search_key = models.TextField(editable=False, blank=True, default="")
+    # Others on the site may find this account by name (Connections → search).
+    discoverable = models.BooleanField(_("others on Shajara can find me by name"), default=True)
 
     class Meta:
         verbose_name = _("user")

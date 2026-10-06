@@ -308,7 +308,7 @@ input[type=radio], input[type=checkbox] { width: 18px; height: 18px; margin: 0; 
 .has-error input, .has-error select, .has-error textarea { border-color: var(--danger); }
 .field div[id] > div, .choices > div { display: inline-flex; margin: 0 8px 8px 0; }
 .field div[id] label, .choices label { display: inline-flex; align-items: center; gap: 9px; padding: 9px 14px; border: 1px solid var(--line-strong); border-radius: var(--r-md); font-weight: 600; cursor: pointer; transition: all var(--t-fast); }
-.field div[id] label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.field div[id] label:has(input:checked), .choices label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
 .checkbox { display: flex; gap: 10px; align-items: center; font-weight: 600; cursor: pointer; }
 .checkbox input[type=checkbox] { appearance: none; -webkit-appearance: none; display: inline-grid; place-content: center; flex: none; width: 20px; height: 20px; border: 1.5px solid var(--line-strong); border-radius: 6px; background: var(--surface); cursor: pointer; transition: background var(--t-fast), border-color var(--t-fast); }
 .checkbox input[type=checkbox]::after { content: ""; width: 10px; height: 5px; margin-top: -2px; border: solid var(--accent-ink); border-width: 0 0 2px 2px; transform: rotate(-45deg) scale(0); transition: transform var(--t-fast); }
@@ -417,6 +417,7 @@ select[multiple] option { padding: 7px 9px; border-radius: var(--r-sm); }
 .profile::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 104px; background: var(--grad); }
 .profile::after { content: ""; position: absolute; inset: 0 0 auto 0; height: 104px; background: var(--ikat); opacity: .09; }
 .profile > * { position: relative; z-index: 1; }
+.avatar-zoom { display: block; padding: 0; border: 0; background: none; cursor: zoom-in; border-radius: 50%; }
 .profile .avatar.lg { margin-top: -72px; }
 .profile h1 { margin: 0 0 4px; }
 .profile .sub { color: var(--muted); }
@@ -439,11 +440,6 @@ select[multiple] option { padding: 7px 9px; border-radius: var(--r-sm); }
 .famtree .mini.self { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 .famtree .mini.add { border-style: dashed; color: var(--muted); padding-left: 13px; }
 .famtree .mini small { display: block; color: var(--muted); font-weight: 500; }
-.prompt-list { display: grid; gap: 8px; }
-.prompt { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: var(--r-md); background: var(--gold-soft); color: var(--ink); font-weight: 500; transition: transform var(--t) var(--ease); }
-.prompt:hover { color: var(--ink); transform: translateX(2px); }
-.prompt .ico { color: var(--gold); }
-.prompt .go { margin-left: auto; color: var(--gold); }
 .album { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
 .album .shot { position: relative; aspect-ratio: 1; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface-2); cursor: zoom-in; }
 .album .shot img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s var(--ease); }
@@ -736,6 +732,28 @@ svg.z-far .t-line { stroke-width: 3; }
 .member { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
 .member:last-child { border-bottom: 0; }
 .member select { width: auto; min-height: 36px; padding: 5px 30px 5px 10px; font-size: .88rem; font-weight: 600; }
+
+.notice.warn { display: block; background: var(--gold-soft); border-color: color-mix(in srgb, var(--gold-bright) 45%, var(--line)); color: var(--ink); }
+.notice.ok { display: block; background: color-mix(in srgb, var(--own) 12%, var(--surface)); border-color: color-mix(in srgb, var(--own) 35%, var(--line)); color: var(--ink); }
+.search-card .search-big { max-width: none; }
+.people-results { margin-top: 12px; }
+.plan-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 6px 0 14px; }
+.plan-stats > div { display: grid; gap: 2px; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface-2); }
+.plan-stats b { font: 700 1.4rem/1.1 var(--font-display); color: var(--accent); }
+.plan-stats .warn b { color: var(--gold); }
+.plan-stats span { color: var(--muted); font-size: .84rem; }
+.plan-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+.plan-item:last-child { border-bottom: 0; }
+.plan-item input[type=checkbox] { flex: none; }
+.plan-warnings { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--ink-2); }
+.sticky-actions { position: sticky; bottom: 0; z-index: 5; padding: 12px 0; background: linear-gradient(transparent, var(--bg) 30%); }
+
+.book-choices { display: grid; gap: 8px; }
+.book-choices label { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border: 1.5px solid var(--line-strong); border-radius: var(--r-md); cursor: pointer; }
+.book-choices label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.book-choices input { margin-top: 3px; flex: none; }
+.book-choices span { display: grid; gap: 2px; }
+.book-choices small { color: var(--muted); font-size: .85rem; }
 
 /* ---------- 13. Landing and sign-in ---------- */
 .hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 48px; align-items: center; padding: 28px 0 16px; }

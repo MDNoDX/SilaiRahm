@@ -10,7 +10,6 @@
       {% include "partials/field.html" with field=profile_form.last_name %}
     </div>
     {% include "partials/field.html" with field=profile_form.email %}
-    {% include "partials/field.html" with field=profile_form.gender %}
     <div class="form-actions">
       <button class="btn btn-primary" name="save_profile" type="submit">{% translate "Save" %}</button>
       {% if user.person %}<a class="btn btn-ghost" href="{{ user.person.get_absolute_url }}">{% translate "My record in the tree" %}</a>{% endif %}
@@ -42,6 +41,9 @@
     </div>
   </div>
   {% include "partials/field.html" with field=prefs_form.time_zone %}
+  <h3 class="subhead">{% translate "Privacy" %}</h3>
+  <div class="switch-row"><label for="{{ prefs_form.discoverable.id_for_label }}">{{ prefs_form.discoverable.label }}</label>{{ prefs_form.discoverable }}</div>
+  <p class="help">{{ prefs_form.discoverable.help_text }}</p>
   <div class="form-actions">
     <button class="btn btn-primary" name="save_prefs" type="submit">{% translate "Save" %}</button>
   </div>

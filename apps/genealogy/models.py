@@ -69,6 +69,11 @@ class Person(models.Model):
     )
 
     search_key = models.TextField(editable=False, blank=True, default="", db_index=True)
+    # This record is a relative who has an account of their own (set when a
+    # connection between the two accounts is accepted).
+    linked_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="tree_records",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

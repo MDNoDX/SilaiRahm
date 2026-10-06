@@ -412,7 +412,7 @@ def build_tree(archive: Archive, focus_id, photo_urls=True, viewer_person=None,
             branch=branches.get(person.pk, "other"),
             direct=person.pk in ancestors,
             url=person.get_absolute_url(),
-            photo=person.photo.url if photo_urls and person.photo else "",
+            photo=f"{person.photo.url}?s=t" if photo_urls and person.photo else "",
             kids_label=(ngettext("%(count)d child", "%(count)d children", kids["count"])
                         % {"count": kids["count"]}) if kids else "",
             sibs_label=(ngettext("%(count)d brother or sister", "%(count)d brothers and sisters", sibs["count"])

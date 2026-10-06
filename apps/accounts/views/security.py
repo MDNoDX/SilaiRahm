@@ -123,8 +123,3 @@ def google_disconnect(request):
         messages.info(request, _("Google has been disconnected from your account."))
     return redirect(reverse("accounts:security") + "#google")
 
-
-@login_required
-def password_change(request):
-    """Old address: the password form now lives in Settings → Security."""
-    return redirect(reverse("accounts:security") + "#password")

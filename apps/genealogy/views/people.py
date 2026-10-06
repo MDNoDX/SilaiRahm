@@ -1,5 +1,6 @@
 """Relatives: the list, a person's page, adding, editing and deleting, marriages, "this is me"."""
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
@@ -9,8 +10,8 @@ from django.views.decorators.http import require_POST
 from apps.core.muchal import next_muchal_year
 from apps.core.text import surname_from_name
 
-from .. import duplicates, history, pdf
-from ..access import can_edit, person_for_edit, person_for_view, require_edit, viewer_person
+from .. import duplicates, history
+from ..access import can_edit, can_view, person_for_edit, person_for_view, require_edit, viewer_person
 from ..forms import MarriageForm, PersonForm, RelativeWithSpouseForm
 from ..kinship import Archive
 from ..models import Change, Marriage, Media, Person
@@ -20,7 +21,7 @@ from .search import _ranked
 
 
 def _filter_people(queryset, show):
-    """The chips above the list of people, and the "what is missing" links of the dashboard."""
+    """The chips above the list of people."""
     from django.db.models import Q
 
     rules = {
@@ -29,14 +30,12 @@ def _filter_people(queryset, show):
         "male": Q(gender="male"),
         "female": Q(gender="female"),
         "nodate": Q(birth_year=None),
-        "noday": Q(is_deceased=False, birth_year__isnull=False) & (Q(birth_month=None) | Q(birth_day=None)),
         "nophoto": Q(photo=""),
-        "nostory": Q(is_deceased=True, biography="", life_story=""),
     }
     return queryset.filter(rules[show]) if show in rules else queryset
 
 
-MISSING_FILTERS = ("nodate", "noday", "nophoto", "nostory", "unlinked")
+MISSING_FILTERS = ("nodate", "nophoto")
 
 
 @login_required
@@ -49,8 +48,6 @@ def people_list(request):
     people = _filter_people(Person.objects.filter(owner=request.archive), show)
     focus = _focus_for(request, archive)
     branches = archive.branches(focus) if focus else {}
-    if show == "unlinked" and focus:
-        people = people.exclude(pk__in=list(archive.generations(focus)))
 
     def row(p):
         return (p, archive.label(focus, p.pk) if focus else "", branches.get(p.pk, "other"))
@@ -120,24 +117,6 @@ def _life_path(archive, person):
     return items
 
 
-def _prompts(person, is_me):
-    """Questions that invite the family to fill in what is still missing."""
-    out = []
-    if not person.birth_year:
-        out.append(("birth", _("When was {name} born? Even the year alone helps.")))
-    elif not (person.birth_month and person.birth_day) and not person.is_deceased:
-        out.append(("birth", _("Add the day and month of birth to be reminded of {name}’s birthday.")))
-    if not person.birth_place:
-        out.append(("place", _("Where was {name} born?")))
-    if not person.photo:
-        out.append(("photo", _("Add a photo of {name}: faces make the family tree come alive.")))
-    if not person.occupation and not person.is_deceased and not is_me:
-        out.append(("work", _("What does {name} do?")))
-    if person.is_deceased and not person.occupation:
-        out.append(("work", _("What did {name} do in life?")))
-    return [(kind, text.format(name=person.first_name)) for kind, text in out[:3]]
-
-
 @login_required
 def person_detail(request, pk):
     person = person_for_view(request, pk)
@@ -167,18 +146,52 @@ def person_detail(request, pk):
         "files": [m for m in media if m.kind != Media.Kind.PHOTO],
         "media_count": len(media),
         "life_path": _life_path(archive, person),
-        "prompts": _prompts(person, request.user.person_id == person.pk) if editable else [],
         "muchal": person.muchal,
         "next_muchal": next_muchal_year(person.birth_year, person.birth_month, person.birth_day)
         if not person.is_deceased else None,
         "section": SECTION,
         "add_relation": ADD_RELATION,
         "is_me": request.user.person_id == person.pk,
-        "can_be_me": (request.user.person_id != person.pk and person.owner_id == request.archive.pk
-                      and not hasattr(person, "account")),
+        # "This is me" only for someone not yet known in this tree: a click must
+        # never quietly turn an account into another relative.
+        "can_be_me": (request.user.person_id is None and person.owner_id == request.archive.pk
+                      and not hasattr(person, "account") and not person.linked_user_id),
         "changes": person.changes.select_related("actor")[:5] if editable else [],
+        **_across_trees(request, person, editable),
     }
     return render(request, "genealogy/people/detail.html", context)
+
+
+def _across_trees(request, person, editable):
+    """The account a record stands for, and the same person in other family trees."""
+    from urllib.parse import quote
+
+    from django.db.models import Q
+    from django.urls import reverse
+
+    from apps.network.models import PersonMatch
+    from apps.network.services import working_tree
+
+    matches = []
+    for m in PersonMatch.objects.filter(Q(first=person) | Q(second=person), rejected=False).select_related(
+            "first__owner", "second__owner"):
+        other = m.other(person.pk)
+        if can_view(request.user, other.owner):
+            matches.append({"person": other, "owner": other.owner, "merge_url": (
+                f"{reverse('network:merge')}?from={other.owner.username}&to={person.owner.username}"
+                if editable else "")})
+    mine = working_tree(request)
+    account = person.linked_user if person.linked_user_id else None
+    return {
+        "account": account,
+        "account_tree": account if account is not None and can_view(request.user, account) else None,
+        "matches": matches,
+        "my_tree": mine if (person.owner_id != mine.pk and can_edit(request.user, mine)
+                            and all(m["owner"].pk != mine.pk for m in matches)) else None,
+        "find_url": (f"{reverse('network:index')}?q={quote(person.full_name)}"
+                     if editable and account is None and not hasattr(person, "account") and not person.is_deceased
+                     else ""),
+    }
 
 
 @login_required
@@ -202,6 +215,8 @@ def person_edit(request, pk):
     if request.method == "POST" and form.is_valid():
         person = form.save()
         history.record_update(request.user, person, before)
+        # Someone's own record: the account follows its gender.
+        get_user_model().objects.filter(person=person).exclude(gender=person.gender).update(gender=person.gender)
         messages.success(request, _("The information has been saved."))
         return redirect(person)
     return render(request, "genealogy/people/form.html", {"form": form, "person": person, "is_new": False})
@@ -309,10 +324,13 @@ def marriage_edit(request, pk):
 
 @login_required
 def person_pdf(request, pk):
+    from .. import pdf  # reportlab loads only when a PDF is asked for
+
     person = person_for_view(request, pk)
     archive = Archive(person.owner)
-    data = pdf.person_pdf(archive, person, focus_id=viewer_person(request, archive),
-                          stories=list(person.stories.all()))
+    stories = sorted(person.stories.all(), key=lambda s: (s.year or 9999, s.created_at))
+    data = pdf.person_pdf(archive, person, focus_id=viewer_person(request, archive), stories=stories,
+                          life_path=_life_path(archive, person))
     return _pdf_response(data, f"{person.short_name}.pdf")
 
 
@@ -321,7 +339,10 @@ def person_pdf(request, pk):
 def set_self(request, pk):
     """"This is me": the viewer's own record in the archive they work in."""
     person = person_for_view(request, pk)
-    if person.owner_id != request.archive.pk or hasattr(person, "account"):
+    if person.owner_id != request.archive.pk or hasattr(person, "account") or person.linked_user_id:
+        raise PermissionDenied(_("Access denied."))
+    if Person.objects.filter(pk=request.user.person_id, owner=request.archive).exists():
+        # Already known in this tree: who you are does not change with one click.
         raise PermissionDenied(_("Access denied."))
     from apps.accounts.models import Membership
 
