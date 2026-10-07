@@ -222,7 +222,7 @@ TELEGRAM_BOT_USERNAME = os.environ.get("TELEGRAM_BOT_USERNAME", "")
 TELEGRAM_WEBHOOK_SECRET = os.environ.get("TELEGRAM_WEBHOOK_SECRET", "")
 # AI assistant (optional): a Google AI Studio key; the free tier is enough.
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "") or "gemini-2.5-flash"
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "") or "gemini-flash-latest"
 # Vercel Cron sends "Authorization: Bearer $CRON_SECRET" to /cron/kunlik/.
 CRON_SECRET = os.environ.get("CRON_SECRET", "")
 # Web Push (reminders on phones and in browsers): a VAPID key pair.

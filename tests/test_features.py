@@ -199,13 +199,20 @@ class AssistantTests(TestCase):
         self.assertEqual(self.p["me"].occupation, "Dasturchi")
 
     def test_busy_and_rate_limit(self):
-        with mock.patch("apps.assistant.gemini.requests.post", return_value=mock.Mock(status_code=429)):
+        with mock.patch("apps.assistant.gemini.requests.post", return_value=mock.Mock(status_code=429, text="quota")):
             self.assertEqual(self.ask("salom").status_code, 502)
         from django.core.cache import cache
 
         cache.set(f"assistant:{self.user.pk}", 999, 60)
         self.assertEqual(self.ask("salom").status_code, 429)
         cache.delete(f"assistant:{self.user.pk}")
+
+    def test_retired_model_falls_back(self):
+        gone = mock.Mock(status_code=404, text="no longer available")
+        with mock.patch("apps.assistant.gemini.requests.post", side_effect=[gone, _answer("Salom!")]) as post:
+            self.assertEqual(self.ask("salom").json()["reply"], "Salom!")
+        self.assertEqual(post.call_count, 2)
+        self.assertNotEqual(post.call_args_list[0].args[0], post.call_args_list[1].args[0])
 
     def test_transcribe(self):
         with mock.patch("apps.assistant.gemini.requests.post", return_value=_answer("Bir kuni bogʻda edik.")) as post:

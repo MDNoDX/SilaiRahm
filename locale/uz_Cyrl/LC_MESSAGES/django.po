@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: shajara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-07 06:57+0500\n"
+"POT-Creation-Date: 2026-10-07 08:12+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Shajara team\n"
 "Language-Team: Uzbek (Cyrillic)\n"
@@ -273,7 +273,7 @@ msgstr "Рухсат олиб ташланди."
 msgid "The information has been saved."
 msgstr "Маълумотлар сақланди."
 
-#: apps/accounts/views/family.py:80 apps/assistant/actions.py:156 apps/assistant/views.py:107 apps/genealogy/access.py:34 apps/genealogy/access.py:52 apps/genealogy/views/events.py:40 apps/genealogy/views/people.py:355 apps/genealogy/views/people.py:369 apps/genealogy/views/people.py:372 apps/network/services.py:278 apps/network/views.py:182 apps/network/views.py:272 apps/network/views.py:304 templates/errors/403.html:3 templates/errors/403.html:6 templates/errors/403_csrf.html:3
+#: apps/accounts/views/family.py:80 apps/assistant/actions.py:156 apps/assistant/views.py:108 apps/genealogy/access.py:34 apps/genealogy/access.py:52 apps/genealogy/views/events.py:40 apps/genealogy/views/people.py:355 apps/genealogy/views/people.py:369 apps/genealogy/views/people.py:372 apps/network/services.py:278 apps/network/views.py:182 apps/network/views.py:272 apps/network/views.py:304 templates/errors/403.html:3 templates/errors/403.html:6 templates/errors/403_csrf.html:3
 msgid "Access denied."
 msgstr "Кириш тақиқланган."
 
@@ -361,7 +361,7 @@ msgstr "Қариндошликни танланг."
 msgid "Choose an existing person or enter the new person's first name."
 msgstr "Мавжуд одамни танланг ёки янги одамнинг исмини киритинг."
 
-#: apps/assistant/views.py:69 apps/assistant/views.py:125 templates/assistant/chat.html:16
+#: apps/assistant/views.py:69 apps/assistant/views.py:126 templates/assistant/chat.html:16
 msgid "The assistant is not set up yet."
 msgstr "Ёрдамчи ҳали созланмаган."
 
@@ -369,7 +369,7 @@ msgstr "Ёрдамчи ҳали созланмаган."
 msgid "Write a message."
 msgstr "Хабар ёзинг."
 
-#: apps/assistant/views.py:75 apps/assistant/views.py:134
+#: apps/assistant/views.py:75 apps/assistant/views.py:135
 msgid "That is enough for this hour. Please try again a little later."
 msgstr "Бу соат учун етарли. Бироздан сўнг яна уриниб кўринг."
 
@@ -377,27 +377,31 @@ msgstr "Бу соат учун етарли. Бироздан сўнг яна у
 msgid "The assistant is busy. Please try again in a minute."
 msgstr "Ёрдамчи банд. Бир дақиқадан сўнг қайта уриниб кўринг."
 
-#: apps/assistant/views.py:84 apps/assistant/views.py:95
+#: apps/assistant/views.py:84 apps/assistant/views.py:96
 msgid "The assistant could not answer. Please try again."
 msgstr "Ёрдамчи жавоб бера олмади. Қайтадан уриниб кўринг."
 
-#: apps/assistant/views.py:105
+#: apps/assistant/views.py:95
+msgid "Here is what I suggest. Check it and press “Add” to save it."
+msgstr "Мана таклифим. Текшириб кўринг ва сақлаш учун «Қўшиш»ни босинг."
+
+#: apps/assistant/views.py:106
 msgid "This proposal has expired. Ask again."
 msgstr "Бу таклифнинг муддати ўтган. Қайтадан сўранг."
 
-#: apps/assistant/views.py:115
+#: apps/assistant/views.py:116
 msgid "Saved."
 msgstr "Сақланди."
 
-#: apps/assistant/views.py:128 apps/genealogy/recordings.py:41
+#: apps/assistant/views.py:129 apps/genealogy/recordings.py:41
 msgid "This is not a voice or video recording."
 msgstr "Бу овозли ёки видео ёзув эмас."
 
-#: apps/assistant/views.py:139
+#: apps/assistant/views.py:140
 msgid "The recording could not be turned into text. Please try again."
 msgstr "Ёзувни матнга айлантириб бўлмади. Қайтадан уриниб кўринг."
 
-#: apps/assistant/views.py:141
+#: apps/assistant/views.py:142
 msgid "No words were heard in the recording."
 msgstr "Ёзувда сўз эшитилмади."
 

@@ -21,27 +21,55 @@ def configured():
     return bool(settings.GEMINI_API_KEY)
 
 
+# Google retires model versions; "-latest" follows the newest Flash. Tried in order when one is gone or busy.
+FALLBACK_MODELS = ["gemini-flash-latest", "gemini-3.8-flash"]
+
+
+def _thinking(model):
+    """Short thinking keeps answers to a few seconds (the 2.x and 3.x models are told differently)."""
+    if model.startswith("gemini-2."):
+        return {"thinkingBudget": 0}
+    return {"thinkingLevel": "low"}
+
+
+def _post(model, body, timeout):
+    try:
+        return requests.post(URL.format(model=model), json=body, timeout=timeout,
+                             headers={"x-goog-api-key": settings.GEMINI_API_KEY})
+    except requests.RequestException as exc:
+        log.warning("Gemini (%s) could not be reached: %s", model, exc)
+        return None
+
+
 def generate(system, contents, tools=None, timeout=45):
     """One answer: {"text": "...", "calls": [{"name": ..., "args": {...}}]}."""
-    body = {"systemInstruction": {"parts": [{"text": system}]}, "contents": contents,
-            "generationConfig": {"temperature": 0.4, "maxOutputTokens": 4096}}
-    if settings.GEMINI_MODEL.startswith("gemini-2.5-flash"):
-        body["generationConfig"]["thinkingConfig"] = {"thinkingBudget": 0}  # answers in a few seconds
+    base = {"systemInstruction": {"parts": [{"text": system}]}, "contents": contents}
     if tools:
-        body["tools"] = [{"functionDeclarations": tools}]
-    try:
-        response = requests.post(URL.format(model=settings.GEMINI_MODEL), json=body, timeout=timeout,
-                                 headers={"x-goog-api-key": settings.GEMINI_API_KEY})
-    except requests.RequestException as exc:
-        raise AIError(str(exc)) from exc
+        base["tools"] = [{"functionDeclarations": tools}]
+    models = list(dict.fromkeys([settings.GEMINI_MODEL] + FALLBACK_MODELS))
+    response = None
+    for model in models:
+        body = {**base, "generationConfig": {"temperature": 0.4, "maxOutputTokens": 4096,
+                                             "thinkingConfig": _thinking(model)}}
+        response = _post(model, body, timeout)
+        if response is not None and response.status_code == 400 and "hinking" in response.text:
+            del body["generationConfig"]["thinkingConfig"]  # a model that does not take this setting
+            response = _post(model, body, timeout)
+        if response is not None and response.status_code == 200:
+            break
+        if response is not None:
+            log.warning("Gemini (%s) answered %s: %s", model, response.status_code, response.text[:300])
+            if response.status_code not in (404, 500, 503):  # a wrong key or a bad request: another model will not help
+                break
+    if response is None:
+        raise AIError("unreachable")
     if response.status_code == 429:
         raise AIError("busy")
     if response.status_code != 200:
-        log.warning("Gemini answered %s: %s", response.status_code, response.text[:300])
         raise AIError(f"status {response.status_code}")
     data = response.json()
     parts = ((data.get("candidates") or [{}])[0].get("content") or {}).get("parts") or []
-    return {"text": "".join(p.get("text", "") for p in parts).strip(),
+    return {"text": "".join(p.get("text", "") for p in parts if not p.get("thought")).strip(),
             "calls": [p["functionCall"] for p in parts if "functionCall" in p]}
 
 

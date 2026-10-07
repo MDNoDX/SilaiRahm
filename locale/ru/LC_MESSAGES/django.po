@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: shajara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-07 06:57+0500\n"
+"POT-Creation-Date: 2026-10-07 08:12+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Shajara team\n"
 "Language-Team: Russian\n"
@@ -277,7 +277,7 @@ msgstr "Доступ закрыт."
 msgid "The information has been saved."
 msgstr "Сохранено."
 
-#: apps/accounts/views/family.py:80 apps/assistant/actions.py:156 apps/assistant/views.py:107 apps/genealogy/access.py:34 apps/genealogy/access.py:52 apps/genealogy/views/events.py:40 apps/genealogy/views/people.py:355 apps/genealogy/views/people.py:369 apps/genealogy/views/people.py:372 apps/network/services.py:278 apps/network/views.py:182 apps/network/views.py:272 apps/network/views.py:304 templates/errors/403.html:3 templates/errors/403.html:6 templates/errors/403_csrf.html:3
+#: apps/accounts/views/family.py:80 apps/assistant/actions.py:156 apps/assistant/views.py:108 apps/genealogy/access.py:34 apps/genealogy/access.py:52 apps/genealogy/views/events.py:40 apps/genealogy/views/people.py:355 apps/genealogy/views/people.py:369 apps/genealogy/views/people.py:372 apps/network/services.py:278 apps/network/views.py:182 apps/network/views.py:272 apps/network/views.py:304 templates/errors/403.html:3 templates/errors/403.html:6 templates/errors/403_csrf.html:3
 msgid "Access denied."
 msgstr "Доступ запрещён."
 
@@ -365,7 +365,7 @@ msgstr "Выберите родство."
 msgid "Choose an existing person or enter the new person's first name."
 msgstr "Выберите человека из древа или введите имя нового."
 
-#: apps/assistant/views.py:69 apps/assistant/views.py:125 templates/assistant/chat.html:16
+#: apps/assistant/views.py:69 apps/assistant/views.py:126 templates/assistant/chat.html:16
 msgid "The assistant is not set up yet."
 msgstr "Помощник ещё не настроен."
 
@@ -373,7 +373,7 @@ msgstr "Помощник ещё не настроен."
 msgid "Write a message."
 msgstr "Напишите сообщение."
 
-#: apps/assistant/views.py:75 apps/assistant/views.py:134
+#: apps/assistant/views.py:75 apps/assistant/views.py:135
 msgid "That is enough for this hour. Please try again a little later."
 msgstr "На этот час достаточно. Попробуйте чуть позже."
 
@@ -381,27 +381,31 @@ msgstr "На этот час достаточно. Попробуйте чуть
 msgid "The assistant is busy. Please try again in a minute."
 msgstr "Помощник занят. Попробуйте через минуту."
 
-#: apps/assistant/views.py:84 apps/assistant/views.py:95
+#: apps/assistant/views.py:84 apps/assistant/views.py:96
 msgid "The assistant could not answer. Please try again."
 msgstr "Помощник не смог ответить. Попробуйте ещё раз."
 
-#: apps/assistant/views.py:105
+#: apps/assistant/views.py:95
+msgid "Here is what I suggest. Check it and press “Add” to save it."
+msgstr "Вот что я предлагаю. Проверьте и нажмите «Добавить», чтобы сохранить."
+
+#: apps/assistant/views.py:106
 msgid "This proposal has expired. Ask again."
 msgstr "Срок этого предложения истёк. Спросите ещё раз."
 
-#: apps/assistant/views.py:115
+#: apps/assistant/views.py:116
 msgid "Saved."
 msgstr "Сохранено."
 
-#: apps/assistant/views.py:128 apps/genealogy/recordings.py:41
+#: apps/assistant/views.py:129 apps/genealogy/recordings.py:41
 msgid "This is not a voice or video recording."
 msgstr "Это не аудио- или видеозапись."
 
-#: apps/assistant/views.py:139
+#: apps/assistant/views.py:140
 msgid "The recording could not be turned into text. Please try again."
 msgstr "Не удалось превратить запись в текст. Попробуйте ещё раз."
 
-#: apps/assistant/views.py:141
+#: apps/assistant/views.py:142
 msgid "No words were heard in the recording."
 msgstr "В записи не слышно слов."
 

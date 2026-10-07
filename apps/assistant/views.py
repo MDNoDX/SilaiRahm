@@ -92,7 +92,8 @@ def message(request):
             "story": str(args.get("story") or args.get("life_story_append") or "")[:MAX_TEXT],
             "token": signing.dumps({"o": request.archive.pk, "n": name, "a": args}, salt=SALT),
         })
-    reply = answer["text"] or ("" if proposals else _("The assistant could not answer. Please try again."))
+    reply = answer["text"] or (_("Here is what I suggest. Check it and press “Add” to save it.") if proposals
+                               else _("The assistant could not answer. Please try again."))
     return JsonResponse({"reply": reply, "proposals": proposals})
 
 
