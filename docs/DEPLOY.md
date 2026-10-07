@@ -162,7 +162,7 @@ Istalgan Linux VPS (1 vCPU, 1–2 GB RAM, Ubuntu 22.04/24.04): Hetzner, DigitalO
 ssh root@SERVER_IP
 curl -fsSL https://get.docker.com | sh
 ufw allow OpenSSH && ufw allow 80 && ufw allow 443 && ufw --force enable
-git clone https://github.com/MDNoDX/Shajara.git shajara && cd shajara
+git clone https://github.com/MDNoDX/SilaiRahm.git silairahm && cd silairahm
 cp .env.example .env && nano .env         # DOMAIN, DJANGO_SECRET_KEY, POSTGRES_PASSWORD …
 docker compose up -d --build
 docker compose exec web python manage.py createsuperuser
