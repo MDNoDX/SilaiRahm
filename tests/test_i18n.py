@@ -249,6 +249,11 @@ class LanguageChoiceTests(TestCase):
             "first_name": "Алишер", "last_name": "Навоий", "gender": "male", "username": "alisher",
             "email": "alisher@example.com", "password1": "Yaxshi-parol-2026", "password2": "Yaxshi-parol-2026",
         })
+        from django.core import mail
+
+        self.assertIn("Silai Rahm", mail.outbox[-1].subject)
+        code = re.search(r"\b(\d{6})\b", mail.outbox[-1].body)[1]
+        self.client.post(reverse("accounts:verify_email"), {"code": code})
         user = User.objects.get(username="alisher")
         self.assertEqual(user.preferred_language, "uz-cyrl")
         self.assertEqual(user.person.first_name, "Алишер")  # stored exactly as typed

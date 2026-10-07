@@ -65,11 +65,10 @@
       {% for m in story_recordings %}{% include "partials/recording_player.html" with file=m.file kind=m.kind %}{% endfor %}
       {% if is_owner %}
       <button class="btn btn-sm no-print" type="button" data-reveal="life-edit">{% include "partials/icon.html" with name="pencil" %}{% if person.life_story %}{% translate "Edit the life story" %}{% else %}{% translate "Write the life story" %}{% endif %}</button>
-      <form id="life-edit" class="life-edit no-print" method="post" enctype="multipart/form-data" action="{% url 'genealogy:person_story' person.pk %}" hidden>{% csrf_token %}
+      <form id="life-edit" class="life-edit no-print" method="post" action="{% url 'genealogy:person_story' person.pk %}" hidden>{% csrf_token %}
         <label class="visually-hidden" for="life-story">{% translate "Life story" %}</label>
         <textarea id="life-story" name="life_story" rows="14">{{ person.life_story }}</textarea>
         <p class="help">{% translate "An empty line starts a new paragraph." %}</p>
-        {% include "partials/recorder.html" with name="recording" target="life-story" %}
         <div class="form-actions"><button class="btn btn-primary" type="submit">{% translate "Save" %}</button>
           <button class="btn btn-ghost" type="button" data-reveal="life-edit">{% translate "Cancel" %}</button></div>
       </form>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: shajara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-06 22:01+0500\n"
+"POT-Creation-Date: 2026-10-07 08:30+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Shajara team\n"
 "Language-Team: Russian\n"
@@ -38,7 +38,7 @@ msgstr "Тёмная"
 msgid "Colour theme"
 msgstr "Тема"
 
-#: static/js/app.js:130 static/js/assistant.js:68
+#: static/js/app.js:130 static/js/assistant.js:68 static/js/assistant.js:247
 msgid "Saving…"
 msgstr "Сохранение…"
 
@@ -50,7 +50,7 @@ msgstr "Выбрать файл"
 msgid "No file chosen"
 msgstr "Файл не выбран"
 
-#: static/js/app.js:201
+#: static/js/app.js:201 static/js/assistant.js:217
 msgid "Remove"
 msgstr "Удалить"
 
@@ -82,7 +82,7 @@ msgstr "Заблокировано в настройках браузера"
 msgid "Off for this device"
 msgstr "На этом устройстве выключено"
 
-#: static/js/app.js:715 static/js/app.js:795
+#: static/js/app.js:715 static/js/app.js:795 static/js/assistant.js:197
 msgid "The recording is too long: up to 4 MB (about 25 minutes of voice or 1 minute of video)."
 msgstr "Запись слишком длинная: до 4 MB (примерно 25 минут голоса или 1 минута видео)."
 
@@ -94,15 +94,15 @@ msgstr "Этот браузер не может прикрепить запис�
 msgid "The camera could not be turned on. Allow access to the camera and the microphone in the browser."
 msgstr "Не удалось включить камеру. Разрешите доступ к камере и микрофону в браузере."
 
-#: static/js/app.js:784 static/js/assistant.js:191
+#: static/js/app.js:784 static/js/assistant.js:328
 msgid "The microphone could not be turned on. Allow access to the microphone in the browser."
 msgstr "Не удалось включить микрофон. Разрешите доступ к микрофону в браузере."
 
-#: static/js/app.js:811 static/js/assistant.js:174
+#: static/js/app.js:811 static/js/assistant.js:278
 msgid "Writing it down…"
 msgstr "Записываю текстом…"
 
-#: static/js/app.js:823 static/js/assistant.js:96 static/js/assistant.js:184
+#: static/js/app.js:823 static/js/assistant.js:96 static/js/assistant.js:151
 msgid "Something went wrong. Please try again."
 msgstr "Что-то пошло не так. Попробуйте ещё раз."
 
@@ -114,11 +114,11 @@ msgstr "Добавить"
 msgid "No, thanks"
 msgstr "Нет, спасибо"
 
-#: static/js/assistant.js:73
+#: static/js/assistant.js:73 static/js/assistant.js:258
 msgid "Open"
 msgstr "Открыть"
 
-#: static/js/assistant.js:74
+#: static/js/assistant.js:74 static/js/assistant.js:272
 msgid "Saved"
 msgstr "Сохранено"
 
@@ -126,13 +126,41 @@ msgstr "Сохранено"
 msgid "Not saved"
 msgstr "Не сохранено"
 
-#: static/js/assistant.js:98
+#: static/js/assistant.js:98 static/js/assistant.js:166 static/js/assistant.js:235
 msgid "No connection. Check the internet and try again."
 msgstr "Нет связи. Проверьте интернет и попробуйте ещё раз."
 
-#: static/js/assistant.js:122
+#: static/js/assistant.js:137
 msgid "Proposed"
 msgstr "Предложено"
+
+#: static/js/assistant.js:216 static/js/assistant.js:282
+msgid "Turn into text and send"
+msgstr "Превратить в текст и отправить"
+
+#: static/js/assistant.js:219
+msgid "Title"
+msgstr "Заголовок"
+
+#: static/js/assistant.js:220
+msgid "For example: Grandfather tells about his childhood"
+msgstr "Например: дедушка рассказывает о детстве"
+
+#: static/js/assistant.js:221
+msgid "Also write it down as text"
+msgstr "Записать также текстом"
+
+#: static/js/assistant.js:222 static/js/assistant.js:251
+msgid "Save as an event"
+msgstr "Сохранить как событие"
+
+#: static/js/assistant.js:241
+msgid "Write a title for the recording."
+msgstr "Напишите заголовок для записи."
+
+#: static/js/assistant.js:260
+msgid "Edit"
+msgstr "Изменить"
 
 #: static/js/tree.js:141
 msgid "Family tree"

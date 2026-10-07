@@ -14,6 +14,8 @@ from apps.genealogy.models import Change, Event, Person
 from apps.genealogy.relations import RELATIONS, attach, problem
 
 EVENT_KINDS = [k for k, _label in Event.Kind.choices]
+PERSON_LABELS = {f.name: f.verbose_name for f in Person._meta.fields}
+PERSON_LABELS["life_story_append"] = Person._meta.get_field("life_story").verbose_name
 PERSON_FIELDS = ["birth_place", "occupation", "education", "death_place", "burial_place", "patronymic", "last_name"]
 NUMBER_FIELDS = ["birth_year", "birth_month", "birth_day", "death_year", "death_month", "death_day"]
 
@@ -26,7 +28,9 @@ TOOLS = [
          "title": {"type": "string", "description": "Short title, in the person's language."},
          "story": {"type": "string", "description": "The story, carefully edited, keeping the person's own words."},
          "people_ids": {"type": "array", "items": {"type": "integer"}, "description": "Ids of the people it is about."},
-         "year": {"type": "integer"}, "month": {"type": "integer"}, "day": {"type": "integer"},
+         "year": {"type": "integer", "description": "Only if the user said the year."},
+         "month": {"type": "integer", "description": "Only if the user said the month; never guess."},
+         "day": {"type": "integer", "description": "Only if the user said the day; never guess."},
          "place": {"type": "string"}},
          "required": ["kind", "title", "people_ids"]}},
     {"name": "add_relative",
@@ -59,6 +63,24 @@ class Refused(Exception):
     pass
 
 
+def _as_id(value):
+    """Models send ids as 23, "23" or "#23"."""
+    text = str(value).strip().lstrip("#")
+    return int(text) if text.isdigit() else None
+
+
+def clean_args(args):
+    """The proposal as it will be shown and saved: ids as numbers, no empty values."""
+    out = {k: v for k, v in args.items() if v not in (None, "", [])}
+    for key in ("anchor_id", "person_id"):
+        if key in out:
+            out[key] = _as_id(out[key])
+    if "people_ids" in out:
+        ids = out["people_ids"] if isinstance(out["people_ids"], list) else [out["people_ids"]]
+        out["people_ids"] = [i for i in dict.fromkeys(_as_id(v) for v in ids) if i is not None]
+    return out
+
+
 def _person(owner, pk):
     person = Person.objects.filter(owner=owner, pk=pk).first() if str(pk).isdigit() else None
     if person is None:
@@ -86,7 +108,7 @@ def describe(owner, name, args):
             relation=str(dict(_relation_names()).get(args.get("relation"), args.get("relation", ""))),
             anchor=people.get(args.get("anchor_id"), "?"))
     if name == "update_person":
-        fields = [k for k in args if k != "person_id"]
+        fields = [str(PERSON_LABELS.get(k, k)) for k in args if k != "person_id"]
         return _("Update {name}: {fields}.").format(name=people.get(args.get("person_id"), "?"),
                                                     fields=", ".join(fields))
     return name

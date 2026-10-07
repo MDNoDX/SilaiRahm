@@ -21,6 +21,7 @@
   
   const newcatalog = {
     "Add": "Qo\u02bbshish",
+    "Also write it down as text": "Matn qilib ham yozilsin",
     "An error occurred.": "Xatolik yuz berdi.",
     "Are you sure you want to delete this?": "Rostdan ham o\u02bbchirmoqchimisiz?",
     "Automatic": "Avtomatik",
@@ -31,7 +32,9 @@
     "Copied": "Nusxalandi",
     "Could not load the family tree. Please try again.": "Shajarani yuklab bo\u02bblmadi. Qaytadan urinib ko\u02bbring.",
     "Dark": "Qorong\u02bbi",
+    "Edit": "Tahrirlash",
     "Family tree": "Shajara",
+    "For example: Grandfather tells about his childhood": "Masalan: Bobom bolaligi haqida so\u02bbzlaydi",
     "Hide brothers and sisters": "Aka-uka va opa-singillarini yashirish",
     "Hide children": "Farzandlarini yashirish",
     "Light": "Yorug\u02bb",
@@ -45,6 +48,7 @@
     "Open": "Ochish",
     "Proposed": "Taklif qilindi",
     "Remove": "Olib tashlash",
+    "Save as an event": "Voqea sifatida saqlash",
     "Saved": "Saqlandi",
     "Saving\u2026": "Saqlanmoqda\u2026",
     "Show brothers and sisters": "Aka-uka va opa-singillarini ko\u02bbrsatish",
@@ -56,6 +60,9 @@
     "The photo is too large. The maximum size is %(size)s MB.": "Rasm hajmi juda katta. Eng ko\u02bbpi %(size)s MB bo\u02bblishi mumkin.",
     "The recording is too long: up to 4 MB (about 25 minutes of voice or 1 minute of video).": "Yozuv juda uzun: 4 MB gacha (taxminan 25 daqiqa ovoz yoki 1 daqiqa video).",
     "This browser cannot attach the recording. Choose a recorded file instead.": "Bu brauzer yozuvni biriktira olmaydi. Uning o\u02bbrniga yozib olingan faylni tanlang.",
+    "Title": "Sarlavha",
+    "Turn into text and send": "Matnga aylantirib yuborish",
+    "Write a title for the recording.": "Yozuvga sarlavha yozing.",
     "Writing it down\u2026": "Matnga yozilmoqda\u2026",
     "You": "Siz",
     "file name\u0004family-tree": "shajara"

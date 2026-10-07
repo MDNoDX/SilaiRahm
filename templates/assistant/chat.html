@@ -18,6 +18,7 @@
   </div>
 {% else %}
 <section class="card ai" data-ai data-message-url="{% url 'assistant:message' %}" data-apply-url="{% url 'assistant:apply' %}"
+         data-transcribe-url="{% url 'assistant:transcribe' %}" data-save-url="{% url 'assistant:save_recording' %}"{% if can_edit %} data-can-edit{% endif %}
          data-archive="{{ archive.pk }}">
   <div class="ai-log" data-ai-log aria-live="polite">
     <div class="ai-hello">
@@ -34,7 +35,8 @@
   </div>
   <form class="ai-form" data-ai-form>
     <textarea name="message" rows="1" maxlength="8000" required placeholder="{% translate 'Write a question or a story…' %}" aria-label="{% translate 'Message' %}"></textarea>
-    <button class="btn" type="button" data-ai-mic hidden data-transcribe-url="{% url 'assistant:transcribe' %}" title="{% translate 'Say it with your voice' %}" aria-label="{% translate 'Say it with your voice' %}">{% include "partials/icon.html" with name="mic" %}</button>
+    <button class="btn" type="button" data-ai-mic hidden title="{% translate 'Record a voice message' %}" aria-label="{% translate 'Record a voice message' %}">{% include "partials/icon.html" with name="mic" %}</button>
+    <label class="btn" title="{% translate 'Send a voice or video recording' %}" aria-label="{% translate 'Send a voice or video recording' %}">{% include "partials/icon.html" with name="video" %}<input type="file" accept="audio/*,video/*" data-ai-file class="visually-hidden"></label>
     <button class="btn btn-primary" type="submit" aria-label="{% translate 'Send' %}">{% include "partials/icon.html" with name="send" %}</button>
   </form>
   <p class="muted small ai-note">{% include "partials/icon.html" with name="shield" %}{% translate "Answers are written by Google Gemini from the family information you can see here. It can make mistakes — check before saving. Do not write passwords or card numbers." %}</p>

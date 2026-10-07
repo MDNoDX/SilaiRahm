@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: shajara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-06 22:01+0500\n"
+"POT-Creation-Date: 2026-10-07 08:30+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Shajara team\n"
 "Language-Team: Uzbek (Latin)\n"
@@ -34,7 +34,7 @@ msgstr "Qorongʻi"
 msgid "Colour theme"
 msgstr "Rang mavzusi"
 
-#: static/js/app.js:130 static/js/assistant.js:68
+#: static/js/app.js:130 static/js/assistant.js:68 static/js/assistant.js:247
 msgid "Saving…"
 msgstr "Saqlanmoqda…"
 
@@ -46,7 +46,7 @@ msgstr "Fayl tanlash"
 msgid "No file chosen"
 msgstr "Fayl tanlanmagan"
 
-#: static/js/app.js:201
+#: static/js/app.js:201 static/js/assistant.js:217
 msgid "Remove"
 msgstr "Olib tashlash"
 
@@ -78,7 +78,7 @@ msgstr "Brauzer sozlamalarida bloklangan"
 msgid "Off for this device"
 msgstr "Bu qurilmada oʻchirilgan"
 
-#: static/js/app.js:715 static/js/app.js:795
+#: static/js/app.js:715 static/js/app.js:795 static/js/assistant.js:197
 msgid "The recording is too long: up to 4 MB (about 25 minutes of voice or 1 minute of video)."
 msgstr "Yozuv juda uzun: 4 MB gacha (taxminan 25 daqiqa ovoz yoki 1 daqiqa video)."
 
@@ -90,15 +90,15 @@ msgstr "Bu brauzer yozuvni biriktira olmaydi. Uning oʻrniga yozib olingan fayln
 msgid "The camera could not be turned on. Allow access to the camera and the microphone in the browser."
 msgstr "Kamerani yoqib boʻlmadi. Brauzerda kamera va mikrofonga ruxsat bering."
 
-#: static/js/app.js:784 static/js/assistant.js:191
+#: static/js/app.js:784 static/js/assistant.js:328
 msgid "The microphone could not be turned on. Allow access to the microphone in the browser."
 msgstr "Mikrofonni yoqib boʻlmadi. Brauzerda mikrofonga ruxsat bering."
 
-#: static/js/app.js:811 static/js/assistant.js:174
+#: static/js/app.js:811 static/js/assistant.js:278
 msgid "Writing it down…"
 msgstr "Matnga yozilmoqda…"
 
-#: static/js/app.js:823 static/js/assistant.js:96 static/js/assistant.js:184
+#: static/js/app.js:823 static/js/assistant.js:96 static/js/assistant.js:151
 msgid "Something went wrong. Please try again."
 msgstr "Nimadir xato ketdi. Qaytadan urinib koʻring."
 
@@ -110,11 +110,11 @@ msgstr "Qoʻshish"
 msgid "No, thanks"
 msgstr "Yoʻq, rahmat"
 
-#: static/js/assistant.js:73
+#: static/js/assistant.js:73 static/js/assistant.js:258
 msgid "Open"
 msgstr "Ochish"
 
-#: static/js/assistant.js:74
+#: static/js/assistant.js:74 static/js/assistant.js:272
 msgid "Saved"
 msgstr "Saqlandi"
 
@@ -122,13 +122,41 @@ msgstr "Saqlandi"
 msgid "Not saved"
 msgstr "Saqlanmadi"
 
-#: static/js/assistant.js:98
+#: static/js/assistant.js:98 static/js/assistant.js:166 static/js/assistant.js:235
 msgid "No connection. Check the internet and try again."
 msgstr "Aloqa yoʻq. Internetni tekshirib, qaytadan urinib koʻring."
 
-#: static/js/assistant.js:122
+#: static/js/assistant.js:137
 msgid "Proposed"
 msgstr "Taklif qilindi"
+
+#: static/js/assistant.js:216 static/js/assistant.js:282
+msgid "Turn into text and send"
+msgstr "Matnga aylantirib yuborish"
+
+#: static/js/assistant.js:219
+msgid "Title"
+msgstr "Sarlavha"
+
+#: static/js/assistant.js:220
+msgid "For example: Grandfather tells about his childhood"
+msgstr "Masalan: Bobom bolaligi haqida soʻzlaydi"
+
+#: static/js/assistant.js:221
+msgid "Also write it down as text"
+msgstr "Matn qilib ham yozilsin"
+
+#: static/js/assistant.js:222 static/js/assistant.js:251
+msgid "Save as an event"
+msgstr "Voqea sifatida saqlash"
+
+#: static/js/assistant.js:241
+msgid "Write a title for the recording."
+msgstr "Yozuvga sarlavha yozing."
+
+#: static/js/assistant.js:260
+msgid "Edit"
+msgstr "Tahrirlash"
 
 #: static/js/tree.js:141
 msgid "Family tree"

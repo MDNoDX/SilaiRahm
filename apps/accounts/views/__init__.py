@@ -7,7 +7,7 @@
 """
 from .auth import (
     LoginView, complete_profile, password_reset, password_reset_complete, password_reset_confirm, password_reset_done,
-    register, two_factor,
+    register, two_factor, verify_email,
 )
 from .profile import data_view, delete_account, settings_view
 from .security import (

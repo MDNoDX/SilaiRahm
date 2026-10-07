@@ -29,12 +29,20 @@ bazasida saqlanadi. Shuning uchun boshqa serverga koʻchish = bazani koʻchirish
 | `CRON_SECRET` | ha | Vercel Cron shu kalit bilan keladi |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google orqali kirish uchun | quyida |
 | `TELEGRAM_BOT_TOKEN` | Telegram eslatmalari uchun | quyida. Bot nomi tokenning oʻzidan olinadi; `TELEGRAM_BOT_USERNAME` shart emas |
-| `GEMINI_API_KEY` | AI yordamchi va ovozni matnga aylantirish uchun | quyida. `GEMINI_MODEL` shart emas (standart `gemini-flash-latest` — har doim eng yangi Flash; u yopilsa yoki band boʻlsa, sayt zaxira modelga oʻtadi) |
+| `GEMINI_API_KEY` | AI yordamchi va ovozni matnga aylantirish uchun | quyida. `GEMINI_MODEL` shart emas (standart `gemini-flash-lite-latest` — eng yangi Flash-Lite, ~2 soniyada javob beradi; u yopilsa yoki band boʻlsa, sayt zaxira modellarga oʻtadi) |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | push-bildirishnomalar uchun | quyida. `VAPID_SUBJECT` shart emas (sayt manzili olinadi) |
-| `EMAIL_*`, `DJANGO_EMAIL_BACKEND` | parolni tiklash xatlari uchun | `.env.example` ga qarang |
+| `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` | email bilan roʻyxatdan oʻtish (tasdiqlash kodi) va parolni tiklash uchun | quyida. Ikkalasi boʻlmasa, roʻyxatdan faqat Google orqali oʻtiladi |
 | `DJANGO_ALLOWED_HOSTS`, `DJANGO_CSRF_TRUSTED_ORIGINS` | faqat oʻz domeningiz boʻlsa | `*.vercel.app` manzillari avtomatik qoʻshiladi |
 
 Oʻzgaruvchi qoʻshilgach, **Deployments → Redeploy** qiling.
+
+### Xat yuborish (Gmail orqali, bepul)
+
+Email bilan roʻyxatdan oʻtganlarga tasdiqlash kodi va parolni tiklash havolasi shu orqali boradi.
+1. Saytdan xat yuboradigan Gmail hisobida ikki bosqichli tasdiqlashni yoqing (myaccount.google.com → Security).
+2. https://myaccount.google.com/apppasswords → nom: «Silai Rahm» → **Create** → 16 harfli parol chiqadi.
+3. Vercel’ga `EMAIL_HOST_USER` = Gmail manzili, `EMAIL_HOST_PASSWORD` = shu 16 harfli parol (boʻshliqsiz) → **Redeploy**.
+   Qolgan sozlamalar (smtp.gmail.com, 587, TLS) oʻzi olinadi. Gmail kuniga ~500 ta xat yuborishga ruxsat beradi.
 
 ### AI yordamchi (Google Gemini, bepul)
 
@@ -43,7 +51,7 @@ Oʻzgaruvchi qoʻshilgach, **Deployments → Redeploy** qiling.
 3. Bepul tarifda daqiqasiga va kuniga soʻrovlar soni cheklangan; sayt har foydalanuvchiga soatiga 40 ta soʻrov beradi.
    Bepul tarifda Google yuborilgan matnlardan oʻz mahsulotlarini yaxshilash uchun foydalanishi mumkin — yordamchi
    sahifasida bu haqda yozilgan. Toʻlovli tarifga (Billing) oʻtsangiz, bu ishlatilmaydi.
-4. Model: `GEMINI_MODEL` (standart `gemini-flash-latest` — tez va bepul). Google eski versiyalarni yopadi (masalan, `gemini-2.5-flash` 2026-yilda yangi foydalanuvchilarga yopildi).
+4. Model: `GEMINI_MODEL` (standart `gemini-flash-lite-latest` — eng tez va bepul). Google eski versiyalarni yopadi (masalan, `gemini-2.5-flash` 2026-yilda yangi foydalanuvchilarga yopildi).
 
 ### Google orqali kirish
 

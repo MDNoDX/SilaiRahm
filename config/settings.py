@@ -222,7 +222,7 @@ TELEGRAM_BOT_USERNAME = os.environ.get("TELEGRAM_BOT_USERNAME", "")
 TELEGRAM_WEBHOOK_SECRET = os.environ.get("TELEGRAM_WEBHOOK_SECRET", "")
 # AI assistant (optional): a Google AI Studio key; the free tier is enough.
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "") or "gemini-flash-latest"
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "") or "gemini-flash-lite-latest"
 # Vercel Cron sends "Authorization: Bearer $CRON_SECRET" to /cron/kunlik/.
 CRON_SECRET = os.environ.get("CRON_SECRET", "")
 # Web Push (reminders on phones and in browsers): a VAPID key pair.
@@ -234,13 +234,19 @@ VAPID_SUBJECT = os.environ.get("VAPID_SUBJECT", "") or (
 
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 60  # stay signed in for two months
 
-EMAIL_BACKEND = os.environ.get("DJANGO_EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
-EMAIL_HOST = os.environ.get("EMAIL_HOST", "localhost")
-EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "25"))
+# Mail (sign-up codes, password reset). Enough on its own: EMAIL_HOST_USER (a Gmail address) and
+# EMAIL_HOST_PASSWORD (a Google "app password"); everything else then defaults to Gmail's server.
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
-EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "0") == "1"
-DEFAULT_FROM_EMAIL = os.environ.get("DJANGO_DEFAULT_FROM_EMAIL", "silairahm@localhost")
+_MAIL_READY = bool(EMAIL_HOST_USER and EMAIL_HOST_PASSWORD)
+EMAIL_BACKEND = os.environ.get("DJANGO_EMAIL_BACKEND", "") or (
+    "django.core.mail.backends.smtp.EmailBackend" if _MAIL_READY else "django.core.mail.backends.console.EmailBackend")
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "") or ("smtp.gmail.com" if _MAIL_READY else "localhost")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "") or (587 if _MAIL_READY else 25))
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "1" if _MAIL_READY else "0") == "1"
+EMAIL_TIMEOUT = 15
+DEFAULT_FROM_EMAIL = os.environ.get("DJANGO_DEFAULT_FROM_EMAIL", "") or (
+    f"Silai Rahm <{EMAIL_HOST_USER}>" if _MAIL_READY else "silairahm@localhost")
 
 LOGGING = {
     "version": 1,

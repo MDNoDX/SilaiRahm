@@ -940,3 +940,9 @@ a.spacer { color: var(--ink); }
 .file-row .file-video { max-width: 280px; }
 @media (prefers-reduced-motion: reduce) { .rec-dot, .ai-form .btn.is-recording { animation: none; } }
 .empty .ornament .ico { width: 100%; height: 100%; }
+.ai-recording { display: flex; flex-direction: column; gap: 10px; width: min(560px, 92%); }
+.ai-recording audio, .ai-recording video { width: 100%; }
+.ai-recording video { max-height: 320px; border-radius: var(--r-sm); background: #000; }
+.ai-field { display: flex; flex-direction: column; gap: 4px; font-size: .88rem; font-weight: 600; }
+.ai-field input { font-weight: 400; }
+.ai-recording .ai-error { margin: 0; }

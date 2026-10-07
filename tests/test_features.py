@@ -7,7 +7,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from apps.accounts.models import User
-from apps.genealogy.models import Event, Media, Person
+from apps.genealogy.models import Event, Person
 from apps.network.models import Follow
 
 from .helpers import make_family
@@ -105,15 +105,6 @@ class RecordingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Event.objects.exists())
 
-    def test_life_story_video(self):
-        video = SimpleUploadedFile("m.mp4", b"\x00\x00\x00\x18ftypmp42" + b"0" * 500, content_type="video/mp4")
-        self.client.post(reverse("genealogy:person_story", args=[self.p["me"].pk]),
-                         {"life_story": "Bolaligim", "recording": video})
-        item = Media.objects.get()
-        self.assertTrue(item.in_story)
-        self.assertEqual(item.kind, "video")
-        self.assertContains(self.client.get(self.p["me"].get_absolute_url()), "<video")
-
     def test_recordings_are_private(self):
         self.client.post(reverse("genealogy:event_create"), {
             "kind": "other", "title": "Kun", "recording": self._voice()})
@@ -124,10 +115,29 @@ class RecordingTests(TestCase):
 
 
 def _answer(text="", calls=()):
-    response = mock.Mock(status_code=200)
+    """A Gemini reply, readable both whole (.json) and as an event stream (.iter_lines)."""
+    response = mock.Mock(status_code=200, text="")
     parts = ([{"text": text}] if text else []) + [{"functionCall": c} for c in calls]
     response.json.return_value = {"candidates": [{"content": {"parts": parts}}]}
+    halves = [text[: len(text) // 2], text[len(text) // 2:]] if text else []
+    lines = [f"data: {json.dumps({'candidates': [{'content': {'parts': [{'text': h}]}}]})}" for h in halves if h]
+    lines += [f"data: {json.dumps({'candidates': [{'content': {'parts': [{'functionCall': c}]}}]})}" for c in calls]
+    response.iter_lines.return_value = lines
     return response
+
+
+def read_stream(response):
+    """The streamed answer put together: {"reply": …, "proposals": […]} or {"error": …}."""
+    if not response.streaming:
+        return response.json()
+    out = {"reply": "", "proposals": []}
+    for line in b"".join(response.streaming_content).decode().splitlines():
+        item = json.loads(line)
+        out["reply"] += item.get("t", "")
+        if "error" in item:
+            out["error"] = item["error"]
+        out["proposals"] = item.get("proposals", out["proposals"])
+    return out
 
 
 @override_settings(GEMINI_API_KEY="test-key")
@@ -137,8 +147,11 @@ class AssistantTests(TestCase):
         self.client.force_login(self.user)
 
     def ask(self, text, **kw):
-        return self.client.post(reverse("assistant:message"), json.dumps({"message": text, "history": kw.get("history", [])}),
-                                content_type="application/json")
+        response = self.client.post(reverse("assistant:message"),
+                                    json.dumps({"message": text, "history": kw.get("history", [])}),
+                                    content_type="application/json")
+        response.data = read_stream(response)
+        return response
 
     def test_page(self):
         self.assertContains(self.client.get(reverse("assistant:chat")), "data-ai")
@@ -151,7 +164,7 @@ class AssistantTests(TestCase):
     def test_answer_knows_the_family(self):
         with mock.patch("apps.assistant.gemini.requests.post", return_value=_answer("Bobongiz — Karim.")) as post:
             data = self.ask("Bobom kim?", history=[{"role": "model", "text": "skip"}, {"role": "user", "text": "Salom"},
-                                                    {"role": "model", "text": "Salom!"}]).json()
+                                                    {"role": "model", "text": "Salom!"}]).data
         self.assertEqual(data["reply"], "Bobongiz — Karim.")
         body = post.call_args.kwargs["json"]
         self.assertIn("Karim", body["systemInstruction"]["parts"][0]["text"])
@@ -164,7 +177,7 @@ class AssistantTests(TestCase):
         call = {"name": "add_event", "args": {"kind": "other", "title": "Pushkin bogʻi", "story": "Bir kuni…",
                                               "people_ids": [self.p["me"].pk], "year": 2012}}
         with mock.patch("apps.assistant.gemini.requests.post", return_value=_answer("Qoʻshaymi?", [call])):
-            data = self.ask("Bir hikoyam bor").json()
+            data = self.ask("Bir hikoyam bor").data
         self.assertEqual(len(data["proposals"]), 1)
         self.assertFalse(Event.objects.exists())
         saved = self.client.post(reverse("assistant:apply"), json.dumps({"token": data["proposals"][0]["token"]}),
@@ -178,7 +191,7 @@ class AssistantTests(TestCase):
         call = {"name": "add_relative", "args": {"anchor_id": self.p["me"].pk, "relation": "father",
                                                  "first_name": "Boshqa", "gender": "male"}}
         with mock.patch("apps.assistant.gemini.requests.post", return_value=_answer("", [call])):
-            token = self.ask("Otam Boshqa").json()["proposals"][0]["token"]
+            token = self.ask("Otam Boshqa").data["proposals"][0]["token"]
         response = self.client.post(reverse("assistant:apply"), json.dumps({"token": token}), content_type="application/json")
         self.assertEqual(response.status_code, 400)  # already has a father
         self.assertFalse(Person.objects.filter(first_name="Boshqa").exists())
@@ -188,7 +201,7 @@ class AssistantTests(TestCase):
         self.assertEqual(response.status_code, 400)
         call = {"name": "update_person", "args": {"person_id": self.p["me"].pk, "occupation": "Dasturchi"}}
         with mock.patch("apps.assistant.gemini.requests.post", return_value=_answer("", [call])):
-            token = self.ask("Men dasturchiman").json()["proposals"][0]["token"]
+            token = self.ask("Men dasturchiman").data["proposals"][0]["token"]
         stranger = account("begona", "Begona")
         self.client.force_login(stranger)
         response = self.client.post(reverse("assistant:apply"), json.dumps({"token": token}), content_type="application/json")
@@ -199,8 +212,8 @@ class AssistantTests(TestCase):
         self.assertEqual(self.p["me"].occupation, "Dasturchi")
 
     def test_busy_and_rate_limit(self):
-        with mock.patch("apps.assistant.gemini.requests.post", return_value=mock.Mock(status_code=429, text="quota")):
-            self.assertEqual(self.ask("salom").status_code, 502)
+        with mock.patch("apps.assistant.gemini.requests.post", return_value=mock.Mock(status_code=503, text="busy")):
+            self.assertIn("error", self.ask("salom").data)
         from django.core.cache import cache
 
         cache.set(f"assistant:{self.user.pk}", 999, 60)
@@ -210,9 +223,37 @@ class AssistantTests(TestCase):
     def test_retired_model_falls_back(self):
         gone = mock.Mock(status_code=404, text="no longer available")
         with mock.patch("apps.assistant.gemini.requests.post", side_effect=[gone, _answer("Salom!")]) as post:
-            self.assertEqual(self.ask("salom").json()["reply"], "Salom!")
+            self.assertEqual(self.ask("salom").data["reply"], "Salom!")
         self.assertEqual(post.call_count, 2)
         self.assertNotEqual(post.call_args_list[0].args[0], post.call_args_list[1].args[0])
+
+    def test_quota_on_one_model_moves_to_the_next(self):
+        out = mock.Mock(status_code=429, text="quota")
+        with mock.patch("apps.assistant.gemini.requests.post", side_effect=[out, _answer("Tayyor")]):
+            self.assertEqual(self.ask("salom").data["reply"], "Tayyor")
+
+    def test_ids_as_text_are_understood(self):
+        call = {"name": "add_event", "args": {"kind": "other", "title": "Safar", "people_ids": ["#%d" % self.p["me"].pk]}}
+        with mock.patch("apps.assistant.gemini.requests.post", return_value=_answer("", [call])):
+            data = self.ask("Safar").data
+        self.assertIn(self.p["me"].short_name, data["proposals"][0]["summary"])
+        self.assertTrue(data["reply"])  # a sentence even when the model only proposed
+
+    def test_chat_recording_saved_as_event(self):
+        voice = SimpleUploadedFile("v.weba", VOICE, content_type="audio/webm")
+        with mock.patch("apps.assistant.gemini.requests.post", return_value=_answer("Bobom bolaligida…")):
+            data = self.client.post(reverse("assistant:save_recording"),
+                                    {"file": voice, "title": "Bobom hikoyasi", "as_text": "1"}).json()
+        self.assertTrue(data["ok"])
+        event = Event.objects.get()
+        self.assertEqual((event.title, event.description, event.recording_kind), ("Bobom hikoyasi", "Bobom bolaligida…", "audio"))
+        self.assertEqual(list(event.people.all()), [self.p["me"]])
+        self.assertEqual(self.client.get(event.recording.url).status_code, 200)
+        # A title is needed; nothing is saved without one.
+        response = self.client.post(reverse("assistant:save_recording"),
+                                    {"file": SimpleUploadedFile("v.weba", VOICE, content_type="audio/webm"), "title": " "})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Event.objects.count(), 1)
 
     def test_transcribe(self):
         with mock.patch("apps.assistant.gemini.requests.post", return_value=_answer("Bir kuni bogʻda edik.")) as post:

@@ -1,4 +1,6 @@
 """Getting in: sign up, sign in (with the second step), password reset, finishing a new profile."""
+import logging
+
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth import views as auth_views
@@ -11,19 +13,59 @@ from django.utils.translation import gettext as _
 
 from apps.core.languages import normalize_language
 
+from .. import signup
+
 from ..forms import CompleteProfileForm, LoginForm, PasswordResetForm, RegisterForm, SetPasswordForm
+
+logger = logging.getLogger(__name__)
 
 
 def register(request):
     if request.user.is_authenticated:
         return redirect("home")
     form = RegisterForm(request.POST or None)
+    ready = signup.email_ready()
     if request.method == "POST" and form.is_valid():
-        user = form.save()
-        login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-        messages.success(request, _("Welcome! Your account has been created."))
-        return redirect(_after_sign_in(request))
-    return render(request, "accounts/auth/register.html", {"form": form, "next": request.GET.get("next", "")})
+        if not ready:
+            form.add_error(None, _("Signing up with an email address is not available yet. Continue with Google."))
+        else:
+            try:
+                signup.start(request, form, normalize_language(translation.get_language()) or "uz")
+            except Exception:  # noqa: BLE001 - the mail server may refuse; tell the person instead of failing
+                logger.exception("Could not send the sign-up code")
+                form.add_error("email", _("The code could not be sent to this address. Check it and try again."))
+            else:
+                if request.POST.get("next"):
+                    request.session["signup_next"] = request.POST["next"]
+                return redirect("accounts:verify_email")
+    return render(request, "accounts/auth/register.html", {"form": form, "next": request.GET.get("next", ""),
+                                                           "email_ready": ready})
+
+
+def verify_email(request):
+    """Step two of signing up: the code from the email."""
+    item = signup.pending(request)
+    if request.user.is_authenticated or not item:
+        return redirect("home" if request.user.is_authenticated else "accounts:register")
+    error = ""
+    if request.method == "POST" and request.POST.get("resend"):
+        if signup.resend(request):
+            messages.success(request, _("A new code has been sent."))
+        else:
+            messages.error(request, _("Please wait a minute before asking for a new code."))
+        return redirect("accounts:verify_email")
+    if request.method == "POST":
+        result = signup.confirm(request, request.POST.get("code", ""))
+        if isinstance(result, str):
+            error = result
+        else:
+            login(request, result, backend="django.contrib.auth.backends.ModelBackend")
+            messages.success(request, _("Welcome! Your account has been created."))
+            target = request.session.pop("signup_next", "")
+            if target and url_has_allowed_host_and_scheme(target, {request.get_host()}, request.is_secure()):
+                return redirect(target)
+            return redirect(_after_sign_in(request))
+    return render(request, "accounts/auth/verify_email.html", {"email": item["data"]["email"], "error": error})
 
 
 def _after_sign_in(request, default="home"):

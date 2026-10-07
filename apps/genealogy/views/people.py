@@ -323,21 +323,7 @@ def marriage_edit(request, pk):
 @login_required
 def person_story(request, pk):
     """The life story, written on the person's page like a book."""
-    from django.core.exceptions import ValidationError
-
-    from .. import recordings
-
     person = person_for_edit(request, pk)
-    upload = request.FILES.get("recording")
-    if upload:  # told aloud: kept with the life story (and in the album)
-        try:
-            content, kind = recordings.clean(upload)
-        except ValidationError as exc:
-            messages.error(request, exc.messages[0])
-            return redirect(person.get_absolute_url() + "#life")
-        Media.objects.create(owner=person.owner, person=person, kind=kind, file=content, in_story=True,
-                             caption=_("Life story")[:200], uploaded_by=request.user)
-        history.record(person.owner, request.user, Change.Action.UPDATED, person, what="album", details={"added": 1})
     before = history.snapshot(person)
     person.life_story = request.POST.get("life_story", "").strip()
     person.save(update_fields=["life_story", "updated_at"])

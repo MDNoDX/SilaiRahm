@@ -9,4 +9,5 @@ urlpatterns = [
     path("xabar/", views.message, name="message"),
     path("saqlash/", views.apply, name="apply"),
     path("matnga/", views.transcribe, name="transcribe"),
+    path("yozuv/", views.save_recording, name="save_recording"),
 ]

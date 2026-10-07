@@ -1,5 +1,5 @@
 """Signing in: e-mail and throttling, Google, the Mac app bridge, two-step sign-in."""
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from apps.accounts import totp
@@ -95,3 +95,53 @@ class TwoFactorTests(TestCase):
         self.assertTrue(totp.verify(secret, totp.code_at(secret, 50), now=50 * 30 + 5))
         self.assertTrue(totp.verify(secret, totp.code_at(secret, 49), now=50 * 30 + 5))   # clock drift
         self.assertFalse(totp.verify(secret, totp.code_at(secret, 40), now=50 * 30 + 5))
+
+
+class EmailSignupTests(TestCase):
+    DATA = {"first_name": "Aziza", "last_name": "Karimova", "gender": "female", "username": "aziza",
+            "email": "aziza@example.com", "password1": "Yaxshi-parol-2026", "password2": "Yaxshi-parol-2026"}
+
+    def code(self):
+        import re
+
+        from django.core import mail
+        return re.search(r"\b(\d{6})\b", mail.outbox[-1].body)[1]
+
+    def test_account_is_made_only_after_the_code(self):
+        response = self.client.post(reverse("accounts:register"), self.DATA)
+        self.assertRedirects(response, reverse("accounts:verify_email"))
+        self.assertFalse(User.objects.filter(username="aziza").exists())
+        self.assertNotIn("Yaxshi-parol-2026", str(self.client.session.items()))  # only a hash waits
+        wrong = "000000" if self.code() != "000000" else "111111"
+        self.assertContains(self.client.post(reverse("accounts:verify_email"), {"code": wrong}), "errorlist")
+        self.assertFalse(User.objects.filter(username="aziza").exists())
+        response = self.client.post(reverse("accounts:verify_email"), {"code": self.code()})
+        user = User.objects.get(username="aziza")
+        self.assertTrue(user.check_password("Yaxshi-parol-2026"))
+        self.assertEqual(user.person.first_name, "Aziza")
+        self.assertEqual(int(self.client.session["_auth_user_id"]), user.pk)
+
+    def test_too_many_wrong_codes(self):
+        self.client.post(reverse("accounts:register"), self.DATA)
+        right = self.code()
+        wrong = "000000" if right != "000000" else "111111"
+        for _ in range(5):
+            self.client.post(reverse("accounts:verify_email"), {"code": wrong})
+        self.client.post(reverse("accounts:verify_email"), {"code": right})
+        self.assertFalse(User.objects.filter(username="aziza").exists())
+
+    def test_resend_waits_a_minute(self):
+        from django.core import mail
+
+        self.client.post(reverse("accounts:register"), self.DATA)
+        self.client.post(reverse("accounts:verify_email"), {"resend": "1"})
+        self.assertEqual(len(mail.outbox), 1)
+
+    @override_settings(DEBUG=False, EMAIL_BACKEND="django.core.mail.backends.console.EmailBackend")
+    def test_without_a_mail_server_google_is_offered(self):
+        response = self.client.post(reverse("accounts:register"), self.DATA)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(User.objects.filter(username="aziza").exists())
+
+    def test_step_two_needs_step_one(self):
+        self.assertRedirects(self.client.get(reverse("accounts:verify_email")), reverse("accounts:register"))

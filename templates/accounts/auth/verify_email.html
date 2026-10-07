@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Confirm your email" %}{% endblock %}
+{% block main_class %}flush{% endblock %}
+{% block content %}
+<div class="auth-layout">
+  <aside class="auth-side">
+    <h2>{% translate "Every family has a story worth keeping" %}</h2>
+    <p>{% translate "Family tree — a family archive for Uzbek families." %}</p>
+  </aside>
+  <div class="auth-main">
+<div class="auth-wrap">
+  <div class="card">
+    <h1>{% translate "Confirm your email" %}</h1>
+    <p class="muted">{% blocktranslate %}We sent a 6-digit code to <b>{{ email }}</b>. Type it here to finish signing up.{% endblocktranslate %}</p>
+    <form method="post" novalidate>{% csrf_token %}
+      {% if error %}<ul class="errorlist"><li>{{ error }}</li></ul>{% endif %}
+      <div class="field">
+        <label for="code">{% translate "Code from the email" %}</label>
+        <input id="code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7" required autofocus
+               pattern="[0-9 ]*" style="font-size:1.4rem;letter-spacing:.3em;text-align:center">
+      </div>
+      <div class="form-actions"><button class="btn btn-primary" type="submit">{% translate "Confirm" %}</button></div>
+    </form>
+    <form method="post" style="margin-top:12px">{% csrf_token %}
+      <p class="muted small">{% translate "No email? Look in the spam folder, or" %}
+        <button class="btn btn-sm btn-ghost" type="submit" name="resend" value="1">{% translate "send a new code" %}</button></p>
+    </form>
+  </div>
+  <p class="muted" style="text-align:center;margin-top:16px"><a href="{% url 'accounts:register' %}">{% translate "Change the details" %}</a></p>
+</div>
+  </div>
+</div>
+{% endblock %}

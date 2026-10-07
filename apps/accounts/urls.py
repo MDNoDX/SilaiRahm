@@ -11,6 +11,7 @@ urlpatterns = [
     path("kirish/kod/", views.two_factor, name="two_factor"),
     path("chiqish/", auth_views.LogoutView.as_view(), name="logout"),
     path("royxatdan-otish/", views.register, name="register"),
+    path("royxatdan-otish/tasdiqlash/", views.verify_email, name="verify_email"),
     path("profilni-toldirish/", views.complete_profile, name="complete_profile"),
     path("parol/tiklash/", views.password_reset, name="password_reset"),
     path("parol/tiklash/yuborildi/", views.password_reset_done, name="password_reset_done"),
