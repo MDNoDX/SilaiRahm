@@ -71,6 +71,22 @@ class Connection(models.Model):
         return self.sender_person if user.pk == self.sender_id else self.recipient_person
 
 
+class Follow(models.Model):
+    """Following an account (Instagram-style). A private account approves each follower."""
+
+    follower = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="following_set")
+    followed = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="followers_set")
+    approved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [models.UniqueConstraint(fields=["follower", "followed"], name="unique_follow")]
+
+    def __str__(self):
+        return f"{self.follower} → {self.followed}{'' if self.approved else ' (requested)'}"
+
+
 class PersonMatch(models.Model):
     """Two records of one person in two family trees (`first.pk < second.pk`)."""
 

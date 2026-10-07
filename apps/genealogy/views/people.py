@@ -11,9 +11,10 @@ from apps.core.muchal import next_muchal_year
 from apps.core.text import surname_from_name
 
 from .. import duplicates, history
-from ..access import can_edit, can_view, person_for_edit, person_for_view, require_edit, viewer_person
+from ..access import can_edit, can_see_stories, can_view, person_for_edit, person_for_view, require_edit, viewer_person
 from ..forms import MarriageForm, PersonForm, RelativeWithSpouseForm
 from ..kinship import Archive
+from ..relations import wife_is_married
 from ..models import Change, Marriage, Media, Person
 from ..terminology import ADD_RELATION, SECTION, generation_label
 from ._common import _focus_for, _pdf_response
@@ -29,13 +30,8 @@ def _filter_people(queryset, show):
         "deceased": Q(is_deceased=True),
         "male": Q(gender="male"),
         "female": Q(gender="female"),
-        "nodate": Q(birth_year=None),
-        "nophoto": Q(photo=""),
     }
     return queryset.filter(rules[show]) if show in rules else queryset
-
-
-MISSING_FILTERS = ("nodate", "nophoto")
 
 
 @login_required
@@ -55,7 +51,7 @@ def people_list(request):
     groups = []
     if query:
         groups = [("", [row(p) for p in _ranked(people, query, 500)])]
-    elif order == "abc" or not focus or show in MISSING_FILTERS:
+    elif order == "abc" or not focus:
         groups = [("", [row(p) for p in people.order_by("first_name", "last_name", "id")])]
     else:
         gens = archive.generations(focus)
@@ -72,7 +68,6 @@ def people_list(request):
     template = "genealogy/people/_grid.html" if request.GET.get("partial") else "genealogy/people/list.html"
     return render(request, template, {
         "groups": groups, "query": query, "total": len(archive.people), "show": show, "order": order,
-        "missing": show in MISSING_FILTERS,
         "shown": sum(len(rows) for _label, rows in groups),
         "duplicates": len(duplicates.pairs(request.archive)) if request.can_edit and not request.GET.get("partial") else 0,
     })
@@ -82,12 +77,12 @@ def _life_path(archive, person):
     """The milestones of one life, oldest first: [{"year", "when", "kind", "text", "url"}]."""
     items = []
 
-    def add(year, month, day, kind, text, url=""):
+    def add(year, month, day, kind, text, url="", story="", recording=None):
         from apps.core.dates import format_partial_date
 
         items.append({"key": (year or 9999, month or 0, day or 0), "year": year,
                       "when": format_partial_date(year, month, day) if year else "", "kind": kind,
-                      "text": text, "url": url})
+                      "text": text, "url": url, "story": story, "recording": recording})
 
     if person.birth_year:
         add(person.birth_year, person.birth_month, person.birth_day, "birth",
@@ -103,9 +98,9 @@ def _life_path(archive, person):
             text = (_("Son {name} was born") if child.is_male else _("Daughter {name} was born")).format(
                 name=child.first_name)
             add(child.birth_year, child.birth_month, child.birth_day, "child", text, child.get_absolute_url())
-    for event in person.events.all():
-        if event.year:
-            add(event.year, event.month, event.day, "event", event.display_title, event.get_absolute_url())
+    for event in person.events.all():  # events and memories, dated or not, with their story
+        add(event.year, event.month, event.day, "event", event.display_title, event.get_absolute_url(),
+            event.description, event if event.recording else None)
     if person.death_year:
         add(person.death_year, person.death_month, person.death_day, "death",
             _("Passed away in {place}").format(place=person.death_place) if person.death_place else _("Passed away"))
@@ -127,8 +122,10 @@ def person_detail(request, pk):
     def people(pks):
         return [(archive.people[x], archive.label(person.pk, x)) for x in pks]
 
-    media = list(person.media.all())
+    show_stories = can_see_stories(request.user, person.owner)
+    media = list(person.media.all()) if show_stories else []
     context = {
+        "show_stories": show_stories,
         "person": person,
         "is_owner": editable,
         "relation_to_me": archive.label(me, person.pk) if me and me != person.pk else "",
@@ -136,16 +133,17 @@ def person_detail(request, pk):
         "father": archive.people.get(person.father_id),
         "mother": archive.people.get(person.mother_id),
         "spouses": people(archive.spouses(person.pk)),
+        "can_add_spouse": person.is_male or not wife_is_married(person),
         "marriages": [m for _sid, m in archive.unions.get(person.pk, [])],
         "children": people(archive.children.get(person.pk, [])),
         "siblings": people(archive.siblings(person.pk)),
-        "stories": person.stories.all(),
-        "events": person.events.all(),
-        "friends": person.friends.all(),
+        "events": person.events.all() if show_stories else [],
+        "friends": person.friends.all() if show_stories else [],
         "photos": [m for m in media if m.kind == Media.Kind.PHOTO],
         "files": [m for m in media if m.kind != Media.Kind.PHOTO],
+        "story_recordings": [m for m in media if m.in_story],
         "media_count": len(media),
-        "life_path": _life_path(archive, person),
+        "life_path": _life_path(archive, person) if show_stories else [],
         "muchal": person.muchal,
         "next_muchal": next_muchal_year(person.birth_year, person.birth_month, person.birth_day)
         if not person.is_deceased else None,
@@ -184,7 +182,6 @@ def _across_trees(request, person, editable):
     account = person.linked_user if person.linked_user_id else None
     return {
         "account": account,
-        "account_tree": account if account is not None and can_view(request.user, account) else None,
         "matches": matches,
         "my_tree": mine if (person.owner_id != mine.pk and can_edit(request.user, mine)
                             and all(m["owner"].pk != mine.pk for m in matches)) else None,
@@ -322,14 +319,43 @@ def marriage_edit(request, pk):
     return render(request, "genealogy/people/marriage_form.html", {"form": form, "marriage": marriage, "back": back})
 
 
+@require_POST
+@login_required
+def person_story(request, pk):
+    """The life story, written on the person's page like a book."""
+    from django.core.exceptions import ValidationError
+
+    from .. import recordings
+
+    person = person_for_edit(request, pk)
+    upload = request.FILES.get("recording")
+    if upload:  # told aloud: kept with the life story (and in the album)
+        try:
+            content, kind = recordings.clean(upload)
+        except ValidationError as exc:
+            messages.error(request, exc.messages[0])
+            return redirect(person.get_absolute_url() + "#life")
+        Media.objects.create(owner=person.owner, person=person, kind=kind, file=content, in_story=True,
+                             caption=_("Life story")[:200], uploaded_by=request.user)
+        history.record(person.owner, request.user, Change.Action.UPDATED, person, what="album", details={"added": 1})
+    before = history.snapshot(person)
+    person.life_story = request.POST.get("life_story", "").strip()
+    person.save(update_fields=["life_story", "updated_at"])
+    history.record_update(request.user, person, before)
+    messages.success(request, _("The information has been saved."))
+    return redirect(person.get_absolute_url() + "#life")
+
+
 @login_required
 def person_pdf(request, pk):
     from .. import pdf  # reportlab loads only when a PDF is asked for
 
     person = person_for_view(request, pk)
+    if not can_see_stories(request.user, person.owner):
+        raise PermissionDenied(_("Access denied."))
     archive = Archive(person.owner)
-    stories = sorted(person.stories.all(), key=lambda s: (s.year or 9999, s.created_at))
-    data = pdf.person_pdf(archive, person, focus_id=viewer_person(request, archive), stories=stories,
+    events = sorted(person.events.all(), key=lambda e: (e.year or 9999, e.month or 0, e.day or 0, e.created_at))
+    data = pdf.person_pdf(archive, person, focus_id=viewer_person(request, archive), stories=events,
                           life_path=_life_path(archive, person))
     return _pdf_response(data, f"{person.short_name}.pdf")
 

@@ -80,6 +80,15 @@ def render_parts(kind, params, days_left=0):
     elif kind == "connection_request":
         title = _("{name} wants to connect with you").format(name=params["name"])
         body = _("Open Connections to answer.")
+    elif kind == "follow_request":
+        title = _("{name} wants to follow you").format(name=params["name"])
+        body = _("Open Friends to answer.")
+    elif kind == "new_follower":
+        title = _("{name} follows you now").format(name=params["name"])
+        body = _("They see what you share with your followers.")
+    elif kind == "follow_accepted":
+        title = _("{name} accepted your follow request").format(name=params["name"])
+        body = _("You can open their family tree now.")
     elif kind == "connection_accepted":
         title = _("{name} accepted your request").format(name=params["name"])
         body = (_("You are friends now.") if params.get("kind") == "friend"
@@ -103,5 +112,5 @@ def telegram_text(notification):
         lines.append(f"<i>{escape(parts['date'])}</i>")
     if notification.url and settings.SITE_URL.startswith("http"):
         link = settings.SITE_URL.rstrip("/") + notification.url
-        lines.append(f'<a href="{escape(link)}">{escape(_("Open in Shajara"))}</a>')
+        lines.append(f'<a href="{escape(link)}">{escape(_("Open in Silai Rahm"))}</a>')
     return "\n".join(lines)

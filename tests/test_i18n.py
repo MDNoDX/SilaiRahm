@@ -20,7 +20,7 @@ SELF_NAMES = ("Oʻzbekcha", "Ўзбекча", "Русский", "English", "loti
 ALLOWED_LATIN_IN_CYRILLIC = {"PDF", "PNG", "MB", "Alisher", "GEDCOM", "Ctrl", "Mac", "Start", "stop", "JSON", "Google",
                              "Telegram", "Web", "UZ", "RU", "EN", "UTC", "MyHeritage", "Ancestry", "Gramps", "URL",
                              "cookie", "next", "Authenticator", "Microsoft", "Push", "iPhone", "iPad", "Esc", "K",
-                             "Shajara", "help", "start"}
+                             "Shajara", "Silai", "Rahm", "Gemini", "GEMINI", "API", "KEY", "AI", "Studio", "Get", "key", "help", "start"}
 LANGUAGES = {"uz": "uz-Latn", "uz-cyrl": "uz-Cyrl", "ru": "ru", "en": "en"}
 
 
@@ -61,8 +61,7 @@ class PagePurityTests(TestCase):
             reverse("genealogy:person_create"),
             reverse("genealogy:relative_add", args=[p["me"].pk]) + "?relation=child",
             reverse("genealogy:person_delete", args=[p["aunt"].pk]),
-            reverse("genealogy:stories"),
-            reverse("genealogy:story_create"),
+            reverse("assistant:chat"),
             reverse("genealogy:search") + "?q=zzzz",
             reverse("friends:list") + "?q=zzzz",
             reverse("accounts:settings"),
@@ -79,7 +78,6 @@ class PagePurityTests(TestCase):
             reverse("genealogy:history"),
             reverse("genealogy:duplicates"),
             reverse("genealogy:people") + "?tartib=abc",
-            reverse("genealogy:tree") + "?view=fan",
             reverse("control_panel"),
             reverse("offline"),
             reverse("notify:list"),
@@ -239,7 +237,7 @@ class LanguageChoiceTests(TestCase):
         user, _p = make_family()
         self.client.force_login(user)
         response = self.client.post(reverse("accounts:settings"), {
-            "prefs-preferred_language": "uz-cyrl", "prefs-time_zone": "Asia/Tashkent",
+            "prefs-preferred_language": "uz-cyrl", "prefs-time_zone": "Asia/Tashkent", "prefs-tree_audience": "followers", "prefs-stories_audience": "family",
             "save_prefs": "1"}, follow=True)
         user.refresh_from_db()
         self.assertEqual(user.preferred_language, "uz-cyrl")

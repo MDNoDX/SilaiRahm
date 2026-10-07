@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>{% block title %}{% endblock %} · {% translate "Family tree" context "site name" %}</title>
+  <title>{% block title %}{% endblock %} · {{ brand_name }}</title>
   <meta name="description" content="{% translate 'Family tree — a family archive for Uzbek families.' %}">
   <meta name="theme-color" content="#f6f3ec" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0e111a" media="(prefers-color-scheme: dark)">
@@ -41,7 +41,7 @@
     <div class="sb-top">
       <a class="brand" href="{% url 'home' %}">
         <span class="brand-mark">{% include "partials/logo.svg" %}</span>
-        <span>{% translate "Family tree" context "site name" %}</span>
+        <span>{{ brand_name }}</span>
       </a>
       <button class="icon-btn sb-collapse" type="button" data-nav-toggle
               title="{% translate 'Collapse the menu' %}" aria-label="{% translate 'Collapse the menu' %}">{% include "partials/icon.html" with name="sidebar" %}</button>
@@ -56,10 +56,9 @@
       <a href="{% url 'genealogy:people' %}" {% if nav == "people" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="people" %}<span>{% translate "Relatives" %}</span></a>
       <a href="{% url 'genealogy:upcoming' %}" {% if nav == "events" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="calendar" %}<span>{% translate "Events" %}</span></a>
       <a href="{% url 'genealogy:timeline' %}" {% if nav == "timeline" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="timeline" %}<span>{% translate "Timeline" %}</span></a>
-      <a href="{% url 'genealogy:stories' %}" {% if nav == "stories" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="book" %}<span>{% translate "Stories" %}</span></a>
-      <a href="{% url 'friends:list' %}" {% if nav == "friends" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="friends" %}<span>{% translate "Friends" %}</span></a>
-      <a href="{% url 'network:index' %}" {% if nav == "network" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="connect" %}<span>{% translate "Connections" %}</span>{% if unread_connections %}<span class="badge sb-badge">{{ unread_connections }}</span>{% endif %}</a>
+      <a href="{% url 'friends:list' %}" {% if nav == "friends" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="friends" %}<span>{% translate "Friends" %}</span>{% if unread_connections %}<span class="badge sb-badge">{{ unread_connections }}</span>{% endif %}</a>
       <a href="{% url 'genealogy:calculator' %}" {% if nav == "calculator" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="link" %}<span>{% translate "Who is who?" %}</span></a>
+      <a href="{% url 'assistant:chat' %}" {% if nav == "assistant" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="sparkle" %}<span>{% translate "Assistant" %}</span></a>
     </nav>
     <div class="sb-bottom">
       <a class="sb-link" href="{% url 'notify:list' %}" {% if nav == "notifications" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="bell" %}<span>{% translate "Notifications" %}</span>{% if unread_count %}<span class="badge sb-badge">{{ unread_count }}</span>{% endif %}</a>
@@ -78,7 +77,7 @@
     <header class="mobilebar">
       <a class="brand" href="{% url 'home' %}">
         <span class="brand-mark">{% include "partials/logo.svg" %}</span>
-        <span>{% translate "Family tree" context "site name" %}</span>
+        <span>{{ brand_name }}</span>
       </a>
       <span class="spacer"></span>
       <button class="icon-btn" type="button" data-cmdk-open aria-label="{% translate 'Search' %}">{% include "partials/icon.html" with name="search" %}</button>
@@ -92,7 +91,7 @@
 <header class="guestbar">
   <a class="brand" href="{% url 'home' %}">
     <span class="brand-mark">{% include "partials/logo.svg" %}</span>
-    <span>{% translate "Family tree" context "site name" %}</span>
+    <span>{{ brand_name }}</span>
   </a>
   <span class="spacer"></span>
   <button class="icon-btn theme-btn" type="button" data-theme-toggle
@@ -125,10 +124,10 @@
     <summary>{% include "partials/icon.html" with name="more" %}<span>{% translate "More" %}</span></summary>
     <div class="menu up">
       <a href="{% url 'genealogy:timeline' %}">{% include "partials/icon.html" with name="timeline" %}{% translate "Timeline" %}</a>
-      <a href="{% url 'genealogy:stories' %}">{% include "partials/icon.html" with name="book" %}{% translate "Stories" %}</a>
       <a href="{% url 'friends:list' %}">{% include "partials/icon.html" with name="friends" %}{% translate "Friends" %}</a>
-      <a href="{% url 'network:index' %}">{% include "partials/icon.html" with name="connect" %}{% translate "Connections" %}{% if unread_connections %} <span class="badge">{{ unread_connections }}</span>{% endif %}</a>
       <a href="{% url 'genealogy:calculator' %}">{% include "partials/icon.html" with name="link" %}{% translate "Who is who?" %}</a>
+    <a href="{% url 'assistant:chat' %}">{% include "partials/icon.html" with name="sparkle" %}{% translate "Ask the assistant" %}</a>
+      <a href="{% url 'assistant:chat' %}">{% include "partials/icon.html" with name="sparkle" %}{% translate "Assistant" %}</a>
       <a href="{% url 'genealogy:history' %}">{% include "partials/icon.html" with name="history" %}{% translate "History" %}</a>
       <a href="{% url 'accounts:settings' %}">{% include "partials/icon.html" with name="settings" %}{% translate "Settings" %}</a>
     </div>
@@ -148,14 +147,13 @@
   <div hidden id="cmdk-actions">
     <a href="{% url 'genealogy:person_create' %}">{% include "partials/icon.html" with name="plus" %}{% translate "Add a new relative" %}</a>
     <a href="{% url 'genealogy:event_create' %}">{% include "partials/icon.html" with name="calendar" %}{% translate "Add a family event" %}</a>
-    <a href="{% url 'genealogy:story_create' %}">{% include "partials/icon.html" with name="pencil" %}{% translate "Write a story" %}</a>
+    <a href="{% url 'genealogy:event_create' %}?kind=other">{% include "partials/icon.html" with name="pencil" %}{% translate "Write a story" %}</a>
     <a href="{% url 'friends:create' %}">{% include "partials/icon.html" with name="friends" %}{% translate "Add a friend" %}</a>
-    <a href="{% url 'network:index' %}">{% include "partials/icon.html" with name="connect" %}{% translate "Find people on Shajara" %}</a>
+    <a href="{% url 'friends:list' %}#people">{% include "partials/icon.html" with name="connect" %}{% translate "Find people on Silai Rahm" %}</a>
     <a href="{% url 'genealogy:tree' %}">{% include "partials/icon.html" with name="tree" %}{% translate "Family tree" context "kinship" %}</a>
     <a href="{% url 'genealogy:people' %}">{% include "partials/icon.html" with name="people" %}{% translate "Relatives" %}</a>
     <a href="{% url 'genealogy:upcoming' %}">{% include "partials/icon.html" with name="calendar" %}{% translate "Events" %}</a>
     <a href="{% url 'genealogy:timeline' %}">{% include "partials/icon.html" with name="timeline" %}{% translate "Timeline" %}</a>
-    <a href="{% url 'genealogy:stories' %}">{% include "partials/icon.html" with name="book" %}{% translate "Stories" %}</a>
     <a href="{% url 'genealogy:book' %}">{% include "partials/icon.html" with name="book" %}{% translate "Family book" %}</a>
     <a href="{% url 'genealogy:calculator' %}">{% include "partials/icon.html" with name="link" %}{% translate "Who is who?" %}</a>
     <a href="{% url 'genealogy:history' %}">{% include "partials/icon.html" with name="history" %}{% translate "History" %}</a>

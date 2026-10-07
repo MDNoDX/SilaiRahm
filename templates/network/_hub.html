@@ -1,0 +1,80 @@
+{% load i18n uz %}
+<section class="card" id="people">
+  <h2>{% include "partials/icon.html" with name="connect" %}{% translate "People on Silai Rahm" %}</h2>
+  <form method="get" action="{% url 'friends:list' %}#people" role="search">
+    <label class="visually-hidden" for="pq">{% translate "Search" %}</label>
+    <div class="search-big picker">
+      {% include "partials/icon.html" with name="search" %}
+      <input id="pq" type="search" name="odam" value="{{ people_query }}" autocomplete="off"
+             placeholder="{% translate 'Name, username or e-mail of a person on Silai Rahm' %}"
+             role="combobox" aria-expanded="false" aria-controls="pq-results"
+             data-live-search="{% url 'network:search_json' %}">
+      <div class="live-results" id="pq-results" role="listbox" hidden></div>
+    </div>
+  </form>
+  {% if people_query %}
+    {% for account, state in people_results %}
+    <div class="member">
+      {% include "partials/user_avatar.html" with account=account size="sm" %}
+      <a class="spacer" href="{% url 'network:profile' account.username %}"><b>{{ account.display_name }}</b> <span class="muted small">@{{ account.username }}</span></a>
+      {% if state == "connected" %}<span class="tag">{% include "partials/icon.html" with name="check" %}{% translate "Connected" context "connection" %}</span>{% endif %}
+      <a class="btn btn-sm" href="{% url 'network:profile' account.username %}">{% translate "Open" %}</a>
+    </div>
+    {% empty %}
+    <p class="muted" style="margin:12px 0 0">{% translate "No one found. People who chose not to be found by name can still be found by their exact username or e-mail." %}</p>
+    {% endfor %}
+  {% endif %}
+
+  {% if follow_requests or incoming %}
+  <h3 class="subhead">{% translate "Requests to you" %}</h3>
+  {% for f in follow_requests %}
+  <div class="member">
+    {% include "partials/user_avatar.html" with account=f.follower size="sm" %}
+    <a class="spacer" href="{% url 'network:profile' f.follower.username %}"><b>{{ f.follower.display_name }}</b> <span class="muted small">@{{ f.follower.username }} · {% translate "wants to follow you" %}</span></a>
+    <form method="post" action="{% url 'network:follow_answer' f.pk %}" class="row">{% csrf_token %}
+      <button class="btn btn-sm btn-primary" type="submit" name="approve" value="1">{% translate "Allow" %}</button>
+      <button class="btn btn-sm btn-ghost" type="submit" name="approve" value="0">{% translate "Decline" %}</button>
+    </form>
+  </div>
+  {% endfor %}
+  {% for c in incoming %}
+  <div class="member">
+    {% include "partials/user_avatar.html" with account=c.sender size="sm" %}
+    <a class="spacer" href="{% url 'network:profile' c.sender.username %}"><b>{{ c.sender.display_name }}</b> <span class="muted small">@{{ c.sender.username }} · {{ c.get_kind_display }}</span>
+      {% if c.message %}<br><span class="small">“{{ c.message }}”</span>{% endif %}</a>
+    <a class="btn btn-sm btn-primary" href="{% url 'network:answer' c.pk %}">{% translate "Answer" %}</a>
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  {% if connected %}
+  <h3 class="subhead">{% translate "Relatives and friends I am connected with" %}</h3>
+  {% for row in connected %}
+  <div class="member">
+    {% if row.record %}{% include "partials/avatar.html" with person=row.record size="sm" branch="own" %}{% else %}{% include "partials/user_avatar.html" with account=row.user size="sm" %}{% endif %}
+    <a class="spacer" href="{% url 'network:profile' row.user.username %}"><b>{{ row.user.display_name }}</b>
+      <span class="muted small">@{{ row.user.username }} · {% if row.label %}{{ row.label }}{% else %}{{ row.connection.get_kind_display }}{% endif %}</span></a>
+    <a class="btn btn-sm" href="{% url 'network:connection' row.connection.pk %}">{% translate "Compare trees" %}</a>
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  {% if following or followers %}
+  <div class="grid grid-2" style="margin-top:12px">
+    <details class="follow-list"><summary><b>{{ following|length }}</b> {% translate "following" %}</summary>
+      {% for u in following %}<a class="member" href="{% url 'network:profile' u.username %}">{% include "partials/user_avatar.html" with account=u size="sm" %}<span class="spacer"><b>{{ u.display_name }}</b> <span class="muted small">@{{ u.username }}</span></span></a>{% endfor %}
+    </details>
+    <details class="follow-list"><summary><b>{{ followers|length }}</b> {% translate "followers" %}</summary>
+      {% for u in followers %}<div class="member">{% include "partials/user_avatar.html" with account=u size="sm" %}<a class="spacer" href="{% url 'network:profile' u.username %}"><b>{{ u.display_name }}</b></a>
+        <form method="post" action="{% url 'network:follower_remove' u.username %}">{% csrf_token %}<button class="btn btn-sm btn-ghost" type="submit" data-confirm>{% translate "Remove" %}</button></form></div>{% endfor %}
+    </details>
+  </div>
+  {% endif %}
+
+  {% if outgoing %}
+  <p class="muted small" style="margin-top:12px">{% translate "Waiting for an answer" context "connection" %}: {% for c in outgoing %}<a href="{% url 'network:profile' c.recipient.username %}">{{ c.recipient.display_name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+  {% endif %}
+  {% if not people_query and not follow_requests and not incoming and not connected and not following and not followers %}
+  <p class="muted small" style="margin:12px 0 0">{% translate "Find your parents, brothers, sisters and cousins by name. Follow them to see their family tree, or connect as relatives: your family trees are then joined and you can take over what each knows." %}</p>
+  {% endif %}
+</section>

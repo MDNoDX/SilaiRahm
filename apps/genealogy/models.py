@@ -175,46 +175,25 @@ class Marriage(models.Model):
         return format_partial_date(self.year, self.month, self.day)
 
 
-class Story(models.Model):
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="stories")
-    person = models.ForeignKey(Person, null=True, blank=True, on_delete=models.SET_NULL, related_name="stories",
-                               verbose_name=_("about whom"))
-    title = models.CharField(_("title"), max_length=200)
-    body = models.TextField(_("text"))
-    year = models.PositiveSmallIntegerField(_("year"), null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        verbose_name = _("story")
-        verbose_name_plural = _("stories")
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        return self.title
-
-    def get_absolute_url(self):
-        return reverse("genealogy:story", args=[self.pk])
-
-
 class Event(models.Model):
-    """A family event: a wedding, a birth, an expected baby, a memorial day…"""
+    """A family event or memory: a wedding, a birth, a celebration, a passing
+    away — with its story told in `description` (the stories of the family
+    live here)."""
 
     class Kind(models.TextChoices):
         WEDDING = "wedding", pgettext_lazy("event", "Wedding")
         ENGAGEMENT = "engagement", pgettext_lazy("event", "Engagement (fotiha)")
-        PREGNANCY = "pregnancy", pgettext_lazy("event", "Expecting a baby")
         BIRTH = "birth", pgettext_lazy("event", "Birth of a child")
         BESHIK = "beshik", pgettext_lazy("event", "Cradle celebration (beshik toʻyi)")
         SUNNAT = "sunnat", pgettext_lazy("event", "Circumcision celebration (sunnat toʻyi)")
-        GRADUATION = "graduation", pgettext_lazy("event", "Graduation")
-        WORK = "work", pgettext_lazy("event", "New job")
-        MOVE = "move", pgettext_lazy("event", "Moving house")
+        AQIQA = "aqiqa", pgettext_lazy("event", "Aqiqa")
+        BIRTHDAY = "birthday", pgettext_lazy("event", "Birthday")
+        HAYIT = "hayit", pgettext_lazy("event", "Eid (hayit)")
+        NEW_YEAR = "new_year", pgettext_lazy("event", "New Year")
         HAJJ = "hajj", pgettext_lazy("event", "Hajj or umrah")
         ANNIVERSARY = "anniversary", pgettext_lazy("event", "Jubilee")
-        DEATH = "death", pgettext_lazy("event", "Death")
-        MEMORIAL = "memorial", pgettext_lazy("event", "Memorial gathering (yil oshi)")
-        OTHER = "other", pgettext_lazy("event", "Other event")
+        DEATH = "death", pgettext_lazy("event", "Passing away")
+        OTHER = "other", pgettext_lazy("event", "Memory or other event")
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="events")
     kind = models.CharField(_("type of event"), max_length=20, choices=Kind.choices, default=Kind.OTHER)
@@ -224,7 +203,9 @@ class Event(models.Model):
     month = models.PositiveSmallIntegerField(_("month"), null=True, blank=True)
     day = models.PositiveSmallIntegerField(_("day"), null=True, blank=True)
     place = models.CharField(_("place"), max_length=200, blank=True)
-    description = models.TextField(_("details"), blank=True)
+    description = models.TextField(_("story"), blank=True)
+    # The story told aloud: a voice message or a short video (audio/*, video/*).
+    recording = models.FileField(_("voice or video message"), upload_to=media_path, blank=True)
     every_year = models.BooleanField(_("remind every year on this day"), default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -249,6 +230,12 @@ class Event(models.Model):
         return format_partial_date(self.year, self.month, self.day)
 
     @property
+    def recording_kind(self):
+        from .recordings import kind_of
+
+        return kind_of(self.recording.name) if self.recording else ""
+
+    @property
     def date(self):
         if self.year and self.month and self.day:
             try:
@@ -259,12 +246,13 @@ class Event(models.Model):
 
 
 class Media(models.Model):
-    """A photo, document or voice recording in a person's album."""
+    """A photo, document, voice recording or video in a person's album."""
 
     class Kind(models.TextChoices):
         PHOTO = "photo", pgettext_lazy("media", "Photo")
         DOCUMENT = "document", pgettext_lazy("media", "Document")
         AUDIO = "audio", pgettext_lazy("media", "Voice recording")
+        VIDEO = "video", pgettext_lazy("media", "Video")
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="media")
     person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="media")
@@ -272,6 +260,8 @@ class Media(models.Model):
     file = models.FileField(upload_to=media_path)
     caption = models.CharField(_("caption"), max_length=200, blank=True)
     year = models.PositiveSmallIntegerField(_("year"), null=True, blank=True)
+    # Told for the life story (shown with it on the person's page), not only kept in the album.
+    in_story = models.BooleanField(default=False)
     uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="+")
     created_at = models.DateTimeField(auto_now_add=True)
 

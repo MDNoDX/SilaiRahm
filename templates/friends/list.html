@@ -5,18 +5,22 @@
 <div class="pagehead">
   <div>
     <h1>{% translate "Friends" %}</h1>
-    <p>{% translate "Friends of anyone in your family: your own, your father’s, your grandmother’s. Their birthdays are remembered too." %}</p>
+    <p>{% translate "People on Silai Rahm you follow and are connected with, and the friends of everyone in your family." %}</p>
   </div>
   <a class="btn btn-primary" href="{% url 'friends:create' %}{% if whose %}?kimning={{ whose }}{% endif %}">{% include "partials/icon.html" with name="plus" %}{% translate "Add a friend" %}</a>
 </div>
 
+{% include "network/_hub.html" %}
+
+<h2 class="section-title" id="family-friends">{% translate "Friends of the family" %}</h2>
+<p class="muted small" style="margin-top:-6px">{% translate "Friends of anyone in your family: your own, your father’s, your grandmother’s. Their birthdays are remembered too." %}</p>
 <div class="row" style="margin-bottom:16px">
   <div class="chips">
     <a class="chip" href="{% url 'friends:list' %}" aria-current="{% if not whose %}true{% else %}false{% endif %}">{% translate "Everyone" %}</a>
     {% for p in people_with_friends %}<a class="chip" href="?kimning={{ p.pk }}" aria-current="{% if whose == p.pk|stringformat:'d' %}true{% else %}false{% endif %}">{{ p.short_name }}</a>{% endfor %}
   </div>
   <span class="spacer"></span>
-  <form class="row" method="get" role="search">
+  <form class="row" method="get" role="search" data-live-page="{% url 'friends:list' %}{% if whose %}?kimning={{ whose }}{% endif %}" data-target="friend-groups">
     {% if whose %}<input type="hidden" name="kimning" value="{{ whose }}">{% endif %}
     <label class="visually-hidden" for="fq">{% translate "Search" %}</label>
     <input id="fq" type="search" name="q" value="{{ query }}" placeholder="{% translate 'Name in Latin or Cyrillic…' %}" style="max-width:280px">
@@ -24,32 +28,8 @@
 </div>
 
 <div class="cols">
-  <div>
-    {% for person, contacts in groups %}
-      <section class="card">
-        <h2>{% if person.pk == user.person_id %}{% translate "My friends" %}{% else %}{% blocktranslate with name=person.short_name %}Friends of {{ name }}{% endblocktranslate %}{% endif %}
-          <a class="btn btn-sm" href="{% url 'friends:create' %}?kimning={{ person.pk }}">{% include "partials/icon.html" with name="plus" %}{% translate "Add" %}</a></h2>
-        <div class="people">
-          {% for c in contacts %}
-            <div class="pcard contact">
-              <span class="avatar b-own" aria-hidden="true">{{ c.initials }}</span>
-              <span class="who spacer">
-                <span class="name">{{ c.name }}{% if c.linked_user %} <span class="tag" title="@{{ c.linked_user.username }}">{% translate "on Shajara" %}</span>{% endif %}</span>
-                <span class="meta">{% if c.how_met %}{{ c.get_how_met_display }}{% endif %}{% if c.how_met and c.birth_date_display %} · {% endif %}{{ c.birth_date_display }}</span>
-                {% if c.phone %}<br><a class="small" href="tel:{{ c.phone }}">{{ c.phone }}</a>{% endif %}
-              </span>
-              <a class="icon-btn" href="{% url 'friends:edit' c.pk %}" title="{% translate 'Edit' %}" aria-label="{% translate 'Edit' %}">{% include "partials/icon.html" with name="pencil" %}</a>
-            </div>
-          {% endfor %}
-        </div>
-      </section>
-    {% empty %}
-      <div class="empty">
-        <h3>{% if query %}{% translate "No results found." %}{% else %}{% translate "No friends yet." %}{% endif %}</h3>
-        <p>{% translate "Add your friends, and your parents’ and grandparents’ friends, so that their names and stories are not forgotten." %}</p>
-        <a class="btn btn-primary" href="{% url 'friends:create' %}">{% translate "Add a friend" %}</a>
-      </div>
-    {% endfor %}
+  <div id="friend-groups">
+    {% include "friends/_groups.html" %}
   </div>
   <aside>
     <section class="card">

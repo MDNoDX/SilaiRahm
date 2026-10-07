@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load i18n uz %}
+{% block title %}{{ other.display_name }}{% endblock %}
+{% block main_class %}narrow{% endblock %}
+{% block content %}
+<div class="card profile-card">
+  <div class="profile-top">
+    {% if record %}{% include "partials/avatar.html" with person=record size="lg" branch="own" %}{% else %}{% include "partials/user_avatar.html" with account=other size="lg" %}{% endif %}
+    <div class="spacer">
+      <h1>{{ other.display_name }}</h1>
+      <p class="muted">@{{ other.username }}{% if label %} · <b>{{ label }}</b>{% endif %}{% if other.private_account %} · {% include "partials/icon.html" with name="lock" %}{% translate "Private account" %}{% endif %}</p>
+      <div class="profile-counts">
+        {% if people is not None %}<span><b>{{ people }}</b> {% translate "in the family tree" %}</span>{% endif %}
+        <span><b>{{ followers }}</b> {% translate "followers" %}</span>
+        <span><b>{{ following }}</b> {% translate "following" %}</span>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-top:14px">
+    <form method="post" action="{% url 'network:follow' other.username %}">{% csrf_token %}
+      {% if follow == "following" %}<button class="btn" type="submit" name="stop" value="1">{% include "partials/icon.html" with name="check" %}{% translate "Following" %}</button>
+      {% elif follow == "requested" %}<button class="btn" type="submit" name="stop" value="1">{% translate "Requested" %}</button>
+      {% else %}<button class="btn btn-primary" type="submit">{% include "partials/icon.html" with name="plus" %}{% translate "Follow" %}</button>{% endif %}
+    </form>
+    {% if connection and connection.status == "accepted" %}
+      <a class="btn" href="{% url 'network:connection' connection.pk %}">{% include "partials/icon.html" with name="merge" %}{% translate "Compare trees" %}</a>
+    {% elif connection and connection.recipient_id == user.pk %}
+      <a class="btn btn-primary" href="{% url 'network:answer' connection.pk %}">{% translate "Answer" %}</a>
+    {% elif connection %}<span class="tag">{% translate "Request sent" %}</span>
+    {% else %}
+      <a class="btn" href="{% url 'network:request' other.username %}">{% include "partials/icon.html" with name="connect" %}{% translate "This is my relative" %}</a>
+    {% endif %}
+    {% if sees_tree %}<a class="btn" href="{% url 'genealogy:tree_for' other.username %}{% if record %}?person={{ record.pk }}{% endif %}">{% include "partials/icon.html" with name="tree" %}{% translate "Family tree" context "kinship" %}</a>{% endif %}
+    {% if in_my_tree %}<a class="btn btn-ghost" href="{{ in_my_tree.get_absolute_url }}">{% translate "In my family tree" %}</a>{% endif %}
+  </div>
+</div>
+
+{% if record %}
+<section class="card">
+  <h2>{% translate "About" %}</h2>
+  <dl class="facts">
+    {% if record.birth_date_display %}<dt>{% translate "Date of birth" %}</dt><dd>{{ record.birth_date_display }}</dd>{% endif %}
+    {% if record.birth_place %}<dt>{% translate "Place of birth" %}</dt><dd>{{ record.birth_place }}</dd>{% endif %}
+    {% if record.occupation %}<dt>{% translate "Occupation" %}</dt><dd>{{ record.occupation }}</dd>{% endif %}
+  </dl>
+  {% if sees_stories and record.life_story %}<div class="prose life-text">{{ record.life_story|linebreaks|truncatewords_html:120 }}</div>
+    <a class="btn btn-sm" href="{{ record.get_absolute_url }}">{% translate "Read the whole life story" %}</a>{% endif %}
+</section>
+{% elif not sees_tree %}
+<div class="empty"><div class="ornament">{% include "partials/icon.html" with name="lock" %}</div>
+  <h3>{% translate "This family tree is not shared with you" %}</h3>
+  <p>{% if other.private_account %}{% translate "Follow, and when they allow it you will see what they share with their followers." %}{% else %}{% translate "Follow to see what they share with their followers." %}{% endif %}</p></div>
+{% endif %}
+{% endblock %}

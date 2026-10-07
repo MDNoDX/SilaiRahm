@@ -1,4 +1,4 @@
-"""Generates Resources/Shajara.wav: the soft two-note chime of Shajara notifications.
+"""Generates Resources/SilaiRahm.wav: the soft two-note chime of Silai Rahm notifications.
 
     python3 make_sound.py
 """
@@ -30,7 +30,7 @@ def main():
         v = 0.5 * bell(659.25, 0.0, t) + 0.42 * bell(987.77, 0.13, t, decay=2.6)  # E5, then B5
         fade = min(1.0, (LENGTH - t) / 0.15)
         frames.append(max(-1.0, min(1.0, v * 0.55 * fade)))
-    out = Path(__file__).parent / "Resources" / "Shajara.wav"
+    out = Path(__file__).parent / "Resources" / "SilaiRahm.wav"
     with wave.open(str(out), "wb") as w:
         w.setnchannels(1)
         w.setsampwidth(2)

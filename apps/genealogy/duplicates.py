@@ -9,7 +9,7 @@ from apps.core.text import search_key
 from apps.friends.models import Contact
 
 from . import history
-from .models import Change, Event, Marriage, Media, Person, Story
+from .models import Change, Event, Marriage, Media, Person
 
 
 def _keys(person):
@@ -65,7 +65,7 @@ def merge(keep, drop, actor):
     """Move everything from `drop` into `keep` and delete `drop`.
 
     Empty fields of `keep` are filled from `drop`; children, marriages,
-    events, stories, friends, album and account links move over.
+    events, friends, album and account links move over.
     """
     if keep.pk == drop.pk or keep.owner_id != drop.owner_id:
         return None
@@ -91,7 +91,6 @@ def merge(keep, drop, actor):
             Marriage.objects.filter(pk=m.pk).update(husband=husband, wife=wife)
     for event in Event.objects.filter(people=drop):
         event.people.add(keep)
-    Story.objects.filter(person=drop).update(person=keep)
     Contact.objects.filter(person=drop).update(person=keep)
     Media.objects.filter(person=drop).update(person=keep)
     Change.objects.filter(person=drop).update(person=keep)

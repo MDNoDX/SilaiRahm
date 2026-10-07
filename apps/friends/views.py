@@ -17,10 +17,8 @@ from .forms import ContactForm
 from .models import Contact
 
 
-@login_required
-
 # ---------------------------------------------------------------------------
-# Friends of people in the tree (no account needed)
+# Friends: people on the site (follow, connect) and friends of the family
 # ---------------------------------------------------------------------------
 @login_required
 def friends_list(request):
@@ -41,9 +39,13 @@ def friends_list(request):
     today = timezone.localdate()
     upcoming = [o for o in occasions(owner, today, today + datetime.timedelta(days=45))
                 if o.kind == "friend_birthday"]
+    context = {"groups": ordered, "whose": whose, "query": query, "total": Contact.objects.filter(owner=owner).count()}
+    if request.GET.get("partial"):  # the live search above the list
+        return render(request, "friends/_groups.html", context)
+    from apps.network.views import hub
+
     return render(request, "friends/list.html", {
-        "groups": ordered, "whose": whose, "query": query, "total": Contact.objects.filter(owner=owner).count(),
-        "people_with_friends": people_with_friends,
+        **context, **hub(request), "people_with_friends": people_with_friends,
         "upcoming": [(o, render_parts(o.kind, o.params, (o.date - today).days)) for o in upcoming],
     })
 

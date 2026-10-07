@@ -11,6 +11,18 @@ from .models import Marriage
 RELATIONS = ("father", "mother", "spouse", "child", "sibling")
 
 
+def wife_is_married(wife, husband=None):
+    """A woman has one marriage at a time: another husband only after the
+    earlier marriage is marked divorced (or the husband has passed away).
+    A man may have several wives."""
+    if wife is None or not wife.pk:
+        return False
+    active = Marriage.objects.filter(wife=wife, is_divorced=False, husband__is_deceased=False)
+    if husband is not None and husband.pk:
+        active = active.exclude(husband=husband)
+    return active.exists()
+
+
 def problem(anchor, person, relation, archive=None):
     """Why `person` cannot become `anchor`'s `relation`, or None if they can.
     `person` may be unsaved (a new record) or already in the tree."""
@@ -35,6 +47,9 @@ def problem(anchor, person, relation, archive=None):
     elif relation == "spouse":
         if person.gender and person.gender == anchor.gender:
             return _("A husband and wife must be a man and a woman.")
+        wife, husband = (anchor, person) if anchor.gender == "female" else (person, anchor)
+        if wife_is_married(wife, husband):
+            return _("She is married. To add another husband, first mark the earlier marriage as divorced.")
     if person.pk and archive is not None and relation in ("father", "mother", "child"):
         parent, child = (anchor, person) if relation == "child" else (person, anchor)
         if parent.pk == child.pk or parent.pk in archive.descendants(child.pk):

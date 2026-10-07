@@ -18,6 +18,7 @@ from apps.genealogy.models import Event, Marriage, Person
 ICONS = {
     "birthday": "🎂", "friend_birthday": "🎈", "memorial": "🕯️", "anniversary": "💍",
     "event": "📅", "muchal": "🌱", "connection_request": "🤝", "connection_accepted": "🤝",
+    "follow_request": "👤", "new_follower": "👤", "follow_accepted": "👤",
 }
 
 

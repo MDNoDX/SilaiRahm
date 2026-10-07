@@ -6,7 +6,7 @@
   <div class="card" style="text-align:center">
     <div class="brand-mark" style="margin:0 auto 14px;width:56px;height:56px;border-radius:16px">{% include "partials/logo.svg" %}</div>
     <h1>{% translate "Sign in to the app" %}</h1>
-    <p class="muted">{% translate "After signing in you will be returned to the Shajara app." %}</p>
+    <p class="muted">{% translate "After signing in you will be returned to the Silai Rahm app." %}</p>
     <div class="stack" style="text-align:left">
       {% if google_login %}{% include "partials/google_button.html" with next=finish %}{% endif %}
       <a class="btn wide-btn" href="{% url 'accounts:login' %}?next={{ finish|urlencode }}">{% translate "Sign in with a username and password" %}</a>

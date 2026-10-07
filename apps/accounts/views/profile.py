@@ -81,7 +81,7 @@ def data_view(request):
             return redirect("genealogy:tree")
     return render(request, "accounts/settings/data.html", {
         "form": form, "can_import": can_import, "people_count": people.count(),
-        "friends_count": user.contacts.count(), "stories_count": user.stories.count(),
+        "friends_count": user.contacts.count(),
         "events_count": user.events.count(),
         "settings_tab": "data",
     })

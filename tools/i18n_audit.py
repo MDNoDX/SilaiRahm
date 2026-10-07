@@ -37,7 +37,7 @@ BAD_TUTUQ = re.compile(r"(?<=[^\W\d_])['’`](?=[^\W\d_])")
 PLACEHOLDER = re.compile(r"%\(\w+\)[sd]|%[sd]|\{\w+\}")
 # Format names, key names and bot commands stay in Latin in both scripts.
 ALLOWED_LATIN_IN_CYRILLIC = {"PDF", "PNG", "Alisher", "MB", "GEDCOM", "Ctrl", "Mac", "Start", "stop", "JSON", "Google",
-                             "Telegram", "Web", "MyHeritage", "Ancestry", "Gramps", "UTC", "Shajara", "next", "help", "start", "URL", "cookie",
+                             "Telegram", "Web", "MyHeritage", "Ancestry", "Gramps", "UTC", "Shajara", "Silai", "Rahm", "Gemini", "GEMINI", "API", "KEY", "AI", "Studio", "Get", "key", "next", "help", "start", "URL", "cookie",
                              "Authenticator", "Microsoft", "Push", "iPhone", "iPad"}
 # Brand and format names that appear as they are in every language.
 BRANDS = {"Google", "Telegram", "GEDCOM", "JSON", "PDF", "PNG"}

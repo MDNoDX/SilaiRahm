@@ -161,7 +161,7 @@ def send_backup(prefs):
             telegram.send_message(prefs.telegram_chat_id, escape(_(
                 "The weekly backup is too large for Telegram. Download it from the Control panel.")))
             return False
-        caption = _("Weekly backup of Shajara. Keep this file: it restores the whole site.")
+        caption = _("Weekly backup of Silai Rahm. Keep this file: it restores the whole site.")
     telegram.send_document(prefs.telegram_chat_id, backup.filename("json.gz"), data, caption)
     return True
 

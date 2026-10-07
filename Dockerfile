@@ -1,4 +1,4 @@
-# Shajara — production image (Django + gunicorn).
+# Silai Rahm — production image (Django + gunicorn).
 FROM python:3.13-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

@@ -1,0 +1,26 @@
+{% load i18n uz %}    {% for person, contacts in groups %}
+      <section class="card">
+        <h2>{% if person.pk == user.person_id %}{% translate "My friends" %}{% else %}{% blocktranslate with name=person.short_name %}Friends of {{ name }}{% endblocktranslate %}{% endif %}
+          <a class="btn btn-sm" href="{% url 'friends:create' %}?kimning={{ person.pk }}">{% include "partials/icon.html" with name="plus" %}{% translate "Add" %}</a></h2>
+        <div class="people">
+          {% for c in contacts %}
+            <div class="pcard contact">
+              <span class="avatar b-own" aria-hidden="true">{{ c.initials }}</span>
+              <span class="who spacer">
+                <span class="name">{{ c.name }}{% if c.linked_user %} <span class="tag" title="@{{ c.linked_user.username }}">{% translate "on Silai Rahm" %}</span>{% endif %}</span>
+                <span class="meta">{% if c.how_met %}{{ c.get_how_met_display }}{% endif %}{% if c.how_met and c.birth_date_display %} · {% endif %}{{ c.birth_date_display }}</span>
+                {% if c.phone %}<br><a class="small" href="tel:{{ c.phone }}">{{ c.phone }}</a>{% endif %}
+              </span>
+              <a class="icon-btn" href="{% url 'friends:edit' c.pk %}" title="{% translate 'Edit' %}" aria-label="{% translate 'Edit' %}">{% include "partials/icon.html" with name="pencil" %}</a>
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+    {% empty %}
+      <div class="empty">
+        <h3>{% if query %}{% translate "No results found." %}{% else %}{% translate "No friends yet." %}{% endif %}</h3>
+        <p>{% translate "Add your friends, and your parents’ and grandparents’ friends, so that their names and stories are not forgotten." %}</p>
+        <a class="btn btn-primary" href="{% url 'friends:create' %}">{% translate "Add a friend" %}</a>
+      </div>
+    {% endfor %}
+  

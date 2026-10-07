@@ -37,7 +37,8 @@ Faqat sizning kompyuteringizda boʻladigan, gitga kirmaydigan narsalar: `.venv/`
 
 | Fayl | Vazifasi |
 |---|---|
-| `models.py` | Jadvallar: `Person`, `Marriage`, `Story`, `Event`, `Media` (albom), `Change` (tarix) |
+| `models.py` | Jadvallar: `Person`, `Marriage` (ajrashgan belgisi bilan), `Event` (voqea va xotiralar, ovozli/video yozuv bilan), `Media` (albom), `Change` (tarix) |
+| `recordings.py` | Ovozli va video xabarlarni tekshirish (turi, 4 MB chegarasi) |
 | `urls.py` | Manzillar, mavzu boʻyicha guruhlangan |
 | `forms.py` | Formalar va tekshiruvlar (sana, ota-ona, dublikat ogohlantirishi) |
 | `access.py` | Kim koʻra oladi / tahrirlay oladi |
@@ -56,12 +57,11 @@ Sahifalar — `views/` papkasida, har bir mavzu alohida faylda:
 | `views/…` | Sahifalar | Shablonlar (`templates/genealogy/…`) |
 |---|---|---|
 | `people.py` | Qarindoshlar roʻyxati, odam sahifasi, qoʻshish / tahrirlash / oʻchirish, nikoh, «bu men» | `people/` |
-| `album.py` | Albom: surat, hujjat, ovozli yozuv yuklash va oʻchirish | `people/detail.html` ichida |
+| `album.py` | Albom: surat, hujjat, ovozli yozuv, video yuklash va oʻchirish | `people/detail.html` ichida |
 | `changes.py` | Dublikatlar, birlashtirish, oʻzgarishlar tarixi, ortga qaytarish | `changes/` |
-| `tree.py` | Shajara sahifasi, maʼlumotlari (daraxt, yelpigʻich), yon panel, tezkor qoʻshish, PDF, kitob | `tree.html` |
+| `tree.py` | Shajara sahifasi, maʼlumotlari, yon panel, tezkor qoʻshish, PDF, kitob | `tree.html` |
 | `timeline.py` | Vaqt chizigʻi | `timeline.html` |
-| `events.py` | Oilaviy voqealar, yaqinlashayotgan sanalar | `events/` |
-| `stories.py` | Hikoyalar | `stories/` |
+| `events.py` | Voqea va xotiralar (hikoyadek), yaqinlashayotgan sanalar | `events/` |
 | `search.py` | Qidiruv sahifasi va tezkor qidiruv (⌘K, tanlagichlar) | `search/` |
 | `calculator.py` | «Kim kimga kim?» | `calculator.html` |
 | `exchange.py` | GEDCOM va JSON eksport / import | — |
@@ -114,14 +114,25 @@ Sahifalar — `views/` papkasida, har bir mavzu alohida faylda:
 
 | Fayl | Vazifasi |
 |---|---|
-| `models.py` | `Connection` (ikki hisob orasidagi soʻrov/bogʻlanish), `PersonMatch` («bu oʻsha odam») |
-| `services.py` | Saytdan odam qidirish, soʻrov yuborish, qabul qilish, rad etish, bogʻlanishni tugatish |
+| `models.py` | `Connection` (ikki hisob orasidagi soʻrov/bogʻlanish), `PersonMatch` («bu oʻsha odam»), `Follow` (kuzatish) |
+| `services.py` | Saytdan odam qidirish, soʻrov yuborish, qabul qilish, rad etish, bogʻlanishni tugatish, kuzatish |
 | `merge.py` | Ikki shajarani solishtirish (mos odamlar, yetishmayotgan qarindoshlar, toʻldiriladigan maʼlumotlar, farqlar) va birlashtirish |
-| `views.py`, `forms.py` | «Bogʻlanishlar» sahifalari; shablonlari `templates/network/` |
+| `views.py`, `forms.py` | Profil sahifasi, kuzatish, bogʻlanish, birlashtirish; roʻyxati «Doʻstlar» sahifasida (`_hub.html`); shablonlari `templates/network/` |
+
+Kim nimani koʻradi (ochiq/yopiq hisob, shajara va hikoyalar auditoriyasi) — `apps/accounts/sharing.py`.
 
 ### `apps/friends/` — doʻstlar
 
 `models.py` (`Contact`), `views.py`, `forms.py`; shablonlari `templates/friends/`.
+
+### `apps/assistant/` — AI yordamchi
+
+| Fayl | Vazifasi |
+|---|---|
+| `gemini.py` | Google Gemini REST mijozi; ovozni matnga aylantirish |
+| `context.py` | Yordamchiga beriladigan maʼlumot: faqat foydalanuvchi koʻra oladigan arxiv, qoidalar, sayt boʻlimlari |
+| `actions.py` | Yordamchi taklif qila oladigan amallar (voqea, qarindosh, maʼlumot) va ularni tasdiqdan keyin bajarish |
+| `views.py` | Suhbat sahifasi, xabar, saqlash (imzolangan taklif), ovozni matnga; shablon `templates/assistant/chat.html`, JS `static/js/assistant.js` |
 
 ## 3. `templates/` — sahifalar
 
@@ -129,13 +140,13 @@ Sahifalar — `views/` papkasida, har bir mavzu alohida faylda:
 templates/
 ├── base.html            umumiy qolip: yon menyu, telefon menyusi, ⌘K qidiruv
 ├── partials/            qayta ishlatiladigan boʻlaklar: icon.html (barcha ikonkalar), avatar,
-│                        person_card, mini_person, field, date_fields, person_picker, logo.svg …
+│                        person_card, mini_person, field, date_fields, person_picker, recorder (ovoz/video yozish),
+│                        recording_player, logo.svg …
 ├── core/                landing (mehmon), dashboard (bosh sahifa), control_panel (boshqaruv)
 ├── genealogy/
 │   ├── people/          list, _grid, detail, form, _fields, relative_form, marriage_form
 │   ├── changes/         duplicates, _duplicates_notice, history
 │   ├── events/          list, detail, form
-│   ├── stories/         list, detail, form
 │   ├── search/          page, _results
 │   └── tree.html · timeline.html · calculator.html · confirm_delete.html
 ├── accounts/
@@ -143,7 +154,9 @@ templates/
 │   ├── settings/        base (yon yorliqlar), general, security, data, family, two_factor_*, delete_account
 │   └── invite/          invite (taklif sahifasi), who_am_i
 ├── notify/              list (bildirishnomalar), settings (eslatmalar, Telegram, push)
-├── friends/             list, contact_form
+├── friends/             list, _groups, contact_form
+├── network/             _hub (odamlar, kuzatish, bogʻlanishlar), profile, merge …
+├── assistant/           chat
 ├── errors/              400, 403, 403_csrf, 404, 500
 ├── pwa/                 sw.js (service worker), offline.html
 ├── registration/        parolni tiklash xati matni
@@ -164,6 +177,7 @@ Nomi `_` bilan boshlanadigan shablon — sahifa emas, boshqa sahifa ichiga qoʻy
 | `test_reminders.py` | Eslatmalar, Telegram, push, cron, haftalik zaxira |
 | `test_import_export.py` | GEDCOM import va eksport |
 | `test_network.py` | Saytdan qidirish, bogʻlanish, shajaralarni birlashtirish, kitoblar, kichik suratlar |
+| `test_features.py` | Kuzatish va maxfiylik, ovozli/video hikoyalar, AI yordamchi (Gemini soxtalashtirilgan) |
 | `test_crawl.py` | Har bir sahifani har xil foydalanuvchi nomidan ochib chiqadi: server xatosi boʻlmasligi kerak |
 | `test_code.py` | Ishlatilmagan import va aniqlanmagan nomlar yoʻqligi |
 | `test_i18n.py` | Har bir sahifa toʻrt tilda toza ekani, til tanlash, kataloglar |
@@ -195,7 +209,9 @@ Hammasini ishga tushirish: `.venv/bin/python manage.py test` · bittasini: `… 
 | Kirish cheklovi (10 marta / 15 daqiqa) | `apps/accounts/forms.py` (`LoginForm`) |
 | Fayl hajmi chegaralari | `config/settings.py` (`PHOTO_MAX_BYTES`), `apps/genealogy/views/album.py` |
 | Muhit oʻzgaruvchilari, serverga joylash | [DEPLOY.md](DEPLOY.md) |
-| Mac ilovasi | `macos/Shajara/*.swift`, yigʻish: `macos/build.sh install` |
+| AI yordamchi qoidalari va bilimi | `apps/assistant/context.py`; amallari — `actions.py` |
+| Ovozli/video xabar chegarasi | `apps/genealogy/recordings.py` (`MAX_BYTES`), yozib olish — `static/js/app.js` (`data-recorder`) |
+| Mac ilovasi | `macos/SilaiRahm/*.swift`, yigʻish: `macos/build.sh install` |
 
 ## 6. Yangi narsa qoʻshganda
 

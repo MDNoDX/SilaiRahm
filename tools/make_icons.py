@@ -1,9 +1,11 @@
-"""Draws the Shajara mark — an ikat diamond as the crown of a tree, gold on
-indigo — and writes every icon the site and the Mac app need.
+"""Draws the Silai Rahm mark (apps/core/mark.py) — a tree with a twisted trunk
+whose branches end in the people of a family, gold on indigo — and writes
+every icon the site and the Mac app need.
 
     python tools/make_icons.py
 """
 import subprocess
+import sys
 from pathlib import Path
 
 from PIL import Image, ImageDraw
@@ -12,10 +14,10 @@ ROOT = Path(__file__).resolve().parent.parent
 GOLD = (240, 195, 78, 255)
 INDIGO_A, INDIGO_B = (24, 33, 82), (59, 59, 146)
 SS = 4  # supersampling
-# The same mark as templates/partials/logo.svg (32 × 32 units).
-MARK_SVG = ('<path d="M16 2.5 25 11.5 16 20.5 7 11.5z"/><path d="M16 20.5v5M10.5 30l5.5-4.5 5.5 4.5"/>'
-            '<g fill="currentColor" stroke="none"><path d="M16 8.1l3.4 3.4-3.4 3.4-3.4-3.4z"/>'
-            '<path d="M3.6 9.6l1.9 1.9-1.9 1.9-1.9-1.9zM28.4 9.6l1.9 1.9-1.9 1.9-1.9-1.9z"/></g>')
+sys.path.insert(0, str(ROOT))
+from apps.core import mark  # noqa: E402 - the one description of the mark
+
+MARK_SVG = mark.svg()
 
 
 def gradient(size):
@@ -45,15 +47,11 @@ def draw_mark(draw, box, colour, weight=2.0):
             cx, cy = p(*pt)
             draw.ellipse((cx - r, cy - r, cx + r, cy + r), fill=colour)
 
-    def diamond(cx, cy, r):
-        draw.polygon([p(cx, cy - r), p(cx + r, cy), p(cx, cy + r), p(cx - r, cy)], fill=colour)
-
-    line([(16, 2.5), (25, 11.5), (16, 20.5), (7, 11.5), (16, 2.5)])   # the crown
-    diamond(16, 11.5, 3.4)                                            # its heart
-    diamond(3.6, 11.5, 1.9)                                           # ikat steps at the sides
-    diamond(28.4, 11.5, 1.9)
-    line([(16, 20.5), (16, 25.5)])                                    # trunk
-    line([(10.5, 30), (16, 25.5), (21.5, 30)])                        # roots
+    for points in mark.polylines():
+        line(points)
+    for cx, cy, r in mark.NODES:
+        a, b = p(cx - r, cy - r), p(cx + r, cy + r)
+        draw.ellipse((a[0], a[1], b[0], b[1]), fill=colour)
 
 
 def app_icon(size, radius=0.225, margin=0.0, mark=0.56):

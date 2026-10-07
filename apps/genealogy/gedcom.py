@@ -43,7 +43,7 @@ def export(archive, owner_name=""):
             fams.setdefault(key, {"husb": key[0], "wife": key[1], "marriage": None, "kids": []})["kids"].append(p.pk)
     fam_ids = {key: f"@F{i}@" for i, key in enumerate(fams, start=1)}
 
-    out = ["0 HEAD", "1 SOUR SHAJARA", "2 NAME Shajara", "1 GEDC", "2 VERS 5.5.1", "2 FORM LINEAGE-LINKED",
+    out = ["0 HEAD", "1 SOUR SILAIRAHM", "2 NAME Silai Rahm", "1 GEDC", "2 VERS 5.5.1", "2 FORM LINEAGE-LINKED",
            "1 CHAR UTF-8", f"1 DATE {gedcom_date(*_today())}"]
     if owner_name:
         out += ["1 SUBM @U1@", "0 @U1@ SUBM", f"1 NAME {owner_name}"]

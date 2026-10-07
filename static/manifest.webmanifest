@@ -1,20 +1,47 @@
 {
-  "name": "Shajara",
-  "short_name": "Shajara",
-  "description": "Oilaviy arxiv va shajara",
+  "name": "Silai Rahm",
+  "short_name": "Silai Rahm",
+  "description": "Silai Rahm — oilaviy shajara va qarindoshlik rishtalari",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f6f3ec",
   "theme_color": "#27357e",
   "icons": [
-    { "src": "img/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "img/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "img/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
-    { "src": "img/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+    {
+      "src": "img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "img/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
   ],
   "shortcuts": [
-    { "name": "Shajara", "url": "/shajara/" },
-    { "name": "Voqealar", "url": "/voqealar/" }
+    {
+      "name": "Shajara",
+      "url": "/shajara/"
+    },
+    {
+      "name": "Voqealar",
+      "url": "/voqealar/"
+    },
+    {
+      "name": "Doʻstlar",
+      "url": "/dostlar/"
+    }
   ]
 }

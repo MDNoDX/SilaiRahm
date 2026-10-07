@@ -1,6 +1,6 @@
 # Saytni internetga joylash
 
-Hozirgi ishlab turgan manzil: **https://shajara-liard.vercel.app** (Vercel + Neon PostgreSQL, Frankfurt).
+Hozirgi ishlab turgan manzil: **https://silairahm.vercel.app** (eski https://shajara-liard.vercel.app ham shu loyihaga ulangan) (Vercel + Neon PostgreSQL, Frankfurt).
 GitHub’dagi `main` tarmogʻiga har bir `git push` saytni avtomatik yangilaydi.
 
 Barcha maʼlumotlar — odamlar, voqealar, doʻstlar, eslatmalar **va rasmlar** — bitta PostgreSQL
@@ -29,18 +29,29 @@ bazasida saqlanadi. Shuning uchun boshqa serverga koʻchish = bazani koʻchirish
 | `CRON_SECRET` | ha | Vercel Cron shu kalit bilan keladi |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google orqali kirish uchun | quyida |
 | `TELEGRAM_BOT_TOKEN` | Telegram eslatmalari uchun | quyida. Bot nomi tokenning oʻzidan olinadi; `TELEGRAM_BOT_USERNAME` shart emas |
+| `GEMINI_API_KEY` | AI yordamchi va ovozni matnga aylantirish uchun | quyida. `GEMINI_MODEL` shart emas (standart `gemini-2.5-flash`) |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | push-bildirishnomalar uchun | quyida. `VAPID_SUBJECT` shart emas (sayt manzili olinadi) |
 | `EMAIL_*`, `DJANGO_EMAIL_BACKEND` | parolni tiklash xatlari uchun | `.env.example` ga qarang |
 | `DJANGO_ALLOWED_HOSTS`, `DJANGO_CSRF_TRUSTED_ORIGINS` | faqat oʻz domeningiz boʻlsa | `*.vercel.app` manzillari avtomatik qoʻshiladi |
 
 Oʻzgaruvchi qoʻshilgach, **Deployments → Redeploy** qiling.
 
+### AI yordamchi (Google Gemini, bepul)
+
+1. https://aistudio.google.com/apikey → Google hisobingiz bilan kiring → **Create API key**.
+2. Kalitni Vercel’ga `GEMINI_API_KEY` qilib yozing (Production) → **Redeploy**. Kalitni hech kimga yubormang.
+3. Bepul tarifda daqiqasiga va kuniga soʻrovlar soni cheklangan; sayt har foydalanuvchiga soatiga 40 ta soʻrov beradi.
+   Bepul tarifda Google yuborilgan matnlardan oʻz mahsulotlarini yaxshilash uchun foydalanishi mumkin — yordamchi
+   sahifasida bu haqda yozilgan. Toʻlovli tarifga (Billing) oʻtsangiz, bu ishlatilmaydi.
+4. Model: `GEMINI_MODEL` (standart `gemini-2.5-flash` — tez va bepul).
+
 ### Google orqali kirish
 
 1. https://console.cloud.google.com → yangi loyiha → **APIs & Services → OAuth consent screen**
-   (External, ilova nomi «Shajara», email).
+   (External, ilova nomi «Silai Rahm», email).
 2. **Credentials → Create credentials → OAuth client ID → Web application**.
-3. *Authorized redirect URIs*: `https://shajara-liard.vercel.app/accounts/google/login/callback/`
+3. *Authorized redirect URIs*: `https://silairahm.vercel.app/accounts/google/login/callback/` va eskisi
+   `https://shajara-liard.vercel.app/accounts/google/login/callback/` (ikkalasi ham boʻlsin)
    (oʻz domeningiz boʻlsa, uni ham qoʻshing).
 4. Berilgan *Client ID* va *Client secret* ni Vercel’ga `GOOGLE_CLIENT_ID` va `GOOGLE_CLIENT_SECRET` qilib yozing → Redeploy.
 

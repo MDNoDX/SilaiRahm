@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils import timezone
 
-from .models import Invite, Membership, Role
+from .models import Audience, Invite, Membership, Role
 
 
 def role_in(user, owner):
@@ -24,8 +24,40 @@ def role_in(user, owner):
     return cache[owner.pk]
 
 
+def follows(user, owner):
+    """An approved follower of `owner` (cached for the request)."""
+    if not getattr(user, "is_authenticated", False) or owner is None or user.pk == owner.pk:
+        return False
+    cache = user.__dict__.setdefault("_follows", {})
+    if owner.pk not in cache:
+        from apps.network.models import Follow
+
+        cache[owner.pk] = Follow.objects.filter(follower=user, followed=owner, approved=True).exists()
+    return cache[owner.pk]
+
+
+def _audience_allows(user, owner, audience):
+    if audience == Audience.PUBLIC:
+        return getattr(user, "is_authenticated", False)
+    if audience == Audience.FOLLOWERS:
+        return follows(user, owner)
+    return False
+
+
 def can_view(user, owner):
-    return role_in(user, owner) is not None
+    """The family tree: family members always; others as the owner chose
+    (everyone on the site, or approved followers)."""
+    if role_in(user, owner) is not None:
+        return True
+    return owner is not None and _audience_allows(user, owner, getattr(owner, "tree_audience", Audience.FAMILY))
+
+
+def can_see_stories(user, owner):
+    """Life stories, events, memories and the album of a family tree."""
+    if role_in(user, owner) is not None:
+        return True
+    return (owner is not None and can_view(user, owner)
+            and _audience_allows(user, owner, getattr(owner, "stories_audience", Audience.FAMILY)))
 
 
 def can_edit(user, owner):

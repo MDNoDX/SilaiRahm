@@ -179,7 +179,7 @@ def push_test(request):
     from . import push
 
     delivered = push.send_to_user(request.user, {
-        "title": _("Shajara"), "body": _("Notifications work on this device."), "url": reverse("notify:settings"),
+        "title": settings.SITE_NAME, "body": _("Notifications work on this device."), "url": reverse("notify:settings"),
         "tag": "test"}) if push.configured() else 0
     return JsonResponse({"ok": bool(delivered)})
 

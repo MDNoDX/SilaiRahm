@@ -11,6 +11,7 @@
   {% translate "Wedding date" as wedding_label %}
   {% include "partials/date_fields.html" with label=wedding_label day=form.wedding_day month=form.wedding_month year=form.wedding_year %}
   <p class="help" style="margin-top:-8px">{% translate "With the day and month, you will be reminded of the wedding anniversary." %}</p>
+  {% include "partials/field.html" with field=form.is_divorced %}
   <div class="form-actions">
     <button class="btn btn-primary" type="submit">{% translate "Save" %}</button>
     <a class="btn btn-ghost" href="{% url 'genealogy:person' back %}">{% translate "Cancel" %}</a>

@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from apps.friends.models import Contact
 
-from .models import Change, Event, Marriage, Media, Person, Story
+from .models import Change, Event, Marriage, Media, Person
 
 FIELDS = [
     "first_name", "last_name", "patronymic", "gender", "birth_year", "birth_month", "birth_day", "birth_place",
@@ -59,7 +59,6 @@ def snapshot_for_delete(person):
                       for m in Marriage.objects.filter(owner=person.owner).filter(husband=person)
                       | Marriage.objects.filter(owner=person.owner).filter(wife=person)],
         "events": list(person.events.values_list("pk", flat=True)),
-        "stories": list(person.stories.values_list("pk", flat=True)),
         "contacts": [{"name": c.name, "how_met": c.how_met, "phone": c.phone, "birth_year": c.birth_year,
                       "birth_month": c.birth_month, "birth_day": c.birth_day, "note": c.note}
                      for c in person.friends.all()],
@@ -118,7 +117,6 @@ def undo(change, actor):
                                            defaults={"year": m["year"], "month": m["month"], "day": m["day"]})
     for event in Event.objects.filter(owner=change.owner, pk__in=data["events"]):
         event.people.add(person)
-    Story.objects.filter(owner=change.owner, pk__in=data["stories"], person=None).update(person=person)
     for c in data["contacts"]:
         Contact.objects.create(owner=change.owner, person=person, **c)
     for m in data["media"]:

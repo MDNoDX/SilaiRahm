@@ -1,4 +1,4 @@
-# Shajara: web (Django), worker (reminders + Telegram), PostgreSQL (data and
+# Silai Rahm: web (Django), worker (reminders + Telegram), PostgreSQL (data and
 # photos) and Caddy (automatic HTTPS). Settings come from .env — see .env.example and DEPLOY.md.
 services:
   db:

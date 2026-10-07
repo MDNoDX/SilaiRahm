@@ -1,6 +1,6 @@
 """Import a JSON export ("Download my data") into a user's archive.
 
-    python manage.py import_archive shajara-2026-09-30.json --user nodirbek
+    python manage.py import_archive silairahm-2026-09-30.json --user nodirbek
 """
 import json
 
@@ -11,7 +11,7 @@ from apps.genealogy.archive_io import import_archive
 
 
 class Command(BaseCommand):
-    help = "Import a Shajara JSON archive into an existing user's account."
+    help = "Import a Silai Rahm JSON archive into an existing user's account."
 
     def add_arguments(self, parser):
         parser.add_argument("file")

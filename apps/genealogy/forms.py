@@ -9,8 +9,9 @@ from apps.accounts.models import Gender
 from apps.core.dates import is_valid_partial_date, month_choices, partial_date_key
 from apps.core.text import normalize_apostrophes
 
-from .models import Event, Marriage, Person, Story
-from .relations import attach
+from . import recordings
+from .models import Event, Marriage, Person
+from .relations import attach, wife_is_married
 from .terminology import ADD_RELATION
 
 SHORT_TEXT_FIELDS = ("first_name", "last_name", "patronymic", "birth_place", "death_place", "burial_place",
@@ -251,10 +252,13 @@ class RelativeForm(PersonForm):
         elif relation == "spouse":
             if gender and gender == anchor.gender:
                 self.add_error("existing" if existing else "gender", _("A husband and wife must be a man and a woman."))
-            elif existing:
+            else:
                 husband, wife = (anchor, existing) if anchor.is_male else (existing, anchor)
-                if Marriage.objects.filter(husband=husband, wife=wife).exists():
+                if existing and Marriage.objects.filter(husband=husband, wife=wife).exists():
                     self.add_error("existing", _("These two people are already recorded as married."))
+                elif wife_is_married(wife, husband):
+                    self.add_error("relation", _("She is married. To add another husband, first mark the earlier "
+                                                 "marriage as divorced."))
         elif relation == "sibling":
             if not anchor.father_id and not anchor.mother_id:
                 self.add_error("relation", _("To add a brother or sister, first add this person's father or mother."))
@@ -325,7 +329,9 @@ class MarriageForm(DatePartsMixin, forms.ModelForm):
 
     class Meta:
         model = Marriage
-        fields = []
+        fields = ["is_divorced"]
+        labels = {"is_divorced": _("Divorced")}
+        help_texts = {"is_divorced": _("The marriage stays in the family tree, shown as ended.")}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -334,6 +340,9 @@ class MarriageForm(DatePartsMixin, forms.ModelForm):
     def clean(self):
         data = super().clean()
         self.clean_date_parts()
+        m = self.instance
+        if not data.get("is_divorced") and m.is_divorced and wife_is_married(m.wife, m.husband):
+            self.add_error("is_divorced", _("She has another marriage now: it cannot be active again."))
         return data
 
     def save(self, commit=True):
@@ -345,15 +354,22 @@ class MarriageForm(DatePartsMixin, forms.ModelForm):
 
 
 class EventForm(DatePartsMixin, forms.ModelForm):
-    date_prefix, date_target, date_future, date_require_year = "event", "", True, True
+    # A memory may have no exact date ("when I was five").
+    date_prefix, date_target, date_future, date_require_year = "event", "", True, False
+    recording = forms.FileField(label=_("Voice or video message"), required=False)
+    remove_recording = forms.BooleanField(label=_("Remove the recording"), required=False)
 
     def __init__(self, *args, owner, **kwargs):
         super().__init__(*args, **kwargs)
         self.owner_user = owner
         self.fields["people"].queryset = Person.objects.filter(owner=owner).order_by("first_name", "last_name")
         self.fields["people"].label_from_instance = _person_label
-        self.fields["people"].widget.attrs.update({"size": 8, "data-filterable": ""})
+        self.fields["people"].widget.attrs.update({"data-chips": "", "data-placeholder": _("Type a name…")})
+        self.fields["people"].label = _("Who")
         self.fields["title"].help_text = _("Optional. For example: “Sardorbek and Madina’s wedding”.")
+        self.fields["description"].label = _("The story")
+        self.fields["description"].help_text = _("Tell it as you remember it: who was there, what happened, what "
+                                                 "made everyone laugh. An empty line starts a new paragraph.")
         self.add_date_fields()
         self.order_fields(["kind", "title", "people", "event_day", "event_month", "event_year", "every_year",
                            "place", "description"])
@@ -361,7 +377,7 @@ class EventForm(DatePartsMixin, forms.ModelForm):
     class Meta:
         model = Event
         fields = ["kind", "title", "people", "every_year", "place", "description"]
-        widgets = {"description": forms.Textarea(attrs={"rows": 4})}
+        widgets = {"description": forms.Textarea(attrs={"rows": 12})}
 
     def clean(self):
         data = super().clean()
@@ -373,28 +389,22 @@ class EventForm(DatePartsMixin, forms.ModelForm):
                 data[name] = normalize_apostrophes(data[name].strip())
         return data
 
+    def clean_recording(self):
+        upload = self.cleaned_data.get("recording")
+        return recordings.clean(upload)[0] if upload else None
+
     def save(self, commit=True):
         obj = super().save(commit=False)
         obj.owner = self.owner_user
         self.store_date_parts(obj)
+        new, old = self.cleaned_data.get("recording"), obj.recording.name if obj.recording else ""
+        if new or self.cleaned_data.get("remove_recording"):
+            if old:
+                obj.recording.storage.delete(old)
+            obj.recording = new or ""
         if commit:
             obj.save()
             self.save_m2m()
         return obj
 
 
-class StoryForm(forms.ModelForm):
-    def __init__(self, *args, owner, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["person"].queryset = Person.objects.filter(owner=owner)
-        self.fields["person"].empty_label = pgettext_lazy("choice", "— the whole family —")
-        self.fields["person"].required = False
-        self.fields["year"].widget.attrs["inputmode"] = "numeric"
-
-    class Meta:
-        model = Story
-        fields = ["title", "person", "year", "body"]
-        widgets = {"body": forms.Textarea(attrs={"rows": 12})}
-
-    def clean_title(self):
-        return normalize_apostrophes(self.cleaned_data["title"].strip())

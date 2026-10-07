@@ -7,6 +7,10 @@ person), so this is simple and robust.
 """
 import mimetypes
 
+# Voice messages recorded on iPhones and Macs: browsers expect audio/mp4.
+mimetypes.add_type("audio/mp4", ".m4a")
+mimetypes.add_type("audio/aac", ".aac")
+
 from django.core.files.base import ContentFile
 from django.core.files.storage import Storage
 from django.urls import reverse

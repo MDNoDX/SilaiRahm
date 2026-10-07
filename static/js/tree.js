@@ -3,8 +3,8 @@
    relationship name) in the active language; this file draws it and handles:
    pan / zoom with semantic zoom (less detail, larger type when zoomed out),
    the generation rail, the mini-map, branch colours, opening and closing
-   branches, the side sheet (details and adding a relative in place), the fan
-   chart of ancestors and PNG export. */
+   branches, the side sheet (details and adding a relative in place) and PNG
+   export. */
 (function () {
   "use strict";
 
@@ -21,7 +21,6 @@
   var sheetInner = document.getElementById("tree-sheet-inner");
   var picker = document.getElementById("tree-person");
   var dataUrl = root.getAttribute("data-url");
-  var fanUrl = root.getAttribute("data-fan-url");
   var pdfUrl = root.getAttribute("data-pdf-url");
   var canEdit = !!root.getAttribute("data-can-edit");
 
@@ -35,9 +34,9 @@
     return new Set((params.get(name) || "").split(",").filter(Boolean).map(Number));
   }
   var state = {
-    data: null, fan: null, vb: null, svg: null, selected: null,
+    data: null, vb: null, svg: null, selected: null,
     focus: parseInt(root.getAttribute("data-focus"), 10),
-    view: params.get("view") === "fan" ? "fan" : "tree",
+    view: "tree",
     all: params.get("all") === "1",
     opened: idSet("open"), closed: idSet("closed"), folded: idSet("folded"), unfolded: idSet("kids"),
   };
@@ -228,94 +227,8 @@
     }, 600);
   }
 
-  // ---- the fan chart of ancestors ----------------------------------------------
-  var FAN = { r0: 74, widths: [0, 84, 92, 108, 132, 140, 140], start: -205, span: 230 };
-  function fanRadius(gen) {
-    var r = FAN.r0;
-    for (var i = 1; i <= gen; i++) r += FAN.widths[Math.min(i, FAN.widths.length - 1)];
-    return r;
-  }
-  function polar(r, deg) { var a = deg * Math.PI / 180; return [r * Math.cos(a), r * Math.sin(a)]; }
-  function sector(r1, r2, a1, a2) {
-    var p1 = polar(r2, a1), p2 = polar(r2, a2), p3 = polar(r1, a2), p4 = polar(r1, a1);
-    var large = a2 - a1 > 180 ? 1 : 0;
-    return "M" + p1 + " A" + r2 + "," + r2 + " 0 " + large + " 1 " + p2 + " L" + p3 +
-      " A" + r1 + "," + r1 + " 0 " + large + " 0 " + p4 + "Z";
-  }
-  function renderFan(data) {
-    var svg = el("svg", { role: "group", "aria-label": gettext("Family tree") });
-    var defs = el("defs", {}, svg);
-    var g = el("g", {}, svg);
-    var byKey = {};
-    data.people.forEach(function (p) { byKey[p.gen + ":" + p.slot] = p; });
-    var maxGen = Math.min(6, data.generations + (canEdit ? 1 : 0));
-    var seq = 0;
-
-    function arcLabel(text, cls, r, a1, a2) {       // written along the ring
-      var id = "fan-arc-" + (++seq);
-      el("path", { id: id, d: "M" + polar(r, a1) + " A" + r + "," + r + " 0 0 1 " + polar(r, a2), fill: "none" }, defs);
-      var t = el("text", { "class": cls }, g);
-      var tp = el("textPath", { href: "#" + id, startOffset: "50%", "text-anchor": "middle" }, t);
-      var font = (cls.indexOf("small") === -1 ? "600 13px " : "500 12px ") + FONT;
-      tp.textContent = fitText(text, font, (a2 - a1) * Math.PI / 180 * r - 16);
-    }
-    function radialLabel(text, cls, r1, r2, a1, a2) {  // written outwards, never upside down
-      var mid = (a1 + a2) / 2, c = polar((r1 + r2) / 2, mid);
-      var rot = Math.cos(mid * Math.PI / 180) < 0 ? mid + 180 : mid;
-      el("text", { "class": cls, x: c[0], y: c[1], dy: 4, "text-anchor": "middle",
-        transform: "rotate(" + rot + " " + c[0] + " " + c[1] + ")" }, g).textContent = fitText(text, "500 12px " + FONT, r2 - r1 - 14);
-    }
-
-    for (var gen = 1; gen <= maxGen; gen++) {
-      var slots = Math.pow(2, gen), step = FAN.span / slots;
-      var r1 = fanRadius(gen - 1), r2 = fanRadius(gen);
-      for (var slot = 0; slot < slots; slot++) {
-        var a1 = FAN.start + slot * step, a2 = a1 + step;
-        var p = byKey[gen + ":" + slot];
-        var child = byKey[(gen - 1) + ":" + Math.floor(slot / 2)];
-        if (!p && !(child && canEdit)) continue;
-        var side = slot < slots / 2 ? "paternal" : "maternal";
-        var w = el("path", { d: sector(r1, r2, a1, a2), "class": "fan-wedge " + (p ? side : "empty"),
-          tabindex: "0", role: "button" }, g);
-        if (p) {
-          w.dataset.id = p.id;
-          el("title", {}, w).textContent = [p.name, p.years, p.label].filter(Boolean).join(" · ");
-          if (gen <= 3) {
-            var rm = (r1 + r2) / 2;
-            arcLabel(gen <= 2 ? p.name : (p.first || p.name), "fan-text", rm + (p.years ? 4 : -4), a1, a2);
-            if (p.years) arcLabel(p.years, "fan-text small", rm - 13, a1, a2);
-          } else {
-            radialLabel(p.first || p.name, "fan-text small", r1, r2, a1, a2);
-          }
-        } else {
-          w.dataset.add = child.id;
-          w.dataset.relation = slot % 2 === 0 ? "father" : "mother";
-          el("title", {}, w).textContent = slot % 2 === 0 ? gettext("Add father") : gettext("Add mother");
-          var c = polar((r1 + r2) / 2, (a1 + a2) / 2);
-          el("text", { "class": "fan-text plus", x: c[0], y: c[1], dy: 5, "text-anchor": "middle" }, g).textContent = "+";
-        }
-      }
-    }
-    var centre = byKey["0:0"];
-    var cw = el("circle", { r: FAN.r0, "class": "fan-wedge centre", tabindex: "0", role: "button" }, g);
-    cw.dataset.id = centre.id;
-    wrap(centre.name, "700 15px " + FONT, FAN.r0 * 2 - 24, 2).forEach(function (line, i, all) {
-      el("text", { "class": "fan-text centre", x: 0, y: (i - (all.length - 1) / 2) * 18 + 5, "text-anchor": "middle" }, g).textContent = line;
-    });
-
-    view.querySelectorAll("svg").forEach(function (s) { s.remove(); });
-    view.insertBefore(svg, view.firstChild);
-    state.svg = svg;
-    state.fan = data;
-    var R = fanRadius(maxGen) + 24;
-    var yMax = Math.max(FAN.r0, R * Math.sin((FAN.start + FAN.span) * Math.PI / 180)) + 24;
-    state.bounds = { x: -R, y: -R, w: 2 * R, h: R + yMax };
-    fit(false);
-  }
-
   // ---- pan & zoom via the viewBox ---------------------------------------------
   function bounds() {
-    if (state.view === "fan") return state.bounds;
     return { x: 0, y: 0, w: state.data.width, h: state.data.height };
   }
   function scaleNow() { return state.vb ? view.clientWidth / state.vb.w : 1; }
@@ -515,7 +428,7 @@
   view.addEventListener("pointerleave", function () { tip.hidden = true; });
 
   view.addEventListener("keydown", function (e) {
-    var target = e.target.closest && e.target.closest(".t-toggle, .t-body, .fan-wedge");
+    var target = e.target.closest && e.target.closest(".t-toggle, .t-body");
     if ((e.key === "Enter" || e.key === " ") && target) {
       e.preventDefault();
       activate(target);
@@ -547,12 +460,6 @@
       load(String(id));
       return;
     }
-    var wedge = target.closest && target.closest(".fan-wedge");
-    if (wedge) {
-      if (wedge.dataset.add) { openSheet(parseInt(wedge.dataset.add, 10), wedge.dataset.relation); return; }
-      openSheet(parseInt(wedge.dataset.id, 10));
-      return;
-    }
     var body = target.closest && target.closest(".t-body");
     if (!body) return;
     var pid = parseInt(body.dataset.id, 10), now = Date.now();
@@ -562,7 +469,7 @@
   }
   function centre(pid) {
     state.focus = pid;
-    if (state.view === "fan") loadFan(); else load(String(pid));
+    load(String(pid));
   }
 
   // ---- the side sheet: who this is, and adding a relative in place --------------
@@ -656,7 +563,7 @@
         var btn = form.querySelector("button[type=submit]");
         btn.disabled = true;
         fetch(p.add_url, { method: "POST", body: body, credentials: "same-origin",
-          headers: { "X-CSRFToken": window.Shajara.csrf(), Accept: "application/json" } })
+          headers: { "X-CSRFToken": window.SilaiRahm.csrf(), Accept: "application/json" } })
           .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
           .then(function (res) {
             btn.disabled = false;
@@ -664,7 +571,7 @@
               form.reset();
               form.hidden = true;
               chips.forEach(function (c) { c.setAttribute("aria-pressed", "false"); });
-              if (state.view === "fan") loadFan(); else load(String(p.id), res.d.id);
+              load(String(p.id), res.d.id);
               openSheet(p.id);
               return;
             }
@@ -699,16 +606,11 @@
     root.querySelectorAll("[data-expand]").forEach(function (b) {
       b.setAttribute("aria-pressed", String((b.getAttribute("data-expand") === "all") === state.all));
     });
-    root.querySelectorAll("[data-view]").forEach(function (b) {
-      b.setAttribute("aria-pressed", String(b.getAttribute("data-view") === state.view));
-    });
-    root.querySelectorAll("[data-tree-only]").forEach(function (b) { b.hidden = state.view !== "tree"; });
     var q = query();
     document.getElementById("tree-pdf").href = pdfUrl + "?" + q;
     document.getElementById("tree-poster-a2").href = pdfUrl + "?" + query({ size: "A2", all: "1" });
     document.getElementById("tree-poster-a1").href = pdfUrl + "?" + query({ size: "A1", all: "1" });
-    document.getElementById("tree-png").hidden = state.view !== "tree";
-    window.history.replaceState(null, "", window.location.pathname + "?" + q + (state.view === "fan" ? "&view=fan" : ""));
+    window.history.replaceState(null, "", window.location.pathname + "?" + q);
   }
   function fail() {
     view.classList.remove("loading");
@@ -730,22 +632,7 @@
       })
       .catch(fail);
   }
-  function loadFan() {
-    view.classList.add("loading");
-    fetch(fanUrl + "?person=" + state.focus, { credentials: "same-origin", headers: { Accept: "application/json" } })
-      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(function (data) {
-        view.classList.remove("loading");
-        if (!data.people.length) { setStatus(gettext("The family tree is empty.")); return; }
-        setStatus("");
-        state.focus = data.focus;
-        if (document.activeElement !== picker) picker.value = data.focus_name;
-        renderFan(data);
-        syncUi();
-      })
-      .catch(fail);
-  }
-  function reload() { if (state.view === "fan") loadFan(); else load(null); }
+  function reload() { load(null); }
 
   // The name picker (live search) puts the chosen person in the centre.
   picker.addEventListener("livesearch:pick", function (e) { state.focus = e.detail.id; reload(); });
@@ -754,14 +641,6 @@
       state.all = btn.getAttribute("data-expand") === "all";
       state.opened.clear(); state.closed.clear(); state.folded.clear(); state.unfolded.clear();
       load(String(state.focus));
-    });
-  });
-  root.querySelectorAll("[data-view]").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      state.view = btn.getAttribute("data-view");
-      state.vb = null;
-      positions = {};
-      reload();
     });
   });
 

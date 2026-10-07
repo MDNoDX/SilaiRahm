@@ -89,7 +89,7 @@ final class Notifier: NSObject, ObservableObject, UNUserNotificationCenterDelega
             guard self.enabled else { return }
             var seen = Set(UserDefaults.standard.array(forKey: self.seenKey) as? [Int] ?? [])
             for item in status.items where !seen.contains(item.id) {
-                self.post(id: "shajara-\(item.id)", title: "\(item.icon) \(item.title)", body: item.body, url: item.url)
+                self.post(id: "silairahm-\(item.id)", title: "\(item.icon) \(item.title)", body: item.body, url: item.url)
                 seen.insert(item.id)
             }
             UserDefaults.standard.set(Array(seen.sorted().suffix(500)), forKey: self.seenKey)
@@ -98,7 +98,7 @@ final class Notifier: NSObject, ObservableObject, UNUserNotificationCenterDelega
 
     func sendTest() {
         requestPermission()
-        post(id: "shajara-test-\(Date().timeIntervalSince1970)", title: L.t("testTitle"), body: L.t("testBody"), url: nil)
+        post(id: "silairahm-test-\(Date().timeIntervalSince1970)", title: L.t("testTitle"), body: L.t("testBody"), url: nil)
     }
 
     private func post(id: String, title: String, body: String, url: String?) {
@@ -106,7 +106,7 @@ final class Notifier: NSObject, ObservableObject, UNUserNotificationCenterDelega
         content.title = title
         content.body = body
         switch sound {
-        case .chime: content.sound = UNNotificationSound(named: UNNotificationSoundName("Shajara.wav"))
+        case .chime: content.sound = UNNotificationSound(named: UNNotificationSoundName("SilaiRahm.wav"))
         case .system: content.sound = .default
         case .none: content.sound = nil
         }

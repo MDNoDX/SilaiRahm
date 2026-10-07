@@ -1,4 +1,6 @@
-# Shajara — oʻzbek oilalari uchun oilaviy arxiv (Django)
+# Silai Rahm — qarindoshlik rishtalarini asraydigan oilaviy shajara (Django)
+
+*Silai rahm* — qarindoshlik aloqalarini uzmaslik. Sayt oilaning shajarasi, hayot tarixlari, voqea va xotiralarini bir joyda saqlaydi.
 
 Asosiy til — **Oʻzbekcha (lotin)**; toʻliq tarjimalar: **Ўзбекча (kirill)**, **Русский** va **English**.
 Hammasi Django’ning rasmiy i18n tizimi orqali ishlaydi (`gettext`, `.po` → `.mo`,
@@ -12,29 +14,40 @@ Hammasi Django’ning rasmiy i18n tizimi orqali ishlaydi (`gettext`, `.po` → `
 - **Shajara daraxti** — bitta bogʻlangan chizma. Tarmoqlar rang bilan ajratilgan (oʻz oilasi, ota tomoni,
   ona tomoni), toʻgʻri ajdodlar chizigʻi zarhal; chapda avlod nomlari, burchakda kichik xarita;
   uzoqlashtirganda kartalar soddalashadi. Kartani bosganda yon panel ochiladi va qarindosh **shu yerning oʻzida**
-  qoʻshiladi. **Ajdodlar yelpigʻichi** ham bor.
+  qoʻshiladi.
 - **Birgalikda tuzish** — qarindoshni havola orqali taklif qilasiz (koʻrish yoki tahrirlash huquqi bilan);
   u shajarani oʻz oʻrnidan nomlangan holda koʻradi. **Oʻzgarishlar tarixi**: kim nimani qoʻshgani koʻrinadi,
   xato oʻzgarish yoki oʻchirish ortga qaytariladi.
-- **Bogʻlanishlar** — saytdagi odamlarni ism, foydalanuvchi nomi yoki email boʻyicha topish, «u menga kim» deb belgilab
-  soʻrov yuborish; qabul qilinganda har biri boshqasining shajarasida joylashadi, shajaralar koʻrinadi, xohlasa doʻstlar
+- **Kuzatish va maxfiylik (Instagram kabi)** — hisob ochiq yoki yopiq; yopiq hisobda har bir kuzatuvchini egasi tasdiqlaydi.
+  Shajarani va hikoyalarni (hayot tarixi, voqealar, albom) kim koʻrishini alohida tanlanadi: saytdagi hamma /
+  kuzatuvchilar / faqat oila aʼzolari. Har bir hisobning sahifasi: kuzatish, «bu mening qarindoshim», shajarasini ochish.
+- **Doʻstlar va bogʻlanishlar bitta boʻlimda** — odamlarni yozayotganda taklif qilinadigan qidiruv (Enter shart emas),
+  «u menga kim» deb belgilab soʻrov yuborish; qabul qilinganda har biri boshqasining shajarasida joylashadi, shajaralar koʻrinadi, xohlasa doʻstlar
   roʻyxatiga qoʻshiladi. **Solishtirish va birlashtirish**: ikki shajaradagi bir xil odamlar topiladi, farqlar haqida
   ogohlantiriladi, yetishmayotgan qarindoshlar va maʼlumotlar bir bosishda qoʻshiladi (har biri «Tarix»da qaytariladi).
 - **Dublikatlar** — qoʻshayotganda ogohlantirish, topilgan juftlarni birlashtirish (maʼlumot yoʻqolmaydi).
-- **Albom** — har bir odamga suratlar, hujjatlar (PDF) va ovozli yozuvlar; suratlar yuklashda kichraytiriladi.
-- **Hayot yoʻli va vaqt chizigʻi** — odam sahifasida tugʻilish, toʻy, farzandlar; butun oila boʻyicha oʻn yilliklar.
+- **Albom** — har bir odamga suratlar, hujjatlar (PDF), ovozli yozuvlar va videolar; suratlar yuklashda kichraytiriladi.
+- **Ovozli va video hikoyalar** — voqea, xotira va hayot tarixini yozish oʻrniga brauzerning oʻzida ovozli yoki video xabar
+  qilib aytib berish mumkin (4 MB gacha: ~25 daqiqa ovoz yoki ~1 daqiqa video); yordamchi uni matnga ham aylantiradi.
+- **AI yordamchi** (`/yordamchi/`, Google Gemini) — qarindoshlar va sayt haqidagi savollarga javob beradi, aytilgan hikoyani
+  tahrirlab voqea sifatida, yangi qarindosh yoki maʼlumotni **taklif qiladi**; hech narsa «Qoʻshish» bosilmaguncha saqlanmaydi.
+- **Hayot tarixi kitobdek** — odam sahifasida hayot tarixi, voqealar va xotiralar bitta hikoya boʻlib, sanalar boʻyicha;
+  butun oila boʻyicha vaqt chizigʻi.
 - **Qarindoshlik nomlari** avtomatik: aka/uka, opa/singil, amaki/amma/togʻa/xola, amakivachcha…,
   kelin/kuyov, qaynota/qaynona, yanga/pochcha, «Buvining ukasi», «Onaning xolavachchasi», «Togʻaning xotini».
 - **Muchal** — har bir odamning muchali (yil Navroʻzda almashadi), keyingi muchal yili, Navroʻzda eslatma.
-- **Oilaviy voqealar** — toʻy, fotiha, farzand kutilmoqda, tugʻilish, beshik toʻyi, sunnat toʻyi, yil oshi
-  va boshqalar; kelajakdagi sanalar.
+- **Voqealar va xotiralar** (eski «Hikoyalar» shu yerga qoʻshilgan) — toʻy, fotiha, farzand tugʻilishi, beshik toʻyi,
+  sunnat toʻyi, aqiqa, tugʻilgan kun, hayit, yangi yil, haj yoki umra, yubiley, vafot, «xotira yoki boshqa voqea»;
+  har biri hikoyadek yoziladi va oʻqiladi; kelajakdagi sanalar.
+- **Nikoh** — ayolda bir vaqtda bitta nikoh, erkakda bir nechta; nikohni «ajrashgan» deb belgilash mumkin.
 - **Doʻstlar** — istalgan kishining (oʻzingiz, dadangiz, buvingiz…) doʻstlari, tugʻilgan kunlari bilan.
 - **Eslatmalar** — tugʻilgan kunlar, nikoh yilliklari, xotira kunlari, voqealar, muchal yili: saytda,
   **Telegram bot** orqali va **telefonga push-bildirishnoma** qilib (sayt bosh ekranga qoʻshilganda).
   Bosh sahifadagi «Bugun» blokidan bir bosishda tabrik yuboriladi.
 - **Kim kimga kim?** — ikki odam orasidagi qarindoshlik va bogʻlanish zanjiri.
 - **Familiya taklifi** — oʻgʻil nevaraga ota tarafdagi bobosining ismidan (Madaminjon → Madaminov).
-- **Chop etish** — muqovali **shajara kitobi** (butun oila, ota yoki ona tomoni, hikoyalari bilan), bitta odam uchun
+- **Chop etish** — muqovali **shajara kitobi** (butun oila, ota yoki ona tomoni, voqea va xotiralari bilan; sarlavhasi
+  sozlamalardagi «Oila nomi»dan), bitta odam uchun
   **«Hayot kitobi»**, **devoriy plakat** (balandligi 42 yoki 59 sm, uzunligi oilaga qarab),
   tarjimai hol va daraxt PDF; PNG.
 - **GEDCOM** — eksport va **import** (MyHeritage, Ancestry, Gramps va boshqalardan).
@@ -46,7 +59,7 @@ Hammasi Django’ning rasmiy i18n tizimi orqali ishlaydi (`gettext`, `.po` → `
 - **Boshqaruv paneli** (`/boshqaruv/`) — holat, foydalanuvchilar, zaxira.
 - **Mac ilovasi** — [macos/](macos/README.md): alohida oyna, tizim bildirishnomalari, Dock belgisi.
 
-Sayt: **https://shajara-liard.vercel.app** · Serverga joylash va koʻchirish: [docs/DEPLOY.md](docs/DEPLOY.md).
+Sayt: **https://silairahm.vercel.app** (eski manzil ham ishlaydi: https://shajara-liard.vercel.app) · Serverga joylash va koʻchirish: [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Ishga tushirish
 
@@ -75,13 +88,15 @@ Toʻliq xarita — [docs/TUZILMA.md](docs/TUZILMA.md) («X ni qayerdan topaman?�
 | Papka | Ichida |
 |---|---|
 | `config/` | Sozlamalar, bosh manzillar, sana formatlari |
-| `apps/genealogy/` | Shajara: odamlar, daraxt, albom, tarix, voqealar, hikoyalar, PDF, GEDCOM (`views/` — mavzu boʻyicha) |
+| `apps/genealogy/` | Shajara: odamlar, daraxt, albom, tarix, voqea va xotiralar, ovozli/video yozuvlar, PDF, GEDCOM (`views/` — mavzu boʻyicha) |
 | `apps/accounts/` | Hisob, kirish, ikki bosqichli kirish, oila aʼzolari va taklif havolalari |
 | `apps/notify/` | Eslatmalar: Telegram, push, cron, haftalik zaxira |
 | `apps/core/` | Bosh sahifa, boshqaruv paneli, tillar, sanalar, fayl saqlash |
-| `apps/friends/` | Doʻstlar |
+| `apps/friends/` | Doʻstlar (bogʻlanishlar va kuzatishlar bilan bitta sahifada) |
+| `apps/network/` | Saytdagi boshqa hisoblar: kuzatish, profil, bogʻlanish, shajaralarni solishtirish va birlashtirish |
+| `apps/assistant/` | AI yordamchi: Gemini mijozi, oila konteksti, taklif → tasdiq → saqlash, ovozni matnga aylantirish |
 | `templates/` | Sahifalar — kod bilan bir xil mavzu papkalarida |
-| `static/` | `css/app.css` (dizayn tizimi), `js/app.js`, `js/tree.js`, belgilar |
+| `static/` | `css/app.css` (dizayn tizimi), `js/app.js`, `js/tree.js`, `js/assistant.js`, belgilar |
 | `locale/` | Tarjimalar: `uz`, `uz_Cyrl`, `ru`, `en` |
 | `fonts/` | DejaVu Sans — PDF ichiga joylanadi (Ў Қ Ғ Ҳ va ʻ ʼ belgilari bor) |
 | `tests/` | Testlar, mavzu boʻyicha |

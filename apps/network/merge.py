@@ -36,6 +36,7 @@ COPY_FIELDS = ["first_name", "last_name", "patronymic", "gender", "birth_year", 
 FILL_FIELDS = ["last_name", "patronymic", "birth_year", "birth_month", "birth_day", "birth_place", "death_year",
                "death_month", "death_day", "death_place", "burial_place", "occupation", "education", "biography",
                "life_story"]
+STORY_FIELDS = ["biography", "life_story"]
 DATE_FIELDS = ["birth_year", "birth_month", "birth_day", "death_year", "death_month", "death_day"]
 
 
@@ -165,8 +166,10 @@ def differs(role):
             else _("{name}: the mother differs — {here} here, {there} there."))
 
 
-def analyse(source_owner, target_owner, anchors=()):
-    """The plan for taking `source_owner`'s tree into `target_owner`'s."""
+def analyse(source_owner, target_owner, anchors=(), with_stories=True):
+    """The plan for taking `source_owner`'s tree into `target_owner`'s. Without
+    `with_stories` (the source owner keeps their stories to the family) the
+    life stories are not copied."""
     S, T = Archive(source_owner), Archive(target_owner)
     plan = Plan(source_owner, target_owner)
     pairs, rejected = known_pairs(source_owner, target_owner)
@@ -255,6 +258,8 @@ def analyse(source_owner, target_owner, anchors=()):
             continue
         sp, tp = S.people[s], T.people[t]
         for name in FILL_FIELDS:
+            if not with_stories and name in STORY_FIELDS:
+                continue
             mine, theirs = getattr(tp, name), getattr(sp, name)
             if theirs in (None, "") or mine == theirs:
                 continue
@@ -275,9 +280,10 @@ def analyse(source_owner, target_owner, anchors=()):
 
 
 # ---- carrying out the plan ---------------------------------------------------
-def copy_person(source, owner):
+def copy_person(source, owner, with_stories=True):
     """A new record in `owner`'s tree with `source`'s details (and photo)."""
-    person = Person(owner=owner, **{name: getattr(source, name) for name in COPY_FIELDS})
+    fields = [n for n in COPY_FIELDS if with_stories or n not in STORY_FIELDS]
+    person = Person(owner=owner, **{name: getattr(source, name) for name in fields})
     person.save()
     if source.photo:
         copy_photo(source, person)
@@ -304,9 +310,9 @@ def link_match(a, b, actor, rejected=False):
 
 
 @transaction.atomic
-def apply(source_owner, target_owner, keys=None, actor=None, anchors=()):
+def apply(source_owner, target_owner, keys=None, actor=None, anchors=(), with_stories=True):
     """Carry out the chosen items of the plan; returns counts for the message."""
-    plan = analyse(source_owner, target_owner, anchors)
+    plan = analyse(source_owner, target_owner, anchors, with_stories=with_stories)
     chosen = plan.keys if keys is None else set(keys) & plan.keys
     S = Archive(source_owner)
     done = {"matched": 0, "added": 0, "filled": 0, "linked": 0}
@@ -336,7 +342,7 @@ def apply(source_owner, target_owner, keys=None, actor=None, anchors=()):
         if a.key not in chosen or a.anchor_source not in mapped:
             continue
         anchor = person(mapped[a.anchor_source])
-        new = copy_person(a.source, target_owner)
+        new = copy_person(a.source, target_owner, with_stories=with_stories)
         if problem(anchor, new, a.relation, Archive(target_owner)):
             new.delete()
             continue

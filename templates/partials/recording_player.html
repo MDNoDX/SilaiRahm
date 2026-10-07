@@ -1,0 +1,1 @@
+{% load i18n %}<figure class="recording">{% if kind == "video" %}<video controls preload="metadata" playsinline src="{{ file.url }}"></video>{% else %}<figcaption>{% include "partials/icon.html" with name="mic" %}{% translate "Told aloud" %}</figcaption><audio controls preload="none" src="{{ file.url }}"></audio>{% endif %}</figure>

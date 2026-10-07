@@ -12,7 +12,7 @@
     var t;
     return function () { var args = arguments; clearTimeout(t); t = setTimeout(function () { fn.apply(null, args); }, ms); };
   }
-  window.Shajara = { csrf: csrf };
+  window.SilaiRahm = { csrf: csrf };
 
   // ---- Confirm destructive actions -----------------------------------------
   document.addEventListener("click", function (e) {
@@ -131,6 +131,17 @@
     }, 0);
   });
 
+  // A button that shows or hides a part of the page (and puts the cursor in it).
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-reveal]");
+    if (!btn) return;
+    var box = document.getElementById(btn.getAttribute("data-reveal"));
+    if (!box) return;
+    box.hidden = !box.hidden;
+    var field = !box.hidden && box.querySelector("textarea, input:not([type=hidden])");
+    if (field) field.focus();
+  });
+
   // Parts of a form shown for one choice of a radio group: data-show-when="name=value".
   $all("[data-show-when]").forEach(function (el) {
     var rule = el.getAttribute("data-show-when").split("="), form = el.closest("form");
@@ -168,18 +179,72 @@
   });
 
   // A search box above long multiple-choice lists (people in an event).
-  $all("select[data-filterable]").forEach(function (select) {
-    var box = document.createElement("input");
-    box.type = "search";
-    box.className = "filter-box";
-    box.placeholder = gettext("Type a name to filter…");
-    select.parentNode.insertBefore(box, select);
-    box.addEventListener("input", function () {
-      var q = box.value.trim().toLowerCase();
+  // Choosing several people (who was at an event): chips, and suggestions while typing.
+  $all("select[multiple][data-chips]").forEach(function (select) {
+    var wrap = document.createElement("div"), input = document.createElement("input"), list = document.createElement("div");
+    wrap.className = "chips-select";
+    input.type = "search";
+    input.autocomplete = "off";
+    input.placeholder = select.getAttribute("data-placeholder") || "";
+    list.className = "live-results";
+    list.hidden = true;
+    var fold = function (t) { return t.toLowerCase().replace(/[ʻʼ'`‘’]/g, ""); };
+    var draw = function () {
+      $all(".pick-chip", wrap).forEach(function (c) { c.remove(); });
       Array.prototype.forEach.call(select.options, function (o) {
-        o.hidden = q && o.text.toLowerCase().indexOf(q) === -1 && !o.selected;
+        if (!o.selected) return;
+        var chip = document.createElement("span"), x = document.createElement("button");
+        chip.className = "pick-chip";
+        chip.textContent = o.text;
+        x.type = "button";
+        x.textContent = "×";
+        x.setAttribute("aria-label", gettext("Remove"));
+        x.addEventListener("click", function () { o.selected = false; draw(); input.focus(); });
+        chip.appendChild(x);
+        wrap.insertBefore(chip, input);
       });
+    };
+    var suggest = function () {
+      var q = fold(input.value.trim());
+      list.innerHTML = "";
+      var shown = 0;
+      Array.prototype.forEach.call(select.options, function (o) {
+        if (o.selected || shown >= 8 || (q && fold(o.text).indexOf(q) === -1)) return;
+        var item = document.createElement("button");
+        item.type = "button";
+        item.className = "live-item";
+        item.textContent = o.text;
+        item.addEventListener("mousedown", function (e) {
+          e.preventDefault();
+          o.selected = true;
+          input.value = "";
+          draw();
+          suggest();
+        });
+        list.appendChild(item);
+        shown++;
+      });
+      list.hidden = !shown;
+    };
+    select.hidden = true;
+    select.parentNode.insertBefore(wrap, select);
+    wrap.appendChild(input);
+    wrap.appendChild(list);
+    input.addEventListener("input", suggest);
+    input.addEventListener("focus", suggest);
+    input.addEventListener("blur", function () { window.setTimeout(function () { list.hidden = true; }, 150); });
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        var first = list.querySelector(".live-item");
+        if (first) first.dispatchEvent(new MouseEvent("mousedown"));
+      } else if (e.key === "Backspace" && !input.value) {
+        var picked = Array.prototype.filter.call(select.options, function (o) { return o.selected; });
+        if (picked.length) { picked[picked.length - 1].selected = false; draw(); }
+      }
     });
+    wrap.addEventListener("click", function (e) { if (e.target === wrap) input.focus(); });
+    draw();
   });
 
   // New son: suggest the surname made from the paternal grandfather's name.
@@ -586,7 +651,7 @@
       if (testBtn) testBtn.hidden = !on;
       pushBox.querySelector(".setting-icon").classList.toggle("ok", on);
     };
-    if (!key || /ShajaraMac/.test(navigator.userAgent)) {
+    if (!key || /SilaiRahmMac|ShajaraMac/.test(navigator.userAgent)) {
       // Not set up on the server, or the Mac app (it has its own notifications).
       pushBox.closest("section").hidden = true;
     } else if (!canPush) {
@@ -615,4 +680,148 @@
       });
     }
   }
+  // ---- Voice and video messages: a story told aloud ---------------------
+  $all("[data-recorder]").forEach(function (box) {
+    var input = $("[data-rec-input]", box), live = $("[data-rec-live]", box), result = $("[data-rec-result]", box);
+    var player = $("[data-rec-player]", box), errorBox = $("[data-rec-error]", box), timeBox = $("[data-rec-time]", box);
+    var camera = $("[data-rec-camera]", box), limitBox = $("[data-rec-limit]", box), current = $("[data-rec-current]", box);
+    var max = parseInt(box.getAttribute("data-max"), 10) || 4194304;
+    var recorder = null, stream = null, chunks = [], size = 0, timer = null, started = 0, url = null;
+    var canRecord = !!(window.MediaRecorder && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    var LIMITS = { audio: 25 * 60, video: 75 };
+    var TYPES = {
+      audio: ["audio/webm;codecs=opus", "audio/mp4", "audio/ogg;codecs=opus", "audio/webm"],
+      video: ["video/webm;codecs=vp8,opus", "video/mp4", "video/webm"]
+    };
+    if (canRecord) $all("[data-rec-start]", box).forEach(function (b) { b.hidden = false; });
+
+    function fail(text) { errorBox.textContent = text; errorBox.hidden = !text; }
+    function clock(sec) { return Math.floor(sec / 60) + ":" + ("0" + Math.floor(sec % 60)).slice(-2); }
+    function show(file) {
+      if (url) URL.revokeObjectURL(url);
+      url = URL.createObjectURL(file);
+      var video = /^video\//.test(file.type) && !/\.weba$/.test(file.name);
+      player.innerHTML = "";
+      var el = document.createElement(video ? "video" : "audio");
+      el.controls = true;
+      el.setAttribute("playsinline", "");
+      el.src = url;
+      player.appendChild(el);
+      result.hidden = false;
+      if (current) current.hidden = true;
+    }
+    function put(file) {
+      if (file.size > max) {
+        fail(gettext("The recording is too long: up to 4 MB (about 25 minutes of voice or 1 minute of video)."));
+        return false;
+      }
+      try {
+        var dt = new DataTransfer();
+        dt.items.add(file);
+        input.files = dt.files;
+      } catch (e) {
+        fail(gettext("This browser cannot attach the recording. Choose a recorded file instead."));
+        return false;
+      }
+      fail("");
+      show(file);
+      return true;
+    }
+    function stopAll() {
+      clearInterval(timer);
+      if (stream) stream.getTracks().forEach(function (t) { t.stop(); });
+      stream = null;
+      camera.hidden = true;
+      camera.srcObject = null;
+      live.hidden = true;
+    }
+
+    $all("[data-rec-start]", box).forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var kind = btn.getAttribute("data-rec-start");
+        var wanted = kind === "video" ? { audio: true, video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" } } : { audio: true };
+        fail("");
+        navigator.mediaDevices.getUserMedia(wanted).then(function (s) {
+          stream = s;
+          var type = TYPES[kind].filter(function (t) { return MediaRecorder.isTypeSupported(t); })[0] || "";
+          var options = kind === "video" ? { videoBitsPerSecond: 380000, audioBitsPerSecond: 32000 } : { audioBitsPerSecond: 24000 };
+          if (type) options.mimeType = type;
+          recorder = new MediaRecorder(s, options);
+          chunks = [];
+          size = 0;
+          recorder.ondataavailable = function (e) {
+            if (!e.data || !e.data.size) return;
+            chunks.push(e.data);
+            size += e.data.size;
+            if (size > max * 0.94 && recorder.state === "recording") recorder.stop();
+          };
+          recorder.onstop = function () {
+            stopAll();
+            var mime = (recorder.mimeType || type || (kind === "video" ? "video/webm" : "audio/webm")).split(";")[0];
+            if (kind === "audio") mime = mime.replace(/^video\//, "audio/");
+            var ext = { "audio/webm": "weba", "audio/mp4": "m4a", "audio/ogg": "ogg", "video/webm": "webm", "video/mp4": "mp4" }[mime] || "webm";
+            put(new File(chunks, "message." + ext, { type: mime }));
+          };
+          if (kind === "video") {
+            camera.srcObject = s;
+            camera.hidden = false;
+            camera.play().catch(function () {});
+          }
+          live.hidden = false;
+          result.hidden = true;
+          limitBox.textContent = "/ " + clock(LIMITS[kind]);
+          started = Date.now();
+          timeBox.textContent = "0:00";
+          timer = setInterval(function () {
+            var sec = (Date.now() - started) / 1000;
+            timeBox.textContent = clock(sec);
+            if (sec >= LIMITS[kind] && recorder.state === "recording") recorder.stop();
+          }, 250);
+          recorder.start(1000);
+        }).catch(function () {
+          stopAll();
+          fail(kind === "video" ? gettext("The camera could not be turned on. Allow access to the camera and the microphone in the browser.")
+            : gettext("The microphone could not be turned on. Allow access to the microphone in the browser."));
+        });
+      });
+    });
+    $("[data-rec-stop]", box).addEventListener("click", function () {
+      if (recorder && recorder.state === "recording") recorder.stop();
+    });
+    input.addEventListener("change", function () {
+      if (input.files[0]) {
+        if (input.files[0].size > max) {
+          input.value = "";
+          fail(gettext("The recording is too long: up to 4 MB (about 25 minutes of voice or 1 minute of video)."));
+        } else { fail(""); show(input.files[0]); }
+      }
+    });
+    $("[data-rec-clear]", box).addEventListener("click", function () {
+      input.value = "";
+      result.hidden = true;
+      player.innerHTML = "";
+      if (current) current.hidden = false;
+    });
+    var textBtn = $("[data-rec-text]", box);
+    if (textBtn) textBtn.addEventListener("click", function () {
+      var file = input.files[0], target = document.getElementById(box.getAttribute("data-target"));
+      if (!file || !target) return;
+      var label = textBtn.innerHTML;
+      textBtn.disabled = true;
+      textBtn.textContent = gettext("Writing it down…");
+      var data = new FormData();
+      data.append("file", file);
+      fetch(box.getAttribute("data-transcribe-url"), { method: "POST", credentials: "same-origin", body: data,
+        headers: { "X-CSRFToken": csrf() } })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.error) { fail(d.error); return; }
+          target.value = (target.value.trim() ? target.value.trim() + "\n\n" : "") + d.text;
+          target.dispatchEvent(new Event("input", { bubbles: true }));
+          target.focus();
+        })
+        .catch(function () { fail(gettext("Something went wrong. Please try again.")); })
+        .then(function () { textBtn.disabled = false; textBtn.innerHTML = label; });
+    });
+  });
 })();

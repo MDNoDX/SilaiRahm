@@ -7,5 +7,5 @@ def notifications(request):
     if user is None or not user.is_authenticated:
         return {}
     counts = user.notifications.filter(read_at=None).aggregate(
-        total=Count("id"), connections=Count("id", filter=Q(kind="connection_request")))
+        total=Count("id"), connections=Count("id", filter=Q(kind__in=["connection_request", "follow_request"])))
     return {"unread_count": counts["total"], "unread_connections": counts["connections"]}

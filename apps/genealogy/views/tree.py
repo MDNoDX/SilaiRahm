@@ -9,9 +9,10 @@ from django.views.decorators.http import require_POST
 
 from apps.core.text import surname_from_name
 
-from ..access import archive_owner, can_edit, can_view, person_for_edit, person_for_view, viewer_person
+from ..access import archive_owner, can_edit, can_see_stories, person_for_edit, person_for_view, viewer_person
 from ..kinship import Archive
-from ..models import Story
+from ..relations import wife_is_married
+from ..models import Event
 from ..terminology import ADD_RELATION, BRANCHES
 from ..tree import build_tree
 from ._common import _focus_for, _pdf_response, _tree_state
@@ -30,7 +31,6 @@ def tree_page(request, username=None):
         "is_active_archive": owner.pk == request.archive.pk,
         "focus": archive.people.get(focus),
         "data_url": reverse("genealogy:tree_data_for", args=[owner.username]),
-        "fan_url": reverse("genealogy:fan_data_for", args=[owner.username]),
         "pdf_url": reverse("genealogy:tree_pdf_for", args=[owner.username]),
         "add_relation": ADD_RELATION,
         "branches": BRANCHES,
@@ -49,35 +49,6 @@ def tree_data(request, username):
 
 
 @login_required
-def fan_data(request, username):
-    """Ancestors of the centre person for the fan chart: generation rings,
-    each person at slot 0 … 2^generation − 1 (father before mother)."""
-    owner = archive_owner(request, username)
-    archive = Archive(owner)
-    focus = _focus_for(request, archive, request.GET.get("person"))
-    if focus is None:
-        return JsonResponse({"people": [], "generations": 0, "focus": None})
-    depth = 6
-    out, level = [], [(focus, 0)]
-    for generation in range(depth + 1):
-        nxt = []
-        for pk, slot in level:
-            person = archive.people[pk]
-            out.append({"id": pk, "gen": generation, "slot": slot, "name": person.short_name,
-                        "first": person.first_name, "years": person.lifespan, "gender": person.gender,
-                        "url": person.get_absolute_url(), "label": archive.label(focus, pk) if pk != focus else ""})
-            if person.father_id in archive.people:
-                nxt.append((person.father_id, slot * 2))
-            if person.mother_id in archive.people:
-                nxt.append((person.mother_id, slot * 2 + 1))
-        level = nxt
-        if not level:
-            break
-    return JsonResponse({"people": out, "generations": max(p["gen"] for p in out), "focus": focus,
-                         "focus_name": archive.people[focus].short_name})
-
-
-@login_required
 def person_card(request, pk):
     """What the side panel of the tree shows about one person."""
     person = person_for_view(request, pk)
@@ -85,7 +56,8 @@ def person_card(request, pk):
     me = viewer_person(request, archive)
     editable = can_edit(request.user, person.owner)
     has_parents = bool(person.father_id or person.mother_id)
-    can_add = {"father": not person.father_id, "mother": not person.mother_id, "spouse": True, "child": True,
+    can_add = {"father": not person.father_id, "mother": not person.mother_id,
+               "spouse": person.is_male or not wife_is_married(person), "child": True,
                "sibling": has_parents} if editable else {}
     return JsonResponse({
         "id": person.pk, "name": person.short_name, "full_name": person.full_name, "initials": person.initials,
@@ -101,8 +73,7 @@ def person_card(request, pk):
         "can_add": can_add, "last_name": person.last_name,
         # A relative with an account of their own: their family tree is one click away.
         "account": ({"name": f"@{person.linked_user.username}",
-                     "url": reverse("genealogy:tree_for", args=[person.linked_user.username])
-                     if can_view(request.user, person.linked_user) else ""}
+                     "url": reverse("network:profile", args=[person.linked_user.username])}
                     if person.linked_user_id else None),
         "child_surname": _child_surname(archive, person),
         "counts": {"children": len(archive.children.get(person.pk, [])),
@@ -168,7 +139,10 @@ def tree_pdf(request, username):
 
 
 def _family_name(archive, focus):
-    """The surname the book and the poster are titled with."""
+    """The name the book and the poster are titled with: the one chosen in
+    Settings, else made from the surname of the person in the centre."""
+    if archive.owner.family_name:
+        return archive.owner.family_name
     person = archive.people.get(focus)
     if person is None:
         return ""
@@ -192,10 +166,13 @@ def family_book(request, username=None):
 
         return person_pdf(request, focus)
     side = {"ota": "paternal", "ona": "maternal"}.get(part)
-    stories = sorted(Story.objects.filter(owner=owner), key=lambda s: (s.year or 9999, s.created_at))
+    with_stories = can_see_stories(request.user, owner)
+    stories = sorted(Event.objects.filter(owner=owner).prefetch_related("people"),
+                     key=lambda e: (e.year or 9999, e.month or 0, e.day or 0, e.created_at)) if with_stories else []
     data = pdf.family_book_pdf(archive, focus, owner.display_name,
                                viewer_is_owner=viewer_person(request, archive) == focus,
-                               family=_family_name(archive, focus), side=side, stories=stories)
+                               family=_family_name(archive, focus), side=side, stories=stories,
+                               with_stories=with_stories)
     name = pgettext("file name", "family-book") + {"ota": "-1", "ona": "-2"}.get(part, "")
     return _pdf_response(data, name + ".pdf")
 
@@ -207,5 +184,5 @@ def book_page(request):
     focus = _focus_for(request, archive, request.GET.get("person"))
     return render(request, "genealogy/book.html", {
         "focus": archive.people.get(focus), "owner": request.archive,
-        "branches": BRANCHES, "stories": Story.objects.filter(owner=request.archive).count(),
+        "branches": BRANCHES, "stories": Event.objects.filter(owner=request.archive).count(),
     })

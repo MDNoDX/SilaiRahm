@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load i18n static %}
+{% block title %}{% translate "Assistant" %}{% endblock %}
+{% block content %}
+<div class="pagehead">
+  <div>
+    <h1>{% translate "Assistant" %}</h1>
+    <p>{% translate "Ask about your relatives and the site, or tell a story — the assistant will offer to add it, and saves nothing without your permission." %}</p>
+  </div>
+  {% if configured %}<div class="row"><button class="btn" type="button" data-ai-clear>{% include "partials/icon.html" with name="refresh" %}{% translate "New conversation" %}</button></div>{% endif %}
+</div>
+
+{% if not configured %}
+  <div class="empty">
+    <div class="ornament">{% include "partials/icon.html" with name="sparkle" %}</div>
+    <h3>{% translate "The assistant is not set up yet." %}</h3>
+    {% if user.is_superuser %}<p>{% translate "Add a GEMINI_API_KEY (Google AI Studio → Get API key) to the server settings, and the assistant will start working." %}</p>{% endif %}
+  </div>
+{% else %}
+<section class="card ai" data-ai data-message-url="{% url 'assistant:message' %}" data-apply-url="{% url 'assistant:apply' %}"
+         data-archive="{{ archive.pk }}">
+  <div class="ai-log" data-ai-log aria-live="polite">
+    <div class="ai-hello">
+      <div class="ai-mark">{% include "partials/icon.html" with name="sparkle" %}</div>
+      <p><b>{% translate "Hello!" %}</b> {% translate "I know your family tree and can help with it." %}</p>
+      <div class="chips">
+        <button class="chip" type="button" data-ai-ask>{% translate "Who are my closest relatives?" %}</button>
+        <button class="chip" type="button" data-ai-ask>{% translate "Whose birthdays are coming up?" %}</button>
+        <button class="chip" type="button" data-ai-ask>{% translate "Whose details are missing in the tree?" %}</button>
+        {% if can_edit %}<button class="chip" type="button" data-ai-ask>{% translate "I want to tell a story about my family." %}</button>{% endif %}
+        <button class="chip" type="button" data-ai-ask>{% translate "How do I make a family book?" %}</button>
+      </div>
+    </div>
+  </div>
+  <form class="ai-form" data-ai-form>
+    <textarea name="message" rows="1" maxlength="8000" required placeholder="{% translate 'Write a question or a story…' %}" aria-label="{% translate 'Message' %}"></textarea>
+    <button class="btn" type="button" data-ai-mic hidden data-transcribe-url="{% url 'assistant:transcribe' %}" title="{% translate 'Say it with your voice' %}" aria-label="{% translate 'Say it with your voice' %}">{% include "partials/icon.html" with name="mic" %}</button>
+    <button class="btn btn-primary" type="submit" aria-label="{% translate 'Send' %}">{% include "partials/icon.html" with name="send" %}</button>
+  </form>
+  <p class="muted small ai-note">{% include "partials/icon.html" with name="shield" %}{% translate "Answers are written by Google Gemini from the family information you can see here. It can make mistakes — check before saving. Do not write passwords or card numbers." %}</p>
+</section>
+{% endif %}
+{% endblock %}
+{% block scripts %}{% if configured %}<script src="{% static 'js/assistant.js' %}" defer></script>{% endif %}{% endblock %}

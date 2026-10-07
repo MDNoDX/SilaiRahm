@@ -107,12 +107,15 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = User
         # Gender is not asked again: it is in the person's own record in the tree.
-        fields = ("first_name", "last_name", "email")
-        labels = {"first_name": _("First name"), "last_name": _("Last name"), "email": _("Email")}
+        fields = ("first_name", "last_name", "email", "family_name")
+        labels = {"first_name": _("First name"), "last_name": _("Last name"), "email": _("Email"),
+                  "family_name": _("Name of the family")}
+        help_texts = {"family_name": _("The title of the family book and the wall poster. Empty: made from the surname.")}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["email"].required = True
+        self.fields["family_name"].widget.attrs["placeholder"] = _("For example: The Madaminov family")
 
     def clean_first_name(self):
         return normalize_apostrophes(self.cleaned_data["first_name"].strip())
@@ -120,17 +123,26 @@ class ProfileForm(forms.ModelForm):
     def clean_last_name(self):
         return normalize_apostrophes(self.cleaned_data["last_name"].strip())
 
+    def clean_family_name(self):
+        return normalize_apostrophes(self.cleaned_data["family_name"].strip())
+
 
 class PreferencesForm(forms.ModelForm):
     """Language and time zone: how the site speaks and when reminders come."""
 
     class Meta:
         model = User
-        fields = ["preferred_language", "time_zone", "discoverable"]
+        fields = ["preferred_language", "time_zone", "discoverable", "private_account", "tree_audience",
+                  "stories_audience"]
         labels = {"preferred_language": _("Language"), "time_zone": _("Time zone"),
-                  "discoverable": _("Others on Shajara can find me by name")}
-        help_texts = {"discoverable": _("Off: only someone who knows your exact username or e-mail finds you.")}
-        widgets = {"preferred_language": forms.RadioSelect}
+                  "discoverable": _("Others on Silai Rahm can find me by name"),
+                  "private_account": _("Private account: I approve each follower"),
+                  "tree_audience": _("Who sees my family tree"),
+                  "stories_audience": _("Who sees life stories, events and the album")}
+        help_texts = {"discoverable": _("Off: only someone who knows your exact username or e-mail finds you."),
+                      "stories_audience": _("Invited family members always see everything.")}
+        widgets = {"preferred_language": forms.RadioSelect, "tree_audience": forms.RadioSelect,
+                   "stories_audience": forms.RadioSelect}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -153,9 +165,9 @@ class ImportArchiveForm(forms.Form):
         try:
             data = json.loads(upload.read().decode("utf-8"))
         except (ValueError, UnicodeDecodeError):
-            raise forms.ValidationError(_("This is not a Shajara archive file.")) from None
+            raise forms.ValidationError(_("This is not a Silai Rahm archive file.")) from None
         if not isinstance(data, dict) or data.get("format") != "shajara-archive-1":
-            raise forms.ValidationError(_("This is not a Shajara archive file."))
+            raise forms.ValidationError(_("This is not a Silai Rahm archive file."))
         return data
 
 

@@ -57,7 +57,6 @@
   <a class="stat" href="{% url 'genealogy:people' %}"><b>{{ people_count }}</b><span>{% blocktranslate count counter=people_count context "count" %}relative in the tree{% plural %}relatives in the tree{% endblocktranslate %}</span></a>
   <a class="stat" href="{% url 'genealogy:tree' %}"><b>{{ generations }}</b><span>{% blocktranslate count counter=generations context "count" %}generation{% plural %}generations{% endblocktranslate %}</span></a>
   <a class="stat" href="{% url 'genealogy:upcoming' %}"><b>{{ events_count }}</b><span>{% blocktranslate count counter=events_count context "count" %}family event{% plural %}family events{% endblocktranslate %}</span></a>
-  <a class="stat" href="{% url 'genealogy:stories' %}"><b>{{ stories_count }}</b><span>{% blocktranslate count counter=stories_count context "count" %}story{% plural %}stories{% endblocktranslate %}</span></a>
 </div>
 
 <div class="cols">
@@ -117,7 +116,7 @@
       <h2>{% translate "Quick actions" %}</h2>
       <div class="actions-grid">
         <a class="action" href="{% url 'genealogy:event_create' %}">{% include "partials/icon.html" with name="calendar" %}{% translate "Add a family event" %}</a>
-        <a class="action" href="{% url 'genealogy:story_create' %}">{% include "partials/icon.html" with name="pencil" %}{% translate "Write a story" %}</a>
+        <a class="action" href="{% url 'genealogy:event_create' %}?kind=other">{% include "partials/icon.html" with name="pencil" %}{% translate "Write a story" %}</a>
         <a class="action" href="{% url 'friends:create' %}">{% include "partials/icon.html" with name="friends" %}{% translate "Add a friend" %}</a>
         <a class="action" href="{% url 'accounts:family' %}">{% include "partials/icon.html" with name="share" %}{% translate "Invite a relative" %}</a>
       </div>

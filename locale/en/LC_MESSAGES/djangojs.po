@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: shajara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-30 14:31+0500\n"
+"POT-Creation-Date: 2026-10-06 22:01+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Shajara team\n"
 "Language-Team: English\n"
@@ -38,95 +38,139 @@ msgstr ""
 msgid "Colour theme"
 msgstr ""
 
-#: static/js/app.js:130
+#: static/js/app.js:130 static/js/assistant.js:68
 msgid "Saving…"
 msgstr ""
 
-#: static/js/app.js:142
+#: static/js/app.js:165
 msgid "Choose a file"
 msgstr ""
 
-#: static/js/app.js:148
+#: static/js/app.js:171
 msgid "No file chosen"
 msgstr ""
 
-#: static/js/app.js:163
-msgid "Type a name to filter…"
+#: static/js/app.js:201
+msgid "Remove"
 msgstr ""
 
-#: static/js/app.js:197
+#: static/js/app.js:274
 msgid "Copied"
 msgstr ""
 
-#: static/js/app.js:244
+#: static/js/app.js:321
 msgid "The photo is too large. The maximum size is %(size)s MB."
 msgstr ""
 
-#: static/js/app.js:288
+#: static/js/app.js:365
 msgid "Close"
 msgstr ""
 
-#: static/js/app.js:359 static/js/app.js:500
+#: static/js/app.js:436 static/js/app.js:577
 msgid "No results found."
 msgstr ""
 
-#: static/js/app.js:570
+#: static/js/app.js:647
 msgid "On for this device"
 msgstr ""
 
-#: static/js/app.js:571
+#: static/js/app.js:648
 msgid "Blocked in the browser settings"
 msgstr ""
 
-#: static/js/app.js:571
+#: static/js/app.js:648
 msgid "Off for this device"
 msgstr ""
 
-#: static/js/tree.js:142 static/js/tree.js:246
+#: static/js/app.js:715 static/js/app.js:795
+msgid "The recording is too long: up to 4 MB (about 25 minutes of voice or 1 minute of video)."
+msgstr ""
+
+#: static/js/app.js:723
+msgid "This browser cannot attach the recording. Choose a recorded file instead."
+msgstr ""
+
+#: static/js/app.js:783
+msgid "The camera could not be turned on. Allow access to the camera and the microphone in the browser."
+msgstr ""
+
+#: static/js/app.js:784 static/js/assistant.js:191
+msgid "The microphone could not be turned on. Allow access to the microphone in the browser."
+msgstr ""
+
+#: static/js/app.js:811 static/js/assistant.js:174
+msgid "Writing it down…"
+msgstr ""
+
+#: static/js/app.js:823 static/js/assistant.js:96 static/js/assistant.js:184
+msgid "Something went wrong. Please try again."
+msgstr ""
+
+#: static/js/assistant.js:64
+msgid "Add"
+msgstr ""
+
+#: static/js/assistant.js:65
+msgid "No, thanks"
+msgstr ""
+
+#: static/js/assistant.js:73
+msgid "Open"
+msgstr ""
+
+#: static/js/assistant.js:74
+msgid "Saved"
+msgstr ""
+
+#: static/js/assistant.js:84
+msgid "Not saved"
+msgstr ""
+
+#: static/js/assistant.js:98
+msgid "No connection. Check the internet and try again."
+msgstr ""
+
+#: static/js/assistant.js:122
+msgid "Proposed"
+msgstr ""
+
+#: static/js/tree.js:141
 msgid "Family tree"
 msgstr ""
 
-#: static/js/tree.js:184
+#: static/js/tree.js:183
 msgid "Hide brothers and sisters"
 msgstr ""
 
-#: static/js/tree.js:184
+#: static/js/tree.js:183
 msgid "Show brothers and sisters"
 msgstr ""
 
-#: static/js/tree.js:189
+#: static/js/tree.js:188
 msgid "Hide children"
 msgstr ""
 
-#: static/js/tree.js:189
+#: static/js/tree.js:188
 msgid "Show children"
 msgstr ""
 
-#: static/js/tree.js:293
-msgid "Add father"
-msgstr ""
-
-#: static/js/tree.js:293
-msgid "Add mother"
-msgstr ""
-
-#: static/js/tree.js:603
+#: static/js/tree.js:510
 msgid "You"
 msgstr ""
 
-#: static/js/tree.js:684 static/js/tree.js:821
+#: static/js/tree.js:595 static/js/tree.js:704
 msgid "An error occurred."
 msgstr ""
 
-#: static/js/tree.js:711
+#: static/js/tree.js:617
 msgid "Could not load the family tree. Please try again."
 msgstr ""
 
-#: static/js/tree.js:720 static/js/tree.js:735
+#: static/js/tree.js:626
 msgid "The family tree is empty."
 msgstr ""
 
-#: static/js/tree.js:824
+#: static/js/tree.js:707
 msgctxt "file name"
 msgid "family-tree"
 msgstr "family-tree"

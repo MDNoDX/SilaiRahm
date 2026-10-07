@@ -5,7 +5,7 @@
 {% block content %}
 <div class="pagehead"><div>
   <h1>{% translate "Family book" %}</h1>
-  <p>{% translate "A book ready to print: a cover, the contents, every person with photo, dates, family, life story and stories." %}</p>
+  <p>{% translate "A book ready to print: a cover, the contents, every person with photo, dates, family, life story, events and memories." %}</p>
 </div></div>
 <form class="card book-form" method="get" action="{% url 'genealogy:family_book' %}" data-no-busy>
   <div class="field">
@@ -24,10 +24,10 @@
       <label><input type="radio" name="qism" value="" checked><span><b>{% translate "The whole family" %}</b><small>{% translate "Everyone in the family tree, generation by generation." %}</small></span></label>
       <label><input type="radio" name="qism" value="ota"><span><b>{{ branches.paternal }}</b><small>{% translate "The own family and the father's side, with those who married into it." %}</small></span></label>
       <label><input type="radio" name="qism" value="ona"><span><b>{{ branches.maternal }}</b><small>{% translate "The own family and the mother's side, with those who married into it." %}</small></span></label>
-      <label><input type="radio" name="qism" value="odam"><span><b>{% translate "One person’s life" %}</b><small>{% translate "A book about the chosen person: milestones, life story, all their stories and closest family." %}</small></span></label>
+      <label><input type="radio" name="qism" value="odam"><span><b>{% translate "One person’s life" %}</b><small>{% translate "A book about the chosen person: milestones, life story, events, memories and closest family." %}</small></span></label>
     </div>
   </div>
-  {% if stories %}<p class="muted small">{% blocktranslate count counter=stories %}{{ counter }} story is placed next to the person it is about.{% plural %}{{ counter }} stories are placed next to the people they are about.{% endblocktranslate %}</p>{% endif %}
+  {% if stories %}<p class="muted small">{% blocktranslate count counter=stories %}{{ counter }} event or memory is placed next to the person it is about.{% plural %}{{ counter }} events and memories are placed next to the people they are about.{% endblocktranslate %}</p>{% endif %}
   <div class="form-actions"><button class="btn btn-primary" type="submit">{% include "partials/icon.html" with name="download" %}{% translate "Download the book (PDF)" %}</button></div>
 </form>
 {% endblock %}

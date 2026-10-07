@@ -1,5 +1,5 @@
 """
-Oilaviy shajara — Django settings.
+Silai Rahm (oilaviy shajara) — Django settings.
 
 The product language is Uzbek. Two interface languages are supported:
   uz       — Oʻzbekcha (Latin script), the default
@@ -34,6 +34,9 @@ for _var in ("VERCEL_PROJECT_PRODUCTION_URL", "VERCEL_URL", "VERCEL_BRANCH_URL")
     if os.environ.get(_var):
         ALLOWED_HOSTS.append(os.environ[_var])
         CSRF_TRUSTED_ORIGINS.append(f"https://{os.environ[_var]}")
+# The name of the project (a brand: the same in every language).
+SITE_NAME = "Silai Rahm"
+
 # The public address of the site (used in links sent by Telegram and e-mail).
 SITE_URL = os.environ.get("SITE_URL", "").rstrip("/") or (
     f"https://{os.environ['VERCEL_PROJECT_PRODUCTION_URL']}" if os.environ.get("VERCEL_PROJECT_PRODUCTION_URL")
@@ -52,6 +55,7 @@ INSTALLED_APPS = [
     "apps.friends",
     "apps.network",
     "apps.notify",
+    "apps.assistant",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -213,6 +217,9 @@ TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_BOT_USERNAME = os.environ.get("TELEGRAM_BOT_USERNAME", "")
 # Secret in the webhook URL header so only Telegram can call it.
 TELEGRAM_WEBHOOK_SECRET = os.environ.get("TELEGRAM_WEBHOOK_SECRET", "")
+# AI assistant (optional): a Google AI Studio key; the free tier is enough.
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "") or "gemini-2.5-flash"
 # Vercel Cron sends "Authorization: Bearer $CRON_SECRET" to /cron/kunlik/.
 CRON_SECRET = os.environ.get("CRON_SECRET", "")
 # Web Push (reminders on phones and in browsers): a VAPID key pair.
@@ -230,7 +237,7 @@ EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "25"))
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "0") == "1"
-DEFAULT_FROM_EMAIL = os.environ.get("DJANGO_DEFAULT_FROM_EMAIL", "shajara@localhost")
+DEFAULT_FROM_EMAIL = os.environ.get("DJANGO_DEFAULT_FROM_EMAIL", "silairahm@localhost")
 
 LOGGING = {
     "version": 1,

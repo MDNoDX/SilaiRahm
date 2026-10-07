@@ -4,7 +4,7 @@
 {% block main_class %}narrow{% endblock %}
 {% block content %}
 <div class="pagehead"><div><h1>{% if is_new %}{% translate "Add a family event" %}{% else %}{{ event.display_title }}{% endif %}</h1></div></div>
-<form method="post" novalidate>{% csrf_token %}
+<form method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
   {% for error in form.non_field_errors %}<ul class="errorlist"><li>{{ error }}</li></ul>{% endfor %}
   <fieldset>
     <legend>{% translate "Event" %}</legend>
@@ -19,13 +19,18 @@
     {% include "partials/field.html" with field=form.place %}
   </fieldset>
   <fieldset>
-    <legend>{% translate "Who" %}</legend>
-    {% include "partials/field.html" with field=form.people %}
-    <p class="help" style="margin-top:-8px">{% translate "Hold Ctrl (⌘ on a Mac) to choose several people." %}</p>
+    <legend>{{ form.people.label }}</legend>
+    <label class="visually-hidden" for="{{ form.people.id_for_label }}">{{ form.people.label }}</label>
+    {{ form.people }}
+    {% for error in form.people.errors %}<div class="error">{{ error }}</div>{% endfor %}
   </fieldset>
   <fieldset>
-    <legend>{% translate "Details" %}</legend>
-    {% include "partials/field.html" with field=form.description %}
+    <legend>{{ form.description.label }}</legend>
+    <label class="visually-hidden" for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+    {{ form.description }}
+    <p class="help">{{ form.description.help_text }}</p>
+    {% include "partials/recorder.html" with name="recording" target=form.description.id_for_label current=event.recording current_kind=event.recording_kind remove="remove_recording" %}
+    {% for error in form.recording.errors %}<div class="error">{{ error }}</div>{% endfor %}
   </fieldset>
   <div class="form-actions">
     <button class="btn btn-primary" type="submit">{% translate "Save" %}</button>

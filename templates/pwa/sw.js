@@ -1,5 +1,5 @@
-{% load static %}/* Shajara service worker: push notifications, and a friendly page when offline. */
-const CACHE = "shajara-v3";
+{% load static %}/* Silai Rahm service worker: push notifications, and a friendly page when offline. */
+const CACHE = "silairahm-v4";
 const OFFLINE = "{% url 'offline' %}";
 
 self.addEventListener("install", (event) => {
@@ -39,8 +39,8 @@ self.addEventListener("fetch", (event) => {
 
 self.addEventListener("push", (event) => {
   let data = {};
-  try { data = event.data ? event.data.json() : {}; } catch (e) { data = { title: "Shajara", body: event.data ? event.data.text() : "" }; }
-  event.waitUntil(self.registration.showNotification(data.title || "Shajara", {
+  try { data = event.data ? event.data.json() : {}; } catch (e) { data = { title: "Silai Rahm", body: event.data ? event.data.text() : "" }; }
+  event.waitUntil(self.registration.showNotification(data.title || "Silai Rahm", {
     body: data.body || "",
     icon: "{% static 'img/icon-192.png' %}",
     badge: "{% static 'img/badge.png' %}",

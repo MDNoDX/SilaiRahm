@@ -1,10 +1,10 @@
 """Complete export and import of one user's family archive (JSON).
 
 The export holds everything the user entered — people (with photos),
-marriages, events, stories and friends — so the archive can be kept as a
+marriages, events (with their stories) and friends — so the archive can be kept as a
 backup or moved to another server or account:
 
-    python manage.py import_archive shajara.json --user <username>
+    python manage.py import_archive silairahm.json --user <username>
 """
 import base64
 import datetime
@@ -15,9 +15,9 @@ from django.utils import timezone
 
 from apps.friends.models import Contact
 
-from .models import Event, Marriage, Media, Person, Story
+from .models import Event, Marriage, Media, Person
 
-FORMAT = "shajara-archive-1"
+FORMAT = "shajara-archive-1"  # kept from the old name, so earlier exports still load
 PERSON_FIELDS = [
     "first_name", "last_name", "patronymic", "gender", "birth_year", "birth_month", "birth_day", "birth_place",
     "is_deceased", "death_year", "death_month", "death_day", "death_place", "burial_place", "occupation",
@@ -53,15 +53,13 @@ def export_archive(user):
                       for m in Marriage.objects.filter(owner=user)],
         "events": [{"kind": e.kind, "title": e.title, "year": e.year, "month": e.month, "day": e.day,
                     "place": e.place, "description": e.description, "every_year": e.every_year,
-                    "people": list(e.people.values_list("pk", flat=True))}
+                    "recording": _file(e.recording), "people": list(e.people.values_list("pk", flat=True))}
                    for e in Event.objects.filter(owner=user).prefetch_related("people")],
-        "stories": [{"title": s.title, "body": s.body, "year": s.year, "person": s.person_id}
-                    for s in Story.objects.filter(owner=user)],
         "friends": [{"person": c.person_id, "name": c.name, "how_met": c.how_met, "phone": c.phone,
                      "birth_year": c.birth_year, "birth_month": c.birth_month, "birth_day": c.birth_day,
                      "note": c.note} for c in Contact.objects.filter(owner=user)],
         "album": [{"person": m.person_id, "kind": m.kind, "caption": m.caption, "year": m.year,
-                   "file": _file(m.file)} for m in Media.objects.filter(owner=user)],
+                   "in_story": m.in_story, "file": _file(m.file)} for m in Media.objects.filter(owner=user)],
     }
 
 
@@ -69,7 +67,7 @@ def export_archive(user):
 def import_archive(user, data):
     """Add everything from an export to `user`'s archive. Returns counts."""
     if data.get("format") != FORMAT:
-        raise ValueError("Not a Shajara archive file.")
+        raise ValueError("Not a Silai Rahm archive file.")
     ids = {}
     for row in data["people"]:
         person = Person(owner=user, **{f: row.get(f) if row.get(f) is not None else Person._meta.get_field(f).get_default()
@@ -88,28 +86,36 @@ def import_archive(user, data):
             Marriage.objects.get_or_create(owner=user, husband=ids[row["husband"]], wife=ids[row["wife"]],
                                            defaults={"year": row.get("year"), "month": row.get("month"),
                                                      "day": row.get("day")})
+    kinds = dict(Event.Kind.choices)
     for row in data.get("events", []):
         people = [ids[i] for i in row.pop("people", []) if i in ids]
+        recording = row.pop("recording", None)
+        if row.get("kind") not in kinds:  # a type no longer offered: kept as a memory
+            row["kind"] = Event.Kind.OTHER
         event = Event.objects.create(owner=user, **row)
         event.people.set(people)
-    for row in data.get("stories", []):
-        Story.objects.create(owner=user, title=row["title"], body=row["body"], year=row.get("year"),
-                             person=ids.get(row.get("person")))
+        if recording:
+            event.recording.save(recording["name"], ContentFile(base64.b64decode(recording["data"])), save=True)
+    for row in data.get("stories", []):  # archives from before stories became events
+        event = Event.objects.create(owner=user, kind=Event.Kind.OTHER, title=row["title"][:200],
+                                     description=row["body"], year=row.get("year"))
+        if ids.get(row.get("person")):
+            event.people.add(ids[row["person"]])
     for row in data.get("friends", []):
         if row.get("person") in ids:
             Contact.objects.create(owner=user, **{**row, "person": ids[row["person"]]})
     for row in data.get("album", []):
         if row.get("person") in ids and row.get("file"):
             item = Media(owner=user, person=ids[row["person"]], kind=row.get("kind") or "photo",
-                         caption=row.get("caption") or "", year=row.get("year"))
+                         caption=row.get("caption") or "", year=row.get("year"), in_story=bool(row.get("in_story")))
             item.file.save(row["file"]["name"], ContentFile(base64.b64decode(row["file"]["data"])), save=True)
     own = data.get("owner", {}).get("self")
     if own in ids and not user.person_id:
         user.person = ids[own]
         user.save(update_fields=["person"])
-    return {"people": len(ids), "marriages": len(data.get("marriages", [])), "events": len(data.get("events", [])),
-            "stories": len(data.get("stories", [])), "friends": len(data.get("friends", []))}
+    return {"people": len(ids), "marriages": len(data.get("marriages", [])),
+            "events": len(data.get("events", [])) + len(data.get("stories", [])), "friends": len(data.get("friends", []))}
 
 
 def export_filename():
-    return f"shajara-{datetime.date.today().isoformat()}.json"
+    return f"silairahm-{datetime.date.today().isoformat()}.json"

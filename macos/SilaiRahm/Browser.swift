@@ -6,7 +6,7 @@ import WebKit
 /// Owns the web view and everything the app does around it.
 final class Browser: NSObject, ObservableObject {
     static let shared = Browser()
-    static let defaultServer = "https://shajara-liard.vercel.app"
+    static let defaultServer = "https://silairahm.vercel.app"
 
     @Published var title = ""
     @Published var canGoBack = false
@@ -33,7 +33,7 @@ final class Browser: NSObject, ObservableObject {
         let config = WKWebViewConfiguration()
         config.websiteDataStore = .default()          // keeps you signed in between launches
         config.preferences.isElementFullscreenEnabled = true
-        config.applicationNameForUserAgent = "ShajaraMac/1.2"
+        config.applicationNameForUserAgent = "SilaiRahmMac/1.3"
         webView = WKWebView(frame: .zero, configuration: config)
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
@@ -43,14 +43,14 @@ final class Browser: NSObject, ObservableObject {
         let watcher = """
         (function () {
           var root = document.documentElement;
-          var tell = function () { window.webkit.messageHandlers.shajara.postMessage({theme: root.getAttribute('data-theme') || 'light'}); };
+          var tell = function () { window.webkit.messageHandlers.silairahm.postMessage({theme: root.getAttribute('data-theme') || 'light'}); };
           new MutationObserver(tell).observe(root, {attributes: true, attributeFilter: ['data-theme']});
           tell();
         })();
         """
         let controller = webView.configuration.userContentController
         controller.addUserScript(WKUserScript(source: watcher, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
-        controller.add(self, name: "shajara")
+        controller.add(self, name: "silairahm")
         let zoom = defaults.double(forKey: "zoom")
         if zoom > 0 { webView.pageZoom = zoom }
         observers = [
@@ -147,7 +147,7 @@ final class Browser: NSObject, ObservableObject {
         var parts = URLComponents(url: URL(string: "/ilova/kirish/boshlash/", relativeTo: server)!.absoluteURL,
                                   resolvingAgainstBaseURL: true)!
         parts.queryItems = [URLQueryItem(name: "provider", value: "google")]
-        let session = ASWebAuthenticationSession(url: parts.url!, callbackURLScheme: "shajara") { [weak self] url, error in
+        let session = ASWebAuthenticationSession(url: parts.url!, callbackURLScheme: "silairahm") { [weak self] url, error in
             guard let self else { return }
             if let error = error as? ASWebAuthenticationSessionError, error.code == .canceledLogin { return }
             guard let url,

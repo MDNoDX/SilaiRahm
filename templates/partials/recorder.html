@@ -1,0 +1,31 @@
+{% load i18n %}{# Record or choose a voice/video message. Args: name, target (story textarea id), current, current_kind, remove. #}
+<div class="recorder" data-recorder data-max="4194304"{% if target %} data-target="{{ target }}"{% endif %}{% if ai_ready and target %} data-transcribe-url="{% url 'assistant:transcribe' %}"{% endif %}>
+  <div class="rec-buttons">
+    <button class="btn btn-sm" type="button" data-rec-start="audio" hidden>{% include "partials/icon.html" with name="mic" %}{% translate "Record a voice message" %}</button>
+    <button class="btn btn-sm" type="button" data-rec-start="video" hidden>{% include "partials/icon.html" with name="video" %}{% translate "Record a video message" %}</button>
+    <label class="btn btn-sm btn-ghost">{% include "partials/icon.html" with name="upload" %}{% translate "Choose a recording" %}
+      <input type="file" name="{{ name }}" accept="audio/*,video/*" data-rec-input class="visually-hidden"></label>
+  </div>
+  <div class="rec-live" data-rec-live hidden>
+    <video data-rec-camera muted playsinline hidden></video>
+    <span class="rec-dot" aria-hidden="true"></span><b data-rec-time>0:00</b>
+    <span class="muted small" data-rec-limit></span>
+    <button class="btn btn-sm btn-danger" type="button" data-rec-stop>{% include "partials/icon.html" with name="stop" %}{% translate "Stop" %}</button>
+  </div>
+  <div class="rec-result" data-rec-result hidden>
+    <div data-rec-player></div>
+    <div class="row">
+      {% if ai_ready and target %}<button class="btn btn-sm" type="button" data-rec-text>{% include "partials/icon.html" with name="sparkle" %}{% translate "Turn into text" %}</button>{% endif %}
+      <button class="btn btn-sm btn-ghost" type="button" data-rec-clear>{% include "partials/icon.html" with name="trash" %}{% translate "Remove" %}</button>
+    </div>
+  </div>
+  {% if current %}
+  <div class="rec-current" data-rec-current>
+    {% if current_kind == "video" %}<video controls preload="metadata" playsinline src="{{ current.url }}"></video>
+    {% else %}<audio controls preload="none" src="{{ current.url }}"></audio>{% endif %}
+    {% if remove %}<label class="checkbox"><input type="checkbox" name="{{ remove }}"> {% translate "Remove the recording" %}</label>{% endif %}
+  </div>
+  {% endif %}
+  <p class="help" data-rec-help>{% translate "Tell it aloud if that is easier: up to about 25 minutes of voice or 1 minute of video." %}{% if ai_ready and target %} {% translate "The assistant can also write it down as text." %}{% endif %}</p>
+  <p class="error" data-rec-error hidden></p>
+</div>

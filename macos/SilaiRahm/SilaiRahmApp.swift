@@ -1,12 +1,12 @@
 import SwiftUI
 import WebKit
 
-/// Shajara for macOS: the family-tree site in a native window, with system
+/// Silai Rahm for macOS: the family-tree site in a native window, with system
 /// notifications (and their own sound), a dock badge and menu, a menu-bar
 /// bell, file downloads, printing and Google sign-in. Menus follow the
 /// language chosen on the site: Uzbek (Latin / Cyrillic), Russian or English.
 @main
-struct ShajaraApp: App {
+struct SilaiRahmApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var browser = Browser.shared
     @StateObject private var notifier = Notifier.shared
@@ -14,7 +14,7 @@ struct ShajaraApp: App {
 
     var body: some Scene {
         let lang = browser.language
-        Window("Shajara", id: "main") {
+        Window("Silai Rahm", id: "main") {
             ContentView()
                 .environmentObject(browser)
                 .frame(minWidth: 1040, minHeight: 640)

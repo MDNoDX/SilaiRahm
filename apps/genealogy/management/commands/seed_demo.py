@@ -12,7 +12,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from apps.accounts.models import Invite, Membership
-from apps.genealogy.models import Marriage, Person, Story
+from apps.genealogy.models import Event, Marriage, Person
 
 DEMO_PASSWORD = "namuna-shajara-2026"  # local development only
 
@@ -99,7 +99,8 @@ class Command(BaseCommand):
         for husband, wife, year, divorced in MARRIAGES:
             Marriage.objects.create(owner=user, husband=people[husband], wife=people[wife], year=year, is_divorced=divorced)
         for title, key, year, body in STORIES:
-            Story.objects.create(owner=user, person=people[key], title=title, year=year, body=body)
+            event = Event.objects.create(owner=user, kind=Event.Kind.OTHER, title=title, year=year, description=body)
+            event.people.add(people[key])
         user.person = people["timur"]
         user.save()
 

@@ -89,6 +89,16 @@ struct WebView: NSViewRepresentable {
             return nil
         }
 
+        // MARK: Microphone and camera (voice and video stories)
+
+        @available(macOS 12.0, *)
+        func webView(_ webView: WKWebView, requestMediaCapturePermissionFor origin: WKSecurityOrigin,
+                     initiatedByFrame frame: WKFrameInfo, type: WKMediaCaptureType,
+                     decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+            // Only our own site; macOS still asks the person once (Info.plist explains why).
+            decisionHandler(origin.host == browser.server.host ? .grant : .deny)
+        }
+
         // MARK: JavaScript dialogs
 
         func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String,

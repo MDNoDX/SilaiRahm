@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Change, Marriage, Media, Person, Story
+from .models import Change, Event, Marriage, Media, Person
 
 
 @admin.register(Person)
@@ -12,7 +12,7 @@ class PersonAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Marriage)
-admin.site.register(Story)
+admin.site.register(Event)
 
 
 @admin.register(Media)

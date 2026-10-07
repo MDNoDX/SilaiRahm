@@ -1,4 +1,5 @@
 import datetime
+import re
 
 from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
@@ -53,7 +54,6 @@ def home(request):
         "people_count": len(archive.people),
         "friends_count": owner.contacts.count(),
         "events_count": owner.events.count(),
-        "stories_count": owner.stories.count(),
         "generations": generations,
         "me": archive.people.get(focus),
         "today_items": todays,
@@ -93,16 +93,18 @@ def media(request, name):
     from django.http import Http404, HttpResponse
     from django.utils.http import http_date
 
-    from apps.genealogy.access import can_view
-    from apps.genealogy.models import Media, Person
+    from apps.genealogy.access import can_see_stories, can_view
+    from apps.genealogy.models import Event, Media, Person
 
     from .models import StoredFile
 
     if not request.user.is_authenticated:
         raise Http404
-    holder = (Person.objects.filter(photo=name).select_related("owner").first()
-              or Media.objects.filter(file=name).select_related("owner").first())
-    if holder is None or not can_view(request.user, holder.owner):
+    person = Person.objects.filter(photo=name).select_related("owner").first()
+    album = None if person else (Media.objects.filter(file=name).select_related("owner").first()
+                                 or Event.objects.filter(recording=name).select_related("owner").first())
+    # A portrait goes with the family tree; album files and recorded stories with the stories.
+    if not ((person and can_view(request.user, person.owner)) or (album and can_see_stories(request.user, album.owner))):
         raise Http404
     obj = None
     if request.GET.get("s") == "t":  # the small copy for avatars and cards, made once
@@ -119,7 +121,22 @@ def media(request, name):
     obj = obj or StoredFile.objects.filter(name=name).first()
     if obj is None:
         raise Http404
-    response = HttpResponse(bytes(obj.content), content_type=obj.content_type)
+    content = bytes(obj.content)
+    # Safari plays sound and video only from servers that answer byte ranges.
+    match = re.fullmatch(r"bytes=(\d*)-(\d*)", request.headers.get("Range", "").strip())
+    if match and (match[1] or match[2]) and content:
+        size = len(content)
+        start, end = (int(match[1]), int(match[2] or size - 1)) if match[1] else (max(size - int(match[2]), 0), size - 1)
+        end = min(end, size - 1)
+        if start > end:
+            response = HttpResponse(status=416)
+            response["Content-Range"] = f"bytes */{size}"
+            return response
+        response = HttpResponse(content[start:end + 1], status=206, content_type=obj.content_type)
+        response["Content-Range"] = f"bytes {start}-{end}/{size}"
+    else:
+        response = HttpResponse(content, content_type=obj.content_type)
+    response["Accept-Ranges"] = "bytes"
     response["Cache-Control"] = "private, max-age=31536000, immutable"  # names are unique (uuid)
     response["Last-Modified"] = http_date(obj.created_at.timestamp())
     response["X-Content-Type-Options"] = "nosniff"
@@ -188,7 +205,7 @@ def control_panel(request):
     from django.db.models import Sum
 
     from apps.friends.models import Contact
-    from apps.genealogy.models import Event, Person, Story
+    from apps.genealogy.models import Event, Person
     from apps.notify import telegram
     from apps.notify.models import Notification, NotificationSettings
 
@@ -208,7 +225,6 @@ def control_panel(request):
             (_("Users"), users.count()),
             (_("People in all trees"), Person.objects.count()),
             (_("Events"), Event.objects.count()),
-            (_("Stories"), Story.objects.count()),
             (_("Friends"), Contact.objects.count()),
             (_("Photos"), StoredFile.objects.count()),
             (_("Notifications"), Notification.objects.count()),

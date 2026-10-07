@@ -99,7 +99,7 @@ private struct NotificationSettings: View {
 enum SoundPreview {
     static func play(_ sound: Notifier.Sound) {
         switch sound {
-        case .chime: NSSound(named: "Shajara")?.play()
+        case .chime: NSSound(named: "SilaiRahm")?.play()
         case .system: NSSound.beep()
         case .none: break
         }

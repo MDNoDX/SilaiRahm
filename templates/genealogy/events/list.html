@@ -5,11 +5,11 @@
 <div class="pagehead">
   <div>
     <h1>{% translate "Events" %}</h1>
-    <p>{% translate "Birthdays, anniversaries, memorial days and family events: weddings, a baby on the way, celebrations." %}</p>
+    <p>{% translate "Upcoming dates, and the family’s events and memories — each one told like a story." %}</p>
   </div>
   <div class="row">
     <a class="btn" href="{% url 'genealogy:timeline' %}">{% include "partials/icon.html" with name="timeline" %}{% translate "Timeline" %}</a>
-    {% if can_edit %}<a class="btn btn-primary" href="{% url 'genealogy:event_create' %}">{% include "partials/icon.html" with name="plus" %}{% translate "Add a family event" %}</a>{% endif %}
+    {% if can_edit %}<a class="btn btn-primary" href="{% url 'genealogy:event_create' %}">{% include "partials/icon.html" with name="plus" %}{% translate "Add an event or a memory" %}</a>{% endif %}
   </div>
 </div>
 
@@ -48,7 +48,7 @@
 </div>
 
 <section class="card" style="margin-top:16px">
-  <h2>{% translate "Family chronicle" %}</h2>
+  <h2>{% translate "Events and memories" %}</h2>
   {% if by_year %}
     {% for year, events in by_year %}
       <div class="tl-year">{% if year %}{{ year }}{% else %}{% translate "Date unknown" %}{% endif %}</div>
@@ -58,6 +58,7 @@
           <a href="{{ e.get_absolute_url }}"><b>{{ e.display_title }}</b></a> <span class="kind-badge">{{ e.get_kind_display }}</span>
           <div class="muted small">{% if e.date_display %}{{ e.date_display }}{% endif %}{% if e.place %} · {{ e.place }}{% endif %}
             {% if e.people.all %} · {% for p in e.people.all %}{{ p.short_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}</div>
+          {% if e.description %}<p class="story-excerpt">{{ e.description|truncatewords:45 }} <a href="{{ e.get_absolute_url }}">{% translate "Read" %}</a></p>{% endif %}
         </li>
         {% endfor %}
       </ul>

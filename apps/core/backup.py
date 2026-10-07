@@ -15,7 +15,7 @@ def dump_json():
 
 
 def filename(extension="json"):
-    return f"shajara-full-backup-{timezone.localdate().isoformat()}.{extension}"
+    return f"silairahm-full-backup-{timezone.localdate().isoformat()}.{extension}"
 
 
 def dump_gzip():

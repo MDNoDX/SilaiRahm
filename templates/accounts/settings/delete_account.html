@@ -4,7 +4,7 @@
 {% block content %}
 <div class="auth-wrap"><div class="card">
   <h1>{% translate "Delete account" %}</h1>
-  <p>{% translate "Your account and your whole family archive — people, photos, events, stories and friends — will be deleted permanently." %}</p>
+  <p>{% translate "Your account and your whole family archive — people, photos, events and friends — will be deleted permanently." %}</p>
   <p class="muted">{% translate "Download your data first if you want to keep a copy." %}</p>
   <a class="btn" href="{% url 'genealogy:archive_export' %}">{% include "partials/icon.html" with name="download" %}{% translate "Download my data (JSON)" %}</a>
   <form method="post" novalidate style="margin-top:20px">{% csrf_token %}

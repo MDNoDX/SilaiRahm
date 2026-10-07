@@ -5,7 +5,7 @@
 {% block content %}
 {% if focus %}
 <div class="tree-shell" id="tree"
-     data-url="{{ data_url }}" data-fan-url="{{ fan_url }}" data-pdf-url="{{ pdf_url }}" data-focus="{{ focus.pk }}"
+     data-url="{{ data_url }}" data-pdf-url="{{ pdf_url }}" data-focus="{{ focus.pk }}"
      data-can-edit="{% if is_owner %}1{% endif %}">
   <div class="tree-toolbar">
     <div class="tb-group tb-grow picker">
@@ -16,10 +16,6 @@
              aria-controls="tree-person-results" data-mode="pick"
              data-live-search="{% url 'genealogy:search_json' %}?owner={{ owner.username|urlencode }}">
       <div class="live-results" id="tree-person-results" role="listbox" hidden></div>
-    </div>
-    <div class="segmented" role="group" aria-label="{% translate 'View' %}">
-      <button type="button" data-view="tree" aria-pressed="true">{% include "partials/icon.html" with name="tree" %}<span class="tb-label">{% translate "Tree" %}</span></button>
-      <button type="button" data-view="fan" aria-pressed="false">{% include "partials/icon.html" with name="fan" %}<span class="tb-label">{% translate "Fan of ancestors" %}</span></button>
     </div>
     <div class="tb-group" data-tree-only>
       <div class="segmented" role="group" aria-label="{% translate 'What to show' %}">

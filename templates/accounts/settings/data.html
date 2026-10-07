@@ -4,7 +4,7 @@
 {% block settings %}
 <section class="card">
   <h2>{% translate "Download" %}</h2>
-  <p class="muted small">{% blocktranslate count counter=people_count %}Your archive: {{ counter }} person{% plural %}Your archive: {{ counter }} people{% endblocktranslate %} · {% blocktranslate count counter=events_count %}{{ counter }} event{% plural %}{{ counter }} events{% endblocktranslate %} · {% blocktranslate count counter=stories_count context "count" %}{{ counter }} story{% plural %}{{ counter }} stories{% endblocktranslate %} · {% blocktranslate count counter=friends_count context "count" %}{{ counter }} friend{% plural %}{{ counter }} friends{% endblocktranslate %}</p>
+  <p class="muted small">{% blocktranslate count counter=people_count %}Your archive: {{ counter }} person{% plural %}Your archive: {{ counter }} people{% endblocktranslate %} · {% blocktranslate count counter=events_count %}{{ counter }} event{% plural %}{{ counter }} events{% endblocktranslate %} · {% blocktranslate count counter=friends_count context "count" %}{{ counter }} friend{% plural %}{{ counter }} friends{% endblocktranslate %}</p>
   <div class="download-list">
     <a class="download-item" href="{% url 'genealogy:archive_export' %}">
       <span class="setting-icon">{% include "partials/icon.html" with name="database" %}</span>
@@ -24,7 +24,7 @@
 <section class="card" id="import">
   <h2>{% translate "Import an archive" %}</h2>
   {% if can_import %}
-    <p class="muted small">{% translate "Load a complete archive (JSON) downloaded from Shajara — for example from another server. Your tree must be empty." %}</p>
+    <p class="muted small">{% translate "Load a complete archive (JSON) downloaded from Silai Rahm — for example from another server. Your tree must be empty." %}</p>
     <form method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
       {% include "partials/field.html" with field=form.file %}
       <div class="form-actions"><button class="btn btn-primary" type="submit">{% include "partials/icon.html" with name="upload" %}{% translate "Import" %}</button></div>

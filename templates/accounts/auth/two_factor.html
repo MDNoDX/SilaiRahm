@@ -4,7 +4,7 @@
 {% block content %}
 <div class="auth-wrap"><div class="card">
   <h1>{% translate "Enter the code" %}</h1>
-  <p class="muted">{% translate "Open the authenticator app on your phone and type the six digits shown for Shajara. A recovery code works too." %}</p>
+  <p class="muted">{% translate "Open the authenticator app on your phone and type the six digits shown for Silai Rahm. A recovery code works too." %}</p>
   <form method="post" novalidate>{% csrf_token %}
     {% include "partials/field.html" with field=form.code %}
     <div class="form-actions">

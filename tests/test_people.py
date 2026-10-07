@@ -64,10 +64,20 @@ class LiveSearchTests(TestCase):
         response = self.client.get(reverse("genealogy:search_json"), {"q": "a", "owner": stranger.username})
         self.assertEqual(response.status_code, 403)
 
-    def test_no_divorce_option(self):
-        m = self.p["me"].marriages_as_husband.first()
-        html = self.client.get(reverse("genealogy:marriage_edit", args=[m.pk])).content.decode()
-        self.assertNotIn("is_divorced", html)
+    def test_one_husband_at_a_time_and_divorce(self):
+        wife = self.p["wife"]
+        url = reverse("genealogy:relative_add", args=[wife.pk])
+        data = {"relation": "spouse", "first_name": "Ikkinchi", "gender": "male"}
+        self.assertContains(self.client.post(url, data), "avval oldingi nikohni")
+        m = self.p["me"].marriages_as_husband.get(wife=wife)
+        self.client.post(reverse("genealogy:marriage_edit", args=[m.pk]), {"is_divorced": "on"})
+        m.refresh_from_db()
+        self.assertTrue(m.is_divorced)
+        self.assertEqual(self.client.post(url, data).status_code, 302)
+        # A man may have more than one wife.
+        url = reverse("genealogy:relative_add", args=[self.p["me"].pk])
+        self.assertEqual(self.client.post(url, {"relation": "spouse", "first_name": "Zuhra", "gender": "female"})
+                         .status_code, 302)
 
 
 class FormValidationTests(TestCase):

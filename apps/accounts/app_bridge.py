@@ -3,7 +3,7 @@
 Google refuses to show its sign-in page inside an embedded web view, so the
 app opens /ilova/kirish/boshlash/ in the system's authentication window
 (ASWebAuthenticationSession). After signing in there, the site redirects to
-shajara://kirish?token=… with a short-lived, single-use token; the app then
+silairahm://kirish?token=… with a short-lived, single-use token; the app then
 opens /ilova/kirish/?token=… in its own web view, which signs it in.
 """
 import secrets
@@ -16,12 +16,12 @@ from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-SALT = "shajara.app-login"
+SALT = "silairahm.app-login"
 MAX_AGE = 120  # seconds
 
 
 class AppSchemeRedirect(HttpResponseRedirect):
-    allowed_schemes = ["shajara"]
+    allowed_schemes = ["silairahm"]
 
 
 def start(request):
@@ -39,7 +39,7 @@ def finish(request):
     nonce = secrets.token_urlsafe(16)
     cache.set(f"app-login:{nonce}", request.user.pk, MAX_AGE)
     token = signing.dumps({"n": nonce}, salt=SALT)
-    return AppSchemeRedirect(f"shajara://kirish?token={token}")
+    return AppSchemeRedirect(f"silairahm://kirish?token={token}")
 
 
 def consume(request):

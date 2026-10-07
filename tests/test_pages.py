@@ -18,12 +18,7 @@ class ViewsTests(TestCase):
         self.user, self.p = make_family()
         self.client.force_login(self.user)
 
-    def test_fan_and_card(self):
-        fan = self.client.get(reverse("genealogy:fan_data_for", args=[self.user.username])).json()
-        by_slot = {(x["gen"], x["slot"]): x["first"] for x in fan["people"]}
-        self.assertEqual(by_slot[(0, 0)], "Timur")
-        self.assertEqual((by_slot[(1, 0)], by_slot[(1, 1)]), ("Rustam", "Gulnora"))
-        self.assertEqual((by_slot[(2, 0)], by_slot[(2, 1)]), ("Karim", "Malika"))
+    def test_card(self):
         card = self.client.get(reverse("genealogy:person_card", args=[self.p["me"].pk])).json()
         self.assertTrue(card["is_me"])
         self.assertEqual(card["can_add"], {"father": False, "mother": False, "spouse": True, "child": True, "sibling": True})
@@ -45,8 +40,8 @@ class ViewsTests(TestCase):
         titles = [title for title, _rows in page.context["groups"]]
         self.assertEqual(len(titles), 5)                                      # grandparents … grandchildren
         self.assertEqual(page.context["groups"][0][1][0][0], self.p["grandpa"])
-        missing = self.client.get(reverse("genealogy:people") + "?f=nodate")
-        self.assertEqual([row[0] for _t, rows in missing.context["groups"] for row in rows], [self.p["grandson"]])
+        women = self.client.get(reverse("genealogy:people") + "?f=female")
+        self.assertTrue(all(row[0].gender == "female" for _t, rows in women.context["groups"] for row in rows))
         timeline = self.client.get(reverse("genealogy:timeline"))
         self.assertContains(timeline, "Karim Nurmatov")
         self.assertEqual(timeline.context["decades"][0][0], 2010)             # newest decade first

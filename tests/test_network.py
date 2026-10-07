@@ -57,9 +57,11 @@ class SearchTests(TestCase):
 
     def test_page_lists_results_with_their_state(self):
         self.client.force_login(self.timur)
-        page = self.client.get(reverse("network:index"), {"q": "Kamila"})
+        page = self.client.get(reverse("friends:list"), {"odam": "Kamila"})
         self.assertContains(page, "@kamila")
-        self.assertContains(page, reverse("network:request", args=["kamila"]))
+        self.assertContains(page, reverse("network:profile", args=["kamila"]))
+        live = self.client.get(reverse("network:search_json"), {"q": "Kami"}).json()
+        self.assertEqual(live["results"][0]["url"], reverse("network:profile", args=["kamila"]))
 
 
 class ConnectionTests(TestCase):
@@ -75,7 +77,7 @@ class ConnectionTests(TestCase):
         return self.client.post(reverse("network:request", args=["kamila"]), data)
 
     def test_request_accept_and_what_it_does(self):
-        self.assertRedirects(self.send(), reverse("network:index"))
+        self.assertRedirects(self.send(), reverse("friends:list") + "#people", fetch_redirect_response=False)
         connection = Connection.objects.get()
         self.assertEqual(connection.sender_person, self.p["cousin"])
         note = Notification.objects.get(user=self.kamila, kind="connection_request")
@@ -118,7 +120,7 @@ class ConnectionTests(TestCase):
 
     def test_rules_for_requests(self):
         self.send()
-        self.assertRedirects(self.send(), reverse("network:index"))  # no second request
+        self.assertRedirects(self.send(), reverse("network:index"), fetch_redirect_response=False)  # no second request
         self.assertEqual(Connection.objects.count(), 1)
         self.client.force_login(self.kamila)
         connection = Connection.objects.get()
@@ -230,7 +232,7 @@ class SmallFixesTests(TestCase):
     def test_one_menu_item_lights_up(self):
         user, _p = make_family()
         self.client.force_login(user)
-        for name in ("friends:create", "genealogy:person_create", "genealogy:event_create", "network:index"):
+        for name in ("friends:create", "genealogy:person_create", "genealogy:event_create", "friends:list"):
             html = self.client.get(reverse(name)).content.decode()
             nav = html.split('<nav class="sb-nav">', 1)[1].split("</nav>", 1)[0]
             self.assertEqual(nav.count('aria-current="page"'), 1, name)
@@ -267,12 +269,13 @@ class SmallFixesTests(TestCase):
 
 class BookTests(TestCase):
     def setUp(self):
-        from apps.genealogy.models import Story
+        from apps.genealogy.models import Event
 
         self.user, self.p = make_family()
-        Story.objects.create(owner=self.user, person=self.p["me"], title="Tugʻilishim", year=1984,
-                             body="Birinchi xatboshi.\n\nIkkinchi xatboshi.")
-        Story.objects.create(owner=self.user, title="Toʻy", body="Oila haqida.")
+        memory = Event.objects.create(owner=self.user, title="Tugʻilishim", year=1984,
+                                      description="Birinchi xatboshi.\n\nIkkinchi xatboshi.")
+        memory.people.add(self.p["me"])
+        Event.objects.create(owner=self.user, kind="wedding", title="Toʻy", description="Oila haqida.")
         self.client.force_login(self.user)
 
     def test_choices_page_and_every_kind_of_book(self):

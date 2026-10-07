@@ -10,12 +10,12 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.translation import gettext as _
 
-from apps.accounts.sharing import can_edit, can_view
+from apps.accounts.sharing import can_edit, can_see_stories, can_view
 
-from .models import Person, Story
+from .models import Person
 
-__all__ = ["can_view", "can_edit", "require_edit", "person_for_view", "person_for_edit", "story_for_view",
-           "story_for_edit", "archive_owner", "viewer_person"]
+__all__ = ["can_view", "can_edit", "can_see_stories", "require_edit", "person_for_view", "person_for_edit", "archive_owner",
+           "viewer_person"]
 
 
 def require_edit(request, owner=None):
@@ -39,21 +39,6 @@ def person_for_edit(request, pk):
     person = person_for_view(request, pk)
     require_edit(request, person.owner)
     return person
-
-
-def story_for_view(request, pk):
-    story = Story.objects.select_related("owner", "person").filter(pk=pk).first()
-    if story is None:
-        raise Http404(_("Story not found."))
-    if not can_view(request.user, story.owner):
-        raise PermissionDenied(_("Access denied."))
-    return story
-
-
-def story_for_edit(request, pk):
-    story = story_for_view(request, pk)
-    require_edit(request, story.owner)
-    return story
 
 
 def archive_owner(request, username=None):

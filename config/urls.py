@@ -13,6 +13,7 @@ urlpatterns = [
     path("", include("apps.genealogy.urls")),
     path("dostlar/", include("apps.friends.urls")),
     path("boglanishlar/", include("apps.network.urls")),
+    path("yordamchi/", include("apps.assistant.urls")),
     path("", include("apps.notify.urls")),
     path("salomatlik/", core_views.health, name="health"),
     path("media/<path:name>", core_views.media, name="media"),

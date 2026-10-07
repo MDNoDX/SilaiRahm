@@ -1,11 +1,12 @@
-"""Album: photos, documents and voice recordings of a person."""
+"""Album: photos, documents, voice recordings and videos of a person."""
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from .. import history
+from .. import history, recordings
 from ..access import person_for_edit, require_edit
 from ..models import Change, Media
 
@@ -35,12 +36,16 @@ def media_upload(request, pk):
                 content, ext = small
                 content.name = f"photo.{ext}"
                 kind = Media.Kind.PHOTO
-        elif ctype.startswith("audio/"):
-            kind, content = Media.Kind.AUDIO, ContentFile(upload.read(), name=upload.name)
+        elif ctype.startswith(("audio/", "video/")):
+            try:
+                content, kind = recordings.clean(upload)
+            except ValidationError as exc:
+                messages.error(request, _("“{name}”: {error}").format(name=upload.name, error=exc.messages[0]))
+                continue
         elif ctype in DOCUMENT_TYPES:
             kind, content = Media.Kind.DOCUMENT, ContentFile(upload.read(), name=upload.name)
         if kind is None:
-            messages.error(request, _("“{name}” is not a photo, a PDF document or a recording.").format(name=upload.name))
+            messages.error(request, _("“{name}” is not a photo, a PDF document, a voice recording or a video.").format(name=upload.name))
             continue
         year = request.POST.get("year", "")
         Media.objects.create(owner=person.owner, person=person, kind=kind, file=content,

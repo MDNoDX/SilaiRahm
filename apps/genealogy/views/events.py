@@ -12,7 +12,7 @@ from apps.notify.messages import render_parts
 from apps.notify.occasions import occasions
 
 from .. import history
-from ..access import can_edit, can_view, require_edit
+from ..access import can_edit, can_see_stories, require_edit
 from ..forms import EventForm
 from ..models import Change, Event
 
@@ -36,7 +36,7 @@ def upcoming(request):
 @login_required
 def event_detail(request, pk):
     event = get_object_or_404(Event.objects.prefetch_related("people"), pk=pk)
-    if not can_view(request.user, event.owner):
+    if not can_see_stories(request.user, event.owner):
         raise PermissionDenied(_("Access denied."))
     return render(request, "genealogy/events/detail.html", {
         "event": event, "is_owner": can_edit(request.user, event.owner)})
@@ -56,7 +56,7 @@ def event_create(request):
         initial["kind"] = request.GET["kind"]
     if request.GET.get("person", "").isdigit():
         initial["people"] = [int(request.GET["person"])]
-    form = EventForm(request.POST or None, owner=owner, initial=initial)
+    form = EventForm(request.POST or None, request.FILES or None, owner=owner, initial=initial)
     if request.method == "POST" and form.is_valid():
         event = form.save()
         history.record(owner, request.user, Change.Action.CREATED, subject=event.display_title, what="event")
@@ -68,7 +68,7 @@ def event_create(request):
 @login_required
 def event_edit(request, pk):
     event = _own_event(request, pk)
-    form = EventForm(request.POST or None, instance=event, owner=event.owner)
+    form = EventForm(request.POST or None, request.FILES or None, instance=event, owner=event.owner)
     if request.method == "POST" and form.is_valid():
         form.save()
         history.record(event.owner, request.user, Change.Action.UPDATED, subject=event.display_title, what="event")
@@ -82,6 +82,8 @@ def event_delete(request, pk):
     event = _own_event(request, pk)
     if request.method == "POST":
         history.record(event.owner, request.user, Change.Action.DELETED, subject=event.display_title, what="event")
+        if event.recording:
+            event.recording.delete(save=False)
         event.delete()
         messages.success(request, _("The event has been deleted."))
         return redirect("genealogy:upcoming")

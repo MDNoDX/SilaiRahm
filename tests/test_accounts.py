@@ -26,7 +26,7 @@ class GoogleAndAppLoginTests(TestCase):
         user, _p = make_family()
         self.client.force_login(user)
         response = self.client.get(reverse("app_login_finish"))
-        self.assertTrue(response["Location"].startswith("shajara://kirish?token="))
+        self.assertTrue(response["Location"].startswith("silairahm://kirish?token="))
         token = response["Location"].split("token=", 1)[1]
         app = self.client_class()  # the app's own web view: a fresh session
         response = app.get(reverse("app_login"), {"token": token})

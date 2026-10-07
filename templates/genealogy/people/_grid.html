@@ -7,8 +7,6 @@
   {% endfor %}
 {% elif query %}
   <div class="empty"><h3>{% translate "No results found." %}</h3><p>{% translate "Try another spelling; Latin and Cyrillic both work." %}</p></div>
-{% elif missing %}
-  <div class="empty"><div class="ornament">{% include "partials/logo.svg" %}</div><h3>{% translate "Nothing is missing here. Well done!" %}</h3></div>
 {% else %}
   <div class="empty"><h3>{% translate "No relatives have been added yet." %}</h3></div>
 {% endif %}

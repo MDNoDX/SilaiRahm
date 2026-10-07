@@ -303,3 +303,53 @@ def notify(user, kind, params, key):
     except Exception as exc:  # noqa: BLE001 - the request itself must not fail because of Telegram
         log.warning("Could not deliver %s to user %s: %s", kind, user.pk, exc)
     return notification
+
+
+# ---- following (Instagram-style) ---------------------------------------------
+def follow(user, target):
+    """Follow `target`; a private account first has to approve."""
+    from .models import Follow
+
+    if target.pk == user.pk:
+        raise Refused(_("This is your own account."))
+    item, created = Follow.objects.get_or_create(follower=user, followed=target,
+                                                 defaults={"approved": not target.private_account})
+    if created:
+        kind = "new_follower" if item.approved else "follow_request"
+        notify(target, kind, {"name": user.display_name}, f"follow:{item.pk}")
+    user.__dict__.pop("_follows", None)
+    return item
+
+
+def unfollow(user, target):
+    from .models import Follow
+
+    Follow.objects.filter(follower=user, followed=target).delete()
+    user.__dict__.pop("_follows", None)
+
+
+def answer_follow(user, follow_id, approve):
+    """The owner of a private account lets a follower in, or not."""
+    from .models import Follow
+
+    item = Follow.objects.filter(pk=follow_id, followed=user).select_related("follower").first()
+    if item is None:
+        raise Refused(_("This request is no longer waiting for an answer."))
+    if approve:
+        if not item.approved:
+            item.approved = True
+            item.save(update_fields=["approved"])
+            notify(item.follower, "follow_accepted", {"name": user.display_name}, f"follow:{item.pk}:accepted")
+    else:
+        item.delete()
+    return item
+
+
+def follow_state(user, target):
+    """"following", "requested" or "" for the follow button."""
+    from .models import Follow
+
+    item = Follow.objects.filter(follower=user, followed=target).first()
+    if item is None:
+        return ""
+    return "following" if item.approved else "requested"

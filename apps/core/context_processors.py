@@ -15,11 +15,10 @@ NAV_SECTIONS = {
     "events": {"genealogy:upcoming", "genealogy:event", "genealogy:event_create", "genealogy:event_edit",
                "genealogy:event_delete"},
     "timeline": {"genealogy:timeline"},
-    "stories": {"genealogy:stories", "genealogy:story", "genealogy:story_create", "genealogy:story_edit",
-                "genealogy:story_delete"},
-    "friends": {"friends:list", "friends:create", "friends:edit", "friends:delete"},
-    "network": {"network:index", "network:request", "network:answer", "network:connection", "network:compare"},
+    "friends": {"friends:list", "friends:create", "friends:edit", "friends:delete", "network:index",
+                "network:request", "network:answer", "network:connection", "network:profile", "network:merge"},
     "calculator": {"genealogy:calculator"},
+    "assistant": {"assistant:chat"},
     "notifications": {"notify:list"},
     "history": {"genealogy:history"},
 }
@@ -36,6 +35,8 @@ def site(request):
         "is_cyrillic": current in CYRILLIC_SCRIPT,
         "language_options": language_options(current),
         "google_login": bool(settings.GOOGLE_CLIENT_ID),
+        "ai_ready": bool(settings.GEMINI_API_KEY),
+        "brand_name": settings.SITE_NAME,
         "nav": PAGE_SECTION.get(getattr(getattr(request, "resolver_match", None), "view_name", None), ""),
     }
     user = getattr(request, "user", None)

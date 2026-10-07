@@ -24,15 +24,13 @@
     <a class="chip" href="{% url 'genealogy:people' %}{% if order == 'abc' %}?tartib=abc{% endif %}" aria-current="{% if not show %}true{% else %}false{% endif %}">{% translate "Everyone" %}</a>
     <a class="chip" href="?f=living{% if order == 'abc' %}&amp;tartib=abc{% endif %}" aria-current="{% if show == 'living' %}true{% else %}false{% endif %}">{% translate "Living" %}</a>
     <a class="chip" href="?f=deceased{% if order == 'abc' %}&amp;tartib=abc{% endif %}" aria-current="{% if show == 'deceased' %}true{% else %}false{% endif %}">{% translate "Deceased" %}</a>
-    <a class="chip" href="?f=nodate" aria-current="{% if show == 'nodate' %}true{% else %}false{% endif %}">{% translate "No birth date" %}</a>
-    <a class="chip" href="?f=nophoto" aria-current="{% if show == 'nophoto' %}true{% else %}false{% endif %}">{% translate "No photo" %}</a>
+    <a class="chip" href="?f=male{% if order == 'abc' %}&amp;tartib=abc{% endif %}" aria-current="{% if show == 'male' %}true{% else %}false{% endif %}">{% translate "Men" %}</a>
+    <a class="chip" href="?f=female{% if order == 'abc' %}&amp;tartib=abc{% endif %}" aria-current="{% if show == 'female' %}true{% else %}false{% endif %}">{% translate "Women" %}</a>
   </div>
-  {% if not missing %}
   <div class="segmented" role="group" aria-label="{% translate 'Order' %}">
     <a href="?{% if show %}f={{ show }}{% endif %}" aria-current="{% if order == 'gen' %}true{% else %}false{% endif %}">{% translate "By generation" %}</a>
     <a href="?tartib=abc{% if show %}&amp;f={{ show }}{% endif %}" aria-current="{% if order == 'abc' %}true{% else %}false{% endif %}">{% translate "A–Z" %}</a>
   </div>
-  {% endif %}
 </div>
 <div class="legend-dots" style="margin-bottom:6px">
   <span><i class="dot own"></i>{% translate "Own family" context "branch" %}</span>

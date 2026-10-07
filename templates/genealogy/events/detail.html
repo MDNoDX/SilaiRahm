@@ -10,11 +10,12 @@
     {% if event.date_display %}<dt>{% translate "Date" %}</dt><dd>{{ event.date_display }}{% if event.every_year %} <span class="muted small">({% translate "remembered every year" %})</span>{% endif %}</dd>{% endif %}
     {% if event.place %}<dt>{% translate "Place" %}</dt><dd>{{ event.place }}</dd>{% endif %}
   </dl>
+  {% if event.recording %}{% include "partials/recording_player.html" with file=event.recording kind=event.recording_kind %}{% endif %}
+  {% if event.description %}<div class="prose story-read">{{ event.description|linebreaks }}</div>{% endif %}
   {% if event.people.all %}
     <h2 style="margin-top:18px">{% translate "Who" %}</h2>
     <div class="people">{% for person in event.people.all %}{% include "partials/person_card.html" with label="" %}{% endfor %}</div>
   {% endif %}
-  {% if event.description %}<h2 style="margin-top:18px">{% translate "Details" %}</h2><p class="prose">{{ event.description }}</p>{% endif %}
   {% if is_owner %}
   <div class="form-actions" style="margin-top:20px">
     <a class="btn" href="{% url 'genealogy:event_edit' event.pk %}">{% translate "Edit" %}</a>

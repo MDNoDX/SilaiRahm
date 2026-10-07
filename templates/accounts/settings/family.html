@@ -13,7 +13,7 @@
       <button class="icon-btn" type="button" data-copy="invite-link" title="{% translate 'Copy' %}" aria-label="{% translate 'Copy' %}">{% include "partials/icon.html" with name="copy" %}</button>
     </div>
     <div class="row">
-      <a class="btn btn-sm tg-open" href="https://t.me/share/url?url={{ new_link|urlencode:'' }}&amp;text={% translate 'Join our family tree on Shajara' as share_text %}{{ share_text|urlencode:'' }}" target="_blank" rel="noopener">{% include "partials/icon.html" with name="telegram" %}{% translate "Send in Telegram" %}</a>
+      <a class="btn btn-sm tg-open" href="https://t.me/share/url?url={{ new_link|urlencode:'' }}&amp;text={% translate 'Join our family tree on Silai Rahm' as share_text %}{{ share_text|urlencode:'' }}" target="_blank" rel="noopener">{% include "partials/icon.html" with name="telegram" %}{% translate "Send in Telegram" %}</a>
       <span class="muted small">{% blocktranslate with date=new_invite.expires_at|uzdate %}Works once, until {{ date }}.{% endblocktranslate %}</span>
     </div>
   </div>

@@ -13,6 +13,13 @@ class Gender(models.TextChoices):
     FEMALE = "female", pgettext_lazy("gender", "Female")
 
 
+class Audience(models.TextChoices):
+    """Who may see a part of an account."""
+    PUBLIC = "public", pgettext_lazy("audience", "Everyone on the site")
+    FOLLOWERS = "followers", pgettext_lazy("audience", "My followers")
+    FAMILY = "family", pgettext_lazy("audience", "Only family members")
+
+
 class User(AbstractUser):
     preferred_language = models.CharField(
         _("interface language"), max_length=10, choices=language_choices(), default=LATIN
@@ -43,8 +50,18 @@ class User(AbstractUser):
     totp_enabled = models.BooleanField(default=False)
     recovery_codes = models.JSONField(default=list, blank=True, editable=False)
     search_key = models.TextField(editable=False, blank=True, default="")
+    # How the family is called on the book and the wall poster ("Madaminovlar oilasi").
+    family_name = models.CharField(_("name of the family"), max_length=120, blank=True)
     # Others on the site may find this account by name (Connections → search).
-    discoverable = models.BooleanField(_("others on Shajara can find me by name"), default=True)
+    discoverable = models.BooleanField(_("others on Silai Rahm can find me by name"), default=True)
+    # Privacy, as on Instagram: a private account approves each follower; the
+    # family tree and the stories (life stories, events, album) each have an audience.
+    # Family members (invited relatives) always see everything.
+    private_account = models.BooleanField(_("private account"), default=True)
+    tree_audience = models.CharField(_("who sees my family tree"), max_length=10, choices=Audience.choices,
+                                     default=Audience.FOLLOWERS)
+    stories_audience = models.CharField(_("who sees life stories, events and the album"), max_length=10,
+                                        choices=Audience.choices, default=Audience.FAMILY)
 
     class Meta:
         verbose_name = _("user")

@@ -16,7 +16,7 @@ from apps.accounts.models import Invite, Membership, User
 from apps.accounts.sharing import switch_archive
 from apps.friends.models import Contact
 from apps.genealogy import history
-from apps.genealogy.models import Event, Marriage, Media, Person, Story
+from apps.genealogy.models import Event, Marriage, Media, Person
 from apps.notify.models import Notification
 
 from .helpers import PASSWORD, make_family
@@ -43,7 +43,6 @@ class CrawlTests(TestCase):
         cls.owner.save()
         me = cls.p["me"]
         cls.marriage = Marriage.objects.filter(husband=me).first()
-        cls.story = Story.objects.create(owner=cls.owner, person=me, title="Bolalik", body="Matn")
         cls.event = Event.objects.create(owner=cls.owner, kind="wedding", year=2010, month=5, day=1)
         cls.event.people.add(me)
         cls.contact = Contact.objects.create(owner=cls.owner, person=me, name="Doʻst", birth_month=3, birth_day=8)
@@ -82,7 +81,7 @@ class CrawlTests(TestCase):
             return values
         out = {}
         if "<int:pk>" in route:
-            out["pk"] = (self.story.pk if route.startswith("hikoyalar/") else self.event.pk if route.startswith("voqealar/")
+            out["pk"] = (self.event.pk if route.startswith("voqealar/")
                          else self.contact.pk if route.startswith("dostlar/") else self.p["me"].pk)
         if "<int:user_id>" in route:
             out["user_id"] = self.owner.pk
@@ -115,7 +114,7 @@ class CrawlTests(TestCase):
             except Exception as exc:  # noqa: BLE001 - a route the crawl cannot build is a failure too
                 failures.append(f"{label}: cannot build {route} ({exc})")
                 continue
-            for query in ("", "?q=a&person=1&a=1&b=2&relation=child&f=nodate&tartib=abc&view=fan&all=1"):
+            for query in ("", "?q=a&person=1&a=1&b=2&relation=child&f=nodate&tartib=abc&all=1"):
                 try:
                     response = self.client.get(url + query)
                 except Exception as exc:  # noqa: BLE001 - report every crash, not just the first
