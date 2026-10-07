@@ -230,6 +230,7 @@ class CompleteProfileForm(forms.Form):
         user.person = Person.objects.create(
             owner=user, first_name=user.first_name, last_name=user.last_name, gender=user.gender,
         )
+        user.family_started = False
         user.save()
         return user
 
@@ -256,3 +257,22 @@ class CodeForm(forms.Form):
     code = forms.CharField(label=_("Code from the app"), max_length=12,
                            widget=forms.TextInput(attrs={"inputmode": "numeric", "autocomplete": "one-time-code",
                                                          "autofocus": True}))
+
+
+class FamilyStartForm(forms.Form):
+    """Who a new user's father, mother and grandfathers are: their family tree starts from these."""
+
+    father = forms.CharField(label=_("Father’s first name"), max_length=100)
+    father_last = forms.CharField(label=_("Father’s surname"), max_length=100, required=False)
+    mother = forms.CharField(label=_("Mother’s first name"), max_length=100)
+    mother_last = forms.CharField(label=_("Mother’s surname"), max_length=100, required=False)
+    grandfather = forms.CharField(label=_("Grandfather (father’s father)"), max_length=100, required=False)
+    grandmother = forms.CharField(label=_("Grandmother (father’s mother)"), max_length=100, required=False)
+    mother_father = forms.CharField(label=_("Grandfather (mother’s father)"), max_length=100, required=False)
+    mother_mother = forms.CharField(label=_("Grandmother (mother’s mother)"), max_length=100, required=False)
+
+    def clean(self):
+        data = super().clean()
+        for name, value in list(data.items()):
+            data[name] = normalize_apostrophes((value or "").strip())
+        return data

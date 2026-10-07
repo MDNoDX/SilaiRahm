@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Your family" %}{% endblock %}
+{% block main_class %}narrow{% endblock %}
+{% block content %}
+<div class="card family-start">
+  <h1>{% translate "Your family" %}</h1>
+  <p class="muted">{% blocktranslate with name=me.first_name %}{{ name }}, before you begin: who are your parents and grandparents? Your family tree starts from them, and relatives already on the site can find you more easily. Write surnames only if you know them.{% endblocktranslate %}</p>
+  <form method="post" novalidate>{% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    {% for error in form.non_field_errors %}<ul class="errorlist"><li>{{ error }}</li></ul>{% endfor %}
+    <fieldset>
+      <legend>{% translate "Parents" %}</legend>
+      <div class="form-grid">
+        {% include "partials/field.html" with field=form.father %}
+        {% include "partials/field.html" with field=form.father_last %}
+        {% include "partials/field.html" with field=form.mother %}
+        {% include "partials/field.html" with field=form.mother_last %}
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>{% translate "Grandparents" %}</legend>
+      <div class="form-grid">
+        {% include "partials/field.html" with field=form.grandfather %}
+        {% include "partials/field.html" with field=form.grandmother %}
+        {% include "partials/field.html" with field=form.mother_father %}
+        {% include "partials/field.html" with field=form.mother_mother %}
+      </div>
+      <p class="help">{% translate "Leave empty what you do not know; it can be added later." %}</p>
+    </fieldset>
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">{% translate "Start my family tree" %}</button>
+      <button class="btn btn-ghost" type="submit" name="skip" value="1" formnovalidate>{% translate "Later" %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

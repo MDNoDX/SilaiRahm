@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: shajara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-07 08:30+0500\n"
+"POT-Creation-Date: 2026-10-07 08:41+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Shajara team\n"
 "Language-Team: Uzbek (Latin)\n"
@@ -146,21 +146,53 @@ msgstr "Yangi parol"
 msgid "Confirm the new password"
 msgstr "Yangi parolni tasdiqlash"
 
-#: apps/accounts/forms.py:244
+#: apps/accounts/forms.py:245
 msgid "What may they do?"
 msgstr "Nima qila oladi?"
 
-#: apps/accounts/forms.py:244
+#: apps/accounts/forms.py:245
 msgid "Who is this relative in the tree?"
 msgstr "Bu qarindosh shajarada kim?"
 
-#: apps/accounts/forms.py:245
+#: apps/accounts/forms.py:246
 msgid "Optional. The tree will then name everyone as seen from them."
 msgstr "Ixtiyoriy. Shunda shajara hammani uning nazaridan nomlaydi."
 
-#: apps/accounts/forms.py:256 templates/accounts/settings/security.html:23 templates/accounts/settings/security.html:24
+#: apps/accounts/forms.py:257 templates/accounts/settings/security.html:23 templates/accounts/settings/security.html:24
 msgid "Code from the app"
 msgstr "Ilovadagi kod"
+
+#: apps/accounts/forms.py:265
+msgid "Father’s first name"
+msgstr "Otangizning ismi"
+
+#: apps/accounts/forms.py:266
+msgid "Father’s surname"
+msgstr "Otangizning familiyasi"
+
+#: apps/accounts/forms.py:267
+msgid "Mother’s first name"
+msgstr "Onangizning ismi"
+
+#: apps/accounts/forms.py:268
+msgid "Mother’s surname"
+msgstr "Onangizning familiyasi"
+
+#: apps/accounts/forms.py:269
+msgid "Grandfather (father’s father)"
+msgstr "Bobongiz (otangizning otasi)"
+
+#: apps/accounts/forms.py:270
+msgid "Grandmother (father’s mother)"
+msgstr "Buvingiz (otangizning onasi)"
+
+#: apps/accounts/forms.py:271
+msgid "Grandfather (mother’s father)"
+msgstr "Bobongiz (onangizning otasi)"
+
+#: apps/accounts/forms.py:272
+msgid "Grandmother (mother’s mother)"
+msgstr "Buvingiz (onangizning onasi)"
 
 #: apps/accounts/models.py:12 templates/genealogy/tree.html:108
 msgctxt "gender"
@@ -219,37 +251,37 @@ msgstr "Silai Rahmdagi boshqalar meni ism boʻyicha topa oladi"
 msgid "private account"
 msgstr "yopiq hisob"
 
-#: apps/accounts/models.py:61
+#: apps/accounts/models.py:63
 msgid "who sees my family tree"
 msgstr "shajaramni kimlar koʻradi"
 
-#: apps/accounts/models.py:63
+#: apps/accounts/models.py:65
 msgid "who sees life stories, events and the album"
 msgstr "hayot tarixi, voqealar va albomni kimlar koʻradi"
 
-#: apps/accounts/models.py:67
+#: apps/accounts/models.py:69
 msgid "user"
 msgstr "foydalanuvchi"
 
-#: apps/accounts/models.py:68
+#: apps/accounts/models.py:70
 msgid "users"
 msgstr "foydalanuvchilar"
 
-#: apps/accounts/models.py:90 templates/accounts/settings/family.html:52
+#: apps/accounts/models.py:92 templates/accounts/settings/family.html:52
 msgctxt "role"
 msgid "Can view"
 msgstr "Koʻra oladi"
 
-#: apps/accounts/models.py:91 templates/accounts/settings/family.html:51
+#: apps/accounts/models.py:93 templates/accounts/settings/family.html:51
 msgctxt "role"
 msgid "Can edit"
 msgstr "Tahrirlay oladi"
 
-#: apps/accounts/models.py:99 apps/accounts/models.py:123
+#: apps/accounts/models.py:101 apps/accounts/models.py:125
 msgid "access"
 msgstr "ruxsat"
 
-#: apps/accounts/models.py:126
+#: apps/accounts/models.py:128
 msgid "who is invited"
 msgstr "kim taklif qilinmoqda"
 
@@ -317,6 +349,10 @@ msgstr "Xush kelibsiz! Hisobingiz yaratildi."
 msgid "The code is not correct."
 msgstr "Kod notoʻgʻri."
 
+#: apps/accounts/views/auth.py:220
+msgid "Your family tree has started. Add brothers, sisters and others from here."
+msgstr "Shajarangiz boshlandi. Aka-uka, opa-singil va boshqalarni shu yerdan qoʻshing."
+
 #: apps/accounts/views/family.py:46
 msgid "The invitation link no longer works."
 msgstr "Taklif havolasi endi ishlamaydi."
@@ -325,11 +361,11 @@ msgstr "Taklif havolasi endi ishlamaydi."
 msgid "Access has been removed."
 msgstr "Ruxsat olib tashlandi."
 
-#: apps/accounts/views/family.py:66 apps/accounts/views/profile.py:34 apps/accounts/views/profile.py:45 apps/core/views.py:276 apps/friends/views.py:79 apps/genealogy/views/album.py:93 apps/genealogy/views/people.py:217 apps/genealogy/views/people.py:317 apps/genealogy/views/people.py:331 apps/genealogy/views/people.py:365 apps/network/views.py:306 apps/notify/views.py:65
+#: apps/accounts/views/family.py:66 apps/accounts/views/profile.py:34 apps/accounts/views/profile.py:45 apps/core/views.py:276 apps/friends/views.py:79 apps/genealogy/views/album.py:93 apps/genealogy/views/people.py:217 apps/genealogy/views/people.py:317 apps/genealogy/views/people.py:331 apps/genealogy/views/people.py:365 apps/network/views.py:308 apps/notify/views.py:74
 msgid "The information has been saved."
 msgstr "Maʼlumotlar saqlandi."
 
-#: apps/accounts/views/family.py:80 apps/assistant/actions.py:178 apps/assistant/views.py:138 apps/genealogy/access.py:34 apps/genealogy/access.py:52 apps/genealogy/views/events.py:40 apps/genealogy/views/people.py:341 apps/genealogy/views/people.py:355 apps/genealogy/views/people.py:358 apps/network/services.py:278 apps/network/views.py:182 apps/network/views.py:272 apps/network/views.py:304 templates/errors/403.html:3 templates/errors/403.html:6 templates/errors/403_csrf.html:3
+#: apps/accounts/views/family.py:80 apps/assistant/actions.py:178 apps/assistant/views.py:138 apps/genealogy/access.py:34 apps/genealogy/access.py:52 apps/genealogy/views/events.py:40 apps/genealogy/views/people.py:341 apps/genealogy/views/people.py:355 apps/genealogy/views/people.py:358 apps/network/services.py:280 apps/network/views.py:183 apps/network/views.py:273 apps/network/views.py:306 templates/errors/403.html:3 templates/errors/403.html:6 templates/errors/403_csrf.html:3
 msgid "Access denied."
 msgstr "Kirish taqiqlangan."
 
@@ -1093,7 +1129,7 @@ msgstr "Doʻst qoʻshildi."
 msgid "The record has been deleted."
 msgstr "Maʼlumot oʻchirildi."
 
-#: apps/genealogy/access.py:25 apps/network/services.py:117
+#: apps/genealogy/access.py:25 apps/network/services.py:119
 msgid "You do not have permission to change this information."
 msgstr "Ushbu maʼlumotni oʻzgartirish huquqingiz yoʻq."
 
@@ -1550,11 +1586,11 @@ msgstr "Sahifa %(page)d / %(total)d"
 msgid "Created on %(date)s"
 msgstr "Yaratilgan sana: %(date)s"
 
-#: apps/genealogy/pdf.py:256 templates/friends/contact_form.html:15 templates/genealogy/people/_fields.html:15 templates/genealogy/people/detail.html:41 templates/network/profile.html:42
+#: apps/genealogy/pdf.py:256 templates/friends/contact_form.html:15 templates/genealogy/people/_fields.html:15 templates/genealogy/people/detail.html:41 templates/network/profile.html:52
 msgid "Date of birth"
 msgstr "Tugʻilgan sana"
 
-#: apps/genealogy/pdf.py:257 templates/genealogy/people/detail.html:42 templates/network/profile.html:43
+#: apps/genealogy/pdf.py:257 templates/genealogy/people/detail.html:42 templates/network/profile.html:53
 msgid "Place of birth"
 msgstr "Tugʻilgan joy"
 
@@ -1574,7 +1610,7 @@ msgstr "Vafot etgan joy"
 msgid "Place of burial"
 msgstr "Dafn etilgan joyi"
 
-#: apps/genealogy/pdf.py:262 templates/genealogy/people/detail.html:50 templates/network/profile.html:44
+#: apps/genealogy/pdf.py:262 templates/genealogy/people/detail.html:50 templates/network/profile.html:54
 msgid "Occupation"
 msgstr "Kasbi"
 
@@ -2520,11 +2556,11 @@ msgstr "Shajaralarimizni bir-birimizga koʻrsatish"
 msgid "Add to my friends (their birthday will be remembered)"
 msgstr "Doʻstlarimga qoʻshish (tugʻilgan kuni eslatiladi)"
 
-#: apps/network/forms.py:52 apps/network/services.py:120
+#: apps/network/forms.py:52 apps/network/services.py:122
 msgid "Choose a person from your family tree."
 msgstr "Shajarangizdan odam tanlang."
 
-#: apps/network/forms.py:57 apps/network/services.py:125
+#: apps/network/forms.py:57 apps/network/services.py:127
 msgid "Choose who they are related to."
 msgstr "Kimning qarindoshi ekanini tanlang."
 
@@ -2601,7 +2637,7 @@ msgctxt "connection"
 msgid "Friend"
 msgstr "Doʻst"
 
-#: apps/network/models.py:23 templates/network/_hub.html:75
+#: apps/network/models.py:23 templates/network/_hub.html:76
 msgctxt "connection"
 msgid "Waiting for an answer"
 msgstr "Javob kutilmoqda"
@@ -2616,36 +2652,36 @@ msgctxt "connection"
 msgid "Declined"
 msgstr "Rad etilgan"
 
-#: apps/network/services.py:122
+#: apps/network/services.py:124
 msgid "This record already belongs to another account."
 msgstr "Bu yozuv boshqa hisobga bogʻlangan."
 
-#: apps/network/services.py:170 apps/network/services.py:314 apps/network/views.py:147
+#: apps/network/services.py:172 apps/network/services.py:316 apps/network/views.py:148
 msgid "This is your own account."
 msgstr "Bu oʻzingizning hisobingiz."
 
-#: apps/network/services.py:174
+#: apps/network/services.py:176
 msgid "You are already connected."
 msgstr "Siz allaqachon bogʻlangansiz."
 
-#: apps/network/services.py:176
+#: apps/network/services.py:178
 #, python-brace-format
 msgid "{name} has already sent you a request: answer it below."
 msgstr "{name} sizga allaqachon soʻrov yuborgan: quyida javob bering."
 
-#: apps/network/services.py:178
+#: apps/network/services.py:180
 msgid "Your request is already waiting for an answer."
 msgstr "Soʻrovingiz allaqachon javob kutmoqda."
 
-#: apps/network/services.py:181
+#: apps/network/services.py:183
 msgid "This request was declined recently. You can ask again in a few days."
 msgstr "Bu soʻrov yaqinda rad etilgan. Bir necha kundan keyin yana soʻrashingiz mumkin."
 
-#: apps/network/services.py:183
+#: apps/network/services.py:185
 msgid "You have many unanswered requests. Wait for answers before sending more."
 msgstr "Javobsiz soʻrovlaringiz koʻp. Yana yuborishdan oldin javoblarni kuting."
 
-#: apps/network/services.py:200 apps/network/services.py:262 apps/network/services.py:269 apps/network/services.py:337
+#: apps/network/services.py:202 apps/network/services.py:264 apps/network/services.py:271 apps/network/services.py:339
 msgid "This request is no longer waiting for an answer."
 msgstr "Bu soʻrov endi javob kutmayapti."
 
@@ -2661,35 +2697,35 @@ msgstr "Soʻrov yuborilgan"
 msgid "Wants to connect"
 msgstr "Bogʻlanmoqchi"
 
-#: apps/network/views.py:120
+#: apps/network/views.py:121
 #, python-brace-format
 msgid "You follow {name}."
 msgstr "Siz {name}ni kuzatyapsiz."
 
-#: apps/network/views.py:121
+#: apps/network/views.py:122
 #, python-brace-format
 msgid "Request sent. {name} will decide."
 msgstr "Soʻrov yuborildi. {name} qaror qiladi."
 
-#: apps/network/views.py:172
+#: apps/network/views.py:173
 #, python-brace-format
 msgid "The request has been sent. {name} will see it on the site and in Telegram."
 msgstr "Soʻrov yuborildi. {name} uni saytda va Telegramda koʻradi."
 
-#: apps/network/views.py:193
+#: apps/network/views.py:194
 msgid "The request has been declined."
 msgstr "Soʻrov rad etildi."
 
-#: apps/network/views.py:207
+#: apps/network/views.py:208
 #, python-brace-format
 msgid "You are connected with {name}."
 msgstr "Siz {name} bilan bogʻlandingiz."
 
-#: apps/network/views.py:233
+#: apps/network/views.py:234
 msgid "The connection has ended. The people stay in both family trees."
 msgstr "Bogʻlanish tugatildi. Odamlar ikkala shajarada ham qoladi."
 
-#: apps/network/views.py:283
+#: apps/network/views.py:287
 #, python-brace-format
 msgid "Done: {added} added, {matched} matched, {filled} details filled in, {linked} family links made. Every change can be undone in History."
 msgstr "Tayyor: {added} kishi qoʻshildi, {matched} kishi moslandi, {filled} ta maʼlumot toʻldirildi, {linked} ta oilaviy bogʻlanish qilindi. Har bir oʻzgarishni «Tarix»da ortga qaytarish mumkin."
@@ -2975,27 +3011,27 @@ msgstr "Eslatmalar oʻchirildi. Qayta yoqish uchun /start yuboring."
 msgid "Reminders are on."
 msgstr "Eslatmalar yoqildi."
 
-#: apps/notify/views.py:94 templates/notify/settings.html:8 templates/notify/settings.html:58
+#: apps/notify/views.py:103 templates/notify/settings.html:8 templates/notify/settings.html:58
 msgid "Telegram reminders are not available at the moment."
 msgstr "Telegram orqali eslatmalar hozircha mavjud emas."
 
-#: apps/notify/views.py:117
+#: apps/notify/views.py:126
 msgid "A test message has been sent. Check Telegram."
 msgstr "Sinov xabari yuborildi. Telegramni tekshiring."
 
-#: apps/notify/views.py:123
+#: apps/notify/views.py:132
 msgid "The bot is blocked in Telegram. Connect it again."
 msgstr "Bot Telegramda bloklangan. Uni qayta ulang."
 
-#: apps/notify/views.py:125
+#: apps/notify/views.py:134
 msgid "Telegram did not accept the message. Try again later."
 msgstr "Telegram xabarni qabul qilmadi. Keyinroq urinib koʻring."
 
-#: apps/notify/views.py:137
+#: apps/notify/views.py:146
 msgid "Telegram has been disconnected."
 msgstr "Telegram uzildi."
 
-#: apps/notify/views.py:182
+#: apps/notify/views.py:191
 msgid "Notifications work on this device."
 msgstr "Bildirishnomalar bu qurilmada ishlayapti."
 
@@ -3030,6 +3066,35 @@ msgstr "Shu maʼlumotlar asosida shajarada sizning yozuvingiz yaratiladi."
 #: templates/accounts/auth/complete_profile.html:15
 msgid "Continue"
 msgstr "Davom etish"
+
+#: templates/accounts/auth/family_start.html:3 templates/accounts/auth/family_start.html:7
+msgid "Your family"
+msgstr "Oilangiz"
+
+#: templates/accounts/auth/family_start.html:8
+#, python-format
+msgid "%(name)s, before you begin: who are your parents and grandparents? Your family tree starts from them, and relatives already on the site can find you more easily. Write surnames only if you know them."
+msgstr "%(name)s, boshlashdan oldin: ota-onangiz va bobo-buvilaringiz kimlar? Shajarangiz ulardan boshlanadi, saytdagi qarindoshlaringiz ham sizni osonroq topadi. Familiyani faqat bilsangiz yozing."
+
+#: templates/accounts/auth/family_start.html:13 templates/genealogy/people/form.html:15
+msgid "Parents"
+msgstr "Ota-onasi"
+
+#: templates/accounts/auth/family_start.html:22
+msgid "Grandparents"
+msgstr "Bobo-buvilar"
+
+#: templates/accounts/auth/family_start.html:29
+msgid "Leave empty what you do not know; it can be added later."
+msgstr "Bilmaganingizni boʻsh qoldiring — keyin qoʻshish mumkin."
+
+#: templates/accounts/auth/family_start.html:32
+msgid "Start my family tree"
+msgstr "Shajaramni boshlash"
+
+#: templates/accounts/auth/family_start.html:33
+msgid "Later"
+msgstr "Keyinroq"
 
 #: templates/accounts/auth/login.html:8 templates/accounts/auth/register.html:8 templates/accounts/auth/verify_email.html:8
 msgid "Every family has a story worth keeping"
@@ -3401,7 +3466,7 @@ msgstr "Ruxsat"
 msgid "Remove this person’s access?"
 msgstr "Bu odamning ruxsati olib tashlansinmi?"
 
-#: templates/accounts/settings/family.html:54 templates/network/_hub.html:69 templates/partials/recorder.html:19
+#: templates/accounts/settings/family.html:54 templates/network/_hub.html:70 templates/partials/recorder.html:19
 msgid "Remove"
 msgstr "Olib tashlash"
 
@@ -3751,7 +3816,7 @@ msgstr "Silai Rahmdan odam qidirish"
 msgid "Reminder settings"
 msgstr "Eslatma sozlamalari"
 
-#: templates/base.html:180 templates/genealogy/tree.html:80
+#: templates/base.html:181 templates/genealogy/tree.html:80
 msgid "Close"
 msgstr "Yopish"
 
@@ -3876,7 +3941,7 @@ msgid "%(counter)s person wants to connect with you"
 msgid_plural "%(counter)s people want to connect with you"
 msgstr[0] "%(counter)s kishi siz bilan bogʻlanmoqchi"
 
-#: templates/core/dashboard.html:23 templates/network/_hub.html:45 templates/network/profile.html:28
+#: templates/core/dashboard.html:23 templates/network/_hub.html:46 templates/network/profile.html:28
 msgid "Answer"
 msgstr "Javob berish"
 
@@ -4562,10 +4627,6 @@ msgstr "%(owner)s shajarasidan"
 msgid "Edit personal details"
 msgstr "Shaxsiy maʼlumotlarni tahrirlash"
 
-#: templates/genealogy/people/form.html:15
-msgid "Parents"
-msgstr "Ota-onasi"
-
 #: templates/genealogy/people/list.html:8
 #, python-format
 msgid "%(counter)s person in your family tree"
@@ -4771,39 +4832,39 @@ msgstr "Silai Rahmdagi odamning ismi, foydalanuvchi nomi yoki pochtasi"
 msgid "No one found. People who chose not to be found by name can still be found by their exact username or e-mail."
 msgstr "Hech kim topilmadi. Ism boʻyicha topilmaslikni tanlaganlarni aniq foydalanuvchi nomi yoki emaili orqali topish mumkin."
 
-#: templates/network/_hub.html:29
+#: templates/network/_hub.html:30
 msgid "Requests to you"
 msgstr "Sizga kelgan soʻrovlar"
 
-#: templates/network/_hub.html:33
+#: templates/network/_hub.html:34
 msgid "wants to follow you"
 msgstr "sizni kuzatmoqchi"
 
-#: templates/network/_hub.html:35
+#: templates/network/_hub.html:36
 msgid "Allow"
 msgstr "Ruxsat berish"
 
-#: templates/network/_hub.html:36 templates/network/answer.html:26
+#: templates/network/_hub.html:37 templates/network/answer.html:26
 msgid "Decline"
 msgstr "Rad etish"
 
-#: templates/network/_hub.html:51
+#: templates/network/_hub.html:52
 msgid "Relatives and friends I am connected with"
 msgstr "Bogʻlangan qarindosh va doʻstlarim"
 
-#: templates/network/_hub.html:57 templates/network/profile.html:26
+#: templates/network/_hub.html:58 templates/network/profile.html:26
 msgid "Compare trees"
 msgstr "Shajaralarni solishtirish"
 
-#: templates/network/_hub.html:64 templates/network/profile.html:15
+#: templates/network/_hub.html:65 templates/network/profile.html:15
 msgid "following"
 msgstr "kuzatilmoqda"
 
-#: templates/network/_hub.html:67 templates/network/profile.html:14
+#: templates/network/_hub.html:68 templates/network/profile.html:14
 msgid "followers"
 msgstr "kuzatuvchi"
 
-#: templates/network/_hub.html:78
+#: templates/network/_hub.html:79
 msgid "Find your parents, brothers, sisters and cousins by name. Follow them to see their family tree, or connect as relatives: your family trees are then joined and you can take over what each knows."
 msgstr "Ota-onangiz, aka-uka, opa-singil va amakivachchalaringizni ismi boʻyicha toping. Shajarasini koʻrish uchun kuzating yoki qarindosh sifatida bogʻlaning: shajaralaringiz birlashadi va bir-biringiz bilganlarni olishingiz mumkin."
 
@@ -4955,23 +5016,36 @@ msgstr "Kuzatish"
 msgid "This is my relative"
 msgstr "Bu mening qarindoshim"
 
-#: templates/network/profile.html:40
+#: templates/network/profile.html:41
+#, python-format
+msgid "Take %(name)s’s family tree into yours"
+msgstr "%(name)sning shajarasini oʻzingiznikiga oʻtkazish"
+
+#: templates/network/profile.html:42
+msgid "Everyone in their tree who is missing from yours is copied with their links. What you have already built stays; where the two trees differ, you see it before anything changes. Every step can be undone in History."
+msgstr "Uning shajarasidagi, sizda yoʻq har bir odam bogʻlanishlari bilan koʻchiriladi. Siz tuzgan narsalar saqlanib qoladi; ikki shajara farq qilgan joylarni hech narsa oʻzgarmasidan oldin koʻrasiz. Har bir qadamni «Tarix»da qaytarish mumkin."
+
+#: templates/network/profile.html:44
+msgid "See what will be added"
+msgstr "Nimalar qoʻshilishini koʻrish"
+
+#: templates/network/profile.html:50
 msgid "About"
 msgstr "Haqida"
 
-#: templates/network/profile.html:47
+#: templates/network/profile.html:57
 msgid "Read the whole life story"
 msgstr "Hayot tarixini toʻliq oʻqish"
 
-#: templates/network/profile.html:51
+#: templates/network/profile.html:61
 msgid "This family tree is not shared with you"
 msgstr "Bu shajara siz uchun ochilmagan"
 
-#: templates/network/profile.html:52
+#: templates/network/profile.html:62
 msgid "Follow, and when they allow it you will see what they share with their followers."
 msgstr "Kuzating — ruxsat berilgach, kuzatuvchilarga ochilgan narsalarni koʻrasiz."
 
-#: templates/network/profile.html:52
+#: templates/network/profile.html:62
 msgid "Follow to see what they share with their followers."
 msgstr "Kuzatuvchilarga ochilgan narsalarni koʻrish uchun kuzating."
 

@@ -1,5 +1,6 @@
 """Follow and privacy, voice/video stories and the AI assistant (with Gemini mocked)."""
 import json
+import re
 from unittest import mock
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -262,3 +263,71 @@ class AssistantTests(TestCase):
         self.assertEqual(data["text"], "Bir kuni bogʻda edik.")
         part = post.call_args.kwargs["json"]["contents"][0]["parts"][0]["inlineData"]
         self.assertEqual(part["mimeType"], "video/webm")
+
+
+class FamilyStartTests(TestCase):
+    """A new account says who its parents and grandparents are before anything else."""
+
+    def setUp(self):
+        self.user = account("yangi", "Bobur")
+        self.user.family_started = False
+        self.user.save()
+        self.client.force_login(self.user)
+
+    def test_asked_first_and_tree_built(self):
+        self.assertRedirects(self.client.get(reverse("home")), reverse("accounts:family_start") + "?next=/",
+                             fetch_redirect_response=False)
+        response = self.client.post(reverse("accounts:family_start"), {
+            "father": "Akmal", "father_last": "", "mother": "Dilbar", "grandfather": "Madaminjon",
+            "mother_father": "Karim"})
+        self.assertRedirects(response, reverse("genealogy:tree"), fetch_redirect_response=False)
+        me = Person.objects.get(pk=self.user.person_id)
+        self.assertEqual((me.father.first_name, me.mother.first_name), ("Akmal", "Dilbar"))
+        self.assertEqual(me.father.last_name, "")  # unknown surnames stay empty
+        self.assertEqual(me.father.father.first_name, "Madaminjon")
+        self.assertEqual(me.mother.father.first_name, "Karim")
+        self.assertTrue(me.father.marriages_as_husband.filter(wife=me.mother).exists())
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.family_started)
+        self.assertEqual(self.client.get(reverse("home")).status_code, 200)
+
+    def test_parents_needed_unless_skipped(self):
+        self.assertEqual(self.client.post(reverse("accounts:family_start"), {"father": "Akmal"}).status_code, 200)
+        self.client.post(reverse("accounts:family_start"), {"skip": "1"})
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.family_started)
+
+
+class TakeTreeTests(TestCase):
+    """A brother takes over the family tree his sibling built."""
+
+    def test_take_tree_from_linked_record(self):
+        owner, p = make_family()
+        owner.tree_audience = "public"
+        owner.save()
+        brother = account("aka", "Jasur")
+        p["me"].linked_user = brother  # "this is my brother's account" (his record in my tree)
+        p["me"].save()
+        self.client.force_login(brother)
+        page = self.client.get(reverse("network:profile", args=[owner.username]))
+        self.assertContains(page, reverse("network:merge"))
+        url = reverse("network:merge") + f"?from={owner.username}&to={brother.username}"
+        page = self.client.get(url)
+        items = re.findall(r'name="item" value="([^"]+)"', page.content.decode())
+        self.assertTrue(items)
+        self.client.post(url, {"from": owner.username, "to": brother.username, "item": items})
+        mine = Person.objects.get(pk=brother.person_id)
+        self.assertEqual(mine.father.first_name, p["father"].first_name)
+        self.assertGreater(Person.objects.filter(owner=brother).count(), 5)
+
+
+class LiveStatusTests(TestCase):
+    def test_counts_requests(self):
+        owner, _p = make_family()
+        other = account("aziz")
+        self.client.force_login(other)
+        self.client.post(reverse("network:follow", args=[owner.username]))
+        self.client.force_login(owner)
+        data = self.client.get(reverse("notify:status")).json()
+        self.assertEqual(data["connections"], 1)
+        self.assertEqual(data["items"][0]["kind"], "follow_request")

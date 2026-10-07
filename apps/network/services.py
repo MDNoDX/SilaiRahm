@@ -46,7 +46,9 @@ def self_record(user, tree):
         pk = user.person_id
     else:
         pk = Membership.objects.filter(owner=tree, member=user).values_list("person_id", flat=True).first()
-    return Person.objects.filter(pk=pk, owner=tree).first() if pk else None
+    record = Person.objects.filter(pk=pk, owner=tree).first() if pk else None
+    # Otherwise the record the tree's owner linked to this account ("this is my brother's account").
+    return record or Person.objects.filter(owner=tree, linked_user=user).first()
 
 
 def working_tree(request):

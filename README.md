@@ -15,6 +15,13 @@ Hammasi Django’ning rasmiy i18n tizimi orqali ishlaydi (`gettext`, `.po` → `
   ona tomoni), toʻgʻri ajdodlar chizigʻi zarhal; chapda avlod nomlari, burchakda kichik xarita;
   uzoqlashtirganda kartalar soddalashadi. Kartani bosganda yon panel ochiladi va qarindosh **shu yerning oʻzida**
   qoʻshiladi.
+- **Roʻyxatdan oʻtish** — Google orqali (parolsiz) yoki email bilan: email bilan oʻtganda hisob faqat emailga
+  yuborilgan 6 xonali kod kiritilgach ochiladi. Kirishdan oldin otasi, onasi va bobo-buvilari soʻraladi — shajara
+  ulardan boshlanadi.
+- **Jonli yangilanish** — yangi soʻrov, kuzatuvchi yoki qabul qilingan soʻrov sahifani yangilamasdan koʻrinadi
+  (belgilar, xabar oynasi, «Doʻstlar» roʻyxati).
+- **Shajarani oʻtkazish** — akangiz (yoki boshqa qarindosh) sizning shajarangizni oʻzinikiga bir bosishda oladi;
+  u tuzib qoʻygan qismlar saqlanadi, farqlar oldindan koʻrsatiladi.
 - **Birgalikda tuzish** — qarindoshni havola orqali taklif qilasiz (koʻrish yoki tahrirlash huquqi bilan);
   u shajarani oʻz oʻrnidan nomlangan holda koʻradi. **Oʻzgarishlar tarixi**: kim nimani qoʻshgani koʻrinadi,
   xato oʻzgarish yoki oʻchirish ortga qaytariladi.

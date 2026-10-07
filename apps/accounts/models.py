@@ -58,6 +58,8 @@ class User(AbstractUser):
     # family tree and the stories (life stories, events, album) each have an audience.
     # Family members (invited relatives) always see everything.
     private_account = models.BooleanField(_("private account"), default=True)
+    # False for a new account until it has said who its parents and grandfather are (or chose to skip).
+    family_started = models.BooleanField(default=True)
     tree_audience = models.CharField(_("who sees my family tree"), max_length=10, choices=Audience.choices,
                                      default=Audience.FOLLOWERS)
     stories_audience = models.CharField(_("who sees life stories, events and the album"), max_length=10,

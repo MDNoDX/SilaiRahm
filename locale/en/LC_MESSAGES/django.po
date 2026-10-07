@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: shajara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-07 08:30+0500\n"
+"POT-Creation-Date: 2026-10-07 08:41+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Shajara team\n"
 "Language-Team: English\n"
@@ -150,20 +150,60 @@ msgstr ""
 msgid "Confirm the new password"
 msgstr ""
 
-#: apps/accounts/forms.py:244
+#: apps/accounts/forms.py:245
 msgid "What may they do?"
 msgstr ""
 
-#: apps/accounts/forms.py:244
+#: apps/accounts/forms.py:245
 msgid "Who is this relative in the tree?"
 msgstr ""
 
-#: apps/accounts/forms.py:245
+#: apps/accounts/forms.py:246
 msgid "Optional. The tree will then name everyone as seen from them."
 msgstr ""
 
-#: apps/accounts/forms.py:256 templates/accounts/settings/security.html:23 templates/accounts/settings/security.html:24
+#: apps/accounts/forms.py:257 templates/accounts/settings/security.html:23 templates/accounts/settings/security.html:24
 msgid "Code from the app"
+msgstr ""
+
+#: apps/accounts/forms.py:265
+#| msgctxt "kinship"
+#| msgid "Father's sister"
+msgid "Father’s first name"
+msgstr ""
+
+#: apps/accounts/forms.py:266
+#| msgctxt "kinship"
+#| msgid "Father's sister"
+msgid "Father’s surname"
+msgstr ""
+
+#: apps/accounts/forms.py:267
+#| msgctxt "kinship"
+#| msgid "Mother's sister"
+msgid "Mother’s first name"
+msgstr ""
+
+#: apps/accounts/forms.py:268
+#| msgctxt "kinship"
+#| msgid "Mother's sister"
+msgid "Mother’s surname"
+msgstr ""
+
+#: apps/accounts/forms.py:269
+msgid "Grandfather (father’s father)"
+msgstr ""
+
+#: apps/accounts/forms.py:270
+msgid "Grandmother (father’s mother)"
+msgstr ""
+
+#: apps/accounts/forms.py:271
+msgid "Grandfather (mother’s father)"
+msgstr ""
+
+#: apps/accounts/forms.py:272
+msgid "Grandmother (mother’s mother)"
 msgstr ""
 
 #: apps/accounts/models.py:12 templates/genealogy/tree.html:108
@@ -223,37 +263,37 @@ msgstr ""
 msgid "private account"
 msgstr ""
 
-#: apps/accounts/models.py:61
+#: apps/accounts/models.py:63
 msgid "who sees my family tree"
 msgstr ""
 
-#: apps/accounts/models.py:63
+#: apps/accounts/models.py:65
 msgid "who sees life stories, events and the album"
 msgstr ""
 
-#: apps/accounts/models.py:67
+#: apps/accounts/models.py:69
 msgid "user"
 msgstr ""
 
-#: apps/accounts/models.py:68
+#: apps/accounts/models.py:70
 msgid "users"
 msgstr ""
 
-#: apps/accounts/models.py:90 templates/accounts/settings/family.html:52
+#: apps/accounts/models.py:92 templates/accounts/settings/family.html:52
 msgctxt "role"
 msgid "Can view"
 msgstr ""
 
-#: apps/accounts/models.py:91 templates/accounts/settings/family.html:51
+#: apps/accounts/models.py:93 templates/accounts/settings/family.html:51
 msgctxt "role"
 msgid "Can edit"
 msgstr ""
 
-#: apps/accounts/models.py:99 apps/accounts/models.py:123
+#: apps/accounts/models.py:101 apps/accounts/models.py:125
 msgid "access"
 msgstr ""
 
-#: apps/accounts/models.py:126
+#: apps/accounts/models.py:128
 msgid "who is invited"
 msgstr ""
 
@@ -316,6 +356,10 @@ msgstr ""
 msgid "The code is not correct."
 msgstr ""
 
+#: apps/accounts/views/auth.py:220
+msgid "Your family tree has started. Add brothers, sisters and others from here."
+msgstr ""
+
 #: apps/accounts/views/family.py:46
 msgid "The invitation link no longer works."
 msgstr ""
@@ -324,11 +368,11 @@ msgstr ""
 msgid "Access has been removed."
 msgstr ""
 
-#: apps/accounts/views/family.py:66 apps/accounts/views/profile.py:34 apps/accounts/views/profile.py:45 apps/core/views.py:276 apps/friends/views.py:79 apps/genealogy/views/album.py:93 apps/genealogy/views/people.py:217 apps/genealogy/views/people.py:317 apps/genealogy/views/people.py:331 apps/genealogy/views/people.py:365 apps/network/views.py:306 apps/notify/views.py:65
+#: apps/accounts/views/family.py:66 apps/accounts/views/profile.py:34 apps/accounts/views/profile.py:45 apps/core/views.py:276 apps/friends/views.py:79 apps/genealogy/views/album.py:93 apps/genealogy/views/people.py:217 apps/genealogy/views/people.py:317 apps/genealogy/views/people.py:331 apps/genealogy/views/people.py:365 apps/network/views.py:308 apps/notify/views.py:74
 msgid "The information has been saved."
 msgstr ""
 
-#: apps/accounts/views/family.py:80 apps/assistant/actions.py:178 apps/assistant/views.py:138 apps/genealogy/access.py:34 apps/genealogy/access.py:52 apps/genealogy/views/events.py:40 apps/genealogy/views/people.py:341 apps/genealogy/views/people.py:355 apps/genealogy/views/people.py:358 apps/network/services.py:278 apps/network/views.py:182 apps/network/views.py:272 apps/network/views.py:304 templates/errors/403.html:3 templates/errors/403.html:6 templates/errors/403_csrf.html:3
+#: apps/accounts/views/family.py:80 apps/assistant/actions.py:178 apps/assistant/views.py:138 apps/genealogy/access.py:34 apps/genealogy/access.py:52 apps/genealogy/views/events.py:40 apps/genealogy/views/people.py:341 apps/genealogy/views/people.py:355 apps/genealogy/views/people.py:358 apps/network/services.py:280 apps/network/views.py:183 apps/network/views.py:273 apps/network/views.py:306 templates/errors/403.html:3 templates/errors/403.html:6 templates/errors/403_csrf.html:3
 msgid "Access denied."
 msgstr ""
 
@@ -1097,7 +1141,7 @@ msgstr ""
 msgid "The record has been deleted."
 msgstr ""
 
-#: apps/genealogy/access.py:25 apps/network/services.py:117
+#: apps/genealogy/access.py:25 apps/network/services.py:119
 msgid "You do not have permission to change this information."
 msgstr ""
 
@@ -1554,11 +1598,11 @@ msgstr ""
 msgid "Created on %(date)s"
 msgstr ""
 
-#: apps/genealogy/pdf.py:256 templates/friends/contact_form.html:15 templates/genealogy/people/_fields.html:15 templates/genealogy/people/detail.html:41 templates/network/profile.html:42
+#: apps/genealogy/pdf.py:256 templates/friends/contact_form.html:15 templates/genealogy/people/_fields.html:15 templates/genealogy/people/detail.html:41 templates/network/profile.html:52
 msgid "Date of birth"
 msgstr ""
 
-#: apps/genealogy/pdf.py:257 templates/genealogy/people/detail.html:42 templates/network/profile.html:43
+#: apps/genealogy/pdf.py:257 templates/genealogy/people/detail.html:42 templates/network/profile.html:53
 msgid "Place of birth"
 msgstr ""
 
@@ -1578,7 +1622,7 @@ msgstr ""
 msgid "Place of burial"
 msgstr ""
 
-#: apps/genealogy/pdf.py:262 templates/genealogy/people/detail.html:50 templates/network/profile.html:44
+#: apps/genealogy/pdf.py:262 templates/genealogy/people/detail.html:50 templates/network/profile.html:54
 msgid "Occupation"
 msgstr ""
 
@@ -2529,11 +2573,11 @@ msgstr ""
 msgid "Add to my friends (their birthday will be remembered)"
 msgstr ""
 
-#: apps/network/forms.py:52 apps/network/services.py:120
+#: apps/network/forms.py:52 apps/network/services.py:122
 msgid "Choose a person from your family tree."
 msgstr ""
 
-#: apps/network/forms.py:57 apps/network/services.py:125
+#: apps/network/forms.py:57 apps/network/services.py:127
 msgid "Choose who they are related to."
 msgstr ""
 
@@ -2610,7 +2654,7 @@ msgctxt "connection"
 msgid "Friend"
 msgstr ""
 
-#: apps/network/models.py:23 templates/network/_hub.html:75
+#: apps/network/models.py:23 templates/network/_hub.html:76
 msgctxt "connection"
 msgid "Waiting for an answer"
 msgstr ""
@@ -2625,36 +2669,36 @@ msgctxt "connection"
 msgid "Declined"
 msgstr ""
 
-#: apps/network/services.py:122
+#: apps/network/services.py:124
 msgid "This record already belongs to another account."
 msgstr ""
 
-#: apps/network/services.py:170 apps/network/services.py:314 apps/network/views.py:147
+#: apps/network/services.py:172 apps/network/services.py:316 apps/network/views.py:148
 msgid "This is your own account."
 msgstr ""
 
-#: apps/network/services.py:174
+#: apps/network/services.py:176
 msgid "You are already connected."
 msgstr ""
 
-#: apps/network/services.py:176
+#: apps/network/services.py:178
 #, python-brace-format
 msgid "{name} has already sent you a request: answer it below."
 msgstr ""
 
-#: apps/network/services.py:178
+#: apps/network/services.py:180
 msgid "Your request is already waiting for an answer."
 msgstr ""
 
-#: apps/network/services.py:181
+#: apps/network/services.py:183
 msgid "This request was declined recently. You can ask again in a few days."
 msgstr ""
 
-#: apps/network/services.py:183
+#: apps/network/services.py:185
 msgid "You have many unanswered requests. Wait for answers before sending more."
 msgstr ""
 
-#: apps/network/services.py:200 apps/network/services.py:262 apps/network/services.py:269 apps/network/services.py:337
+#: apps/network/services.py:202 apps/network/services.py:264 apps/network/services.py:271 apps/network/services.py:339
 msgid "This request is no longer waiting for an answer."
 msgstr ""
 
@@ -2670,35 +2714,35 @@ msgstr ""
 msgid "Wants to connect"
 msgstr ""
 
-#: apps/network/views.py:120
+#: apps/network/views.py:121
 #, python-brace-format
 msgid "You follow {name}."
 msgstr ""
 
-#: apps/network/views.py:121
+#: apps/network/views.py:122
 #, python-brace-format
 msgid "Request sent. {name} will decide."
 msgstr ""
 
-#: apps/network/views.py:172
+#: apps/network/views.py:173
 #, python-brace-format
 msgid "The request has been sent. {name} will see it on the site and in Telegram."
 msgstr ""
 
-#: apps/network/views.py:193
+#: apps/network/views.py:194
 msgid "The request has been declined."
 msgstr ""
 
-#: apps/network/views.py:207
+#: apps/network/views.py:208
 #, python-brace-format
 msgid "You are connected with {name}."
 msgstr ""
 
-#: apps/network/views.py:233
+#: apps/network/views.py:234
 msgid "The connection has ended. The people stay in both family trees."
 msgstr ""
 
-#: apps/network/views.py:283
+#: apps/network/views.py:287
 #, python-brace-format
 msgid "Done: {added} added, {matched} matched, {filled} details filled in, {linked} family links made. Every change can be undone in History."
 msgstr ""
@@ -2986,27 +3030,27 @@ msgstr ""
 msgid "Reminders are on."
 msgstr ""
 
-#: apps/notify/views.py:94 templates/notify/settings.html:8 templates/notify/settings.html:58
+#: apps/notify/views.py:103 templates/notify/settings.html:8 templates/notify/settings.html:58
 msgid "Telegram reminders are not available at the moment."
 msgstr ""
 
-#: apps/notify/views.py:117
+#: apps/notify/views.py:126
 msgid "A test message has been sent. Check Telegram."
 msgstr ""
 
-#: apps/notify/views.py:123
+#: apps/notify/views.py:132
 msgid "The bot is blocked in Telegram. Connect it again."
 msgstr ""
 
-#: apps/notify/views.py:125
+#: apps/notify/views.py:134
 msgid "Telegram did not accept the message. Try again later."
 msgstr ""
 
-#: apps/notify/views.py:137
+#: apps/notify/views.py:146
 msgid "Telegram has been disconnected."
 msgstr ""
 
-#: apps/notify/views.py:182
+#: apps/notify/views.py:191
 msgid "Notifications work on this device."
 msgstr ""
 
@@ -3040,6 +3084,37 @@ msgstr ""
 
 #: templates/accounts/auth/complete_profile.html:15
 msgid "Continue"
+msgstr ""
+
+#: templates/accounts/auth/family_start.html:3 templates/accounts/auth/family_start.html:7
+msgid "Your family"
+msgstr ""
+
+#: templates/accounts/auth/family_start.html:8
+#, python-format
+msgid "%(name)s, before you begin: who are your parents and grandparents? Your family tree starts from them, and relatives already on the site can find you more easily. Write surnames only if you know them."
+msgstr ""
+
+#: templates/accounts/auth/family_start.html:13 templates/genealogy/people/form.html:15
+msgid "Parents"
+msgstr ""
+
+#: templates/accounts/auth/family_start.html:22
+msgid "Grandparents"
+msgstr ""
+
+#: templates/accounts/auth/family_start.html:29
+msgid "Leave empty what you do not know; it can be added later."
+msgstr ""
+
+#: templates/accounts/auth/family_start.html:32
+#| msgctxt "file name"
+#| msgid "family-tree"
+msgid "Start my family tree"
+msgstr ""
+
+#: templates/accounts/auth/family_start.html:33
+msgid "Later"
 msgstr ""
 
 #: templates/accounts/auth/login.html:8 templates/accounts/auth/register.html:8 templates/accounts/auth/verify_email.html:8
@@ -3415,7 +3490,7 @@ msgstr ""
 msgid "Remove this person’s access?"
 msgstr ""
 
-#: templates/accounts/settings/family.html:54 templates/network/_hub.html:69 templates/partials/recorder.html:19
+#: templates/accounts/settings/family.html:54 templates/network/_hub.html:70 templates/partials/recorder.html:19
 msgid "Remove"
 msgstr ""
 
@@ -3768,7 +3843,7 @@ msgstr ""
 msgid "Reminder settings"
 msgstr ""
 
-#: templates/base.html:180 templates/genealogy/tree.html:80
+#: templates/base.html:181 templates/genealogy/tree.html:80
 msgid "Close"
 msgstr ""
 
@@ -3894,7 +3969,7 @@ msgid_plural "%(counter)s people want to connect with you"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/core/dashboard.html:23 templates/network/_hub.html:45 templates/network/profile.html:28
+#: templates/core/dashboard.html:23 templates/network/_hub.html:46 templates/network/profile.html:28
 msgid "Answer"
 msgstr ""
 
@@ -4588,10 +4663,6 @@ msgstr ""
 msgid "Edit personal details"
 msgstr ""
 
-#: templates/genealogy/people/form.html:15
-msgid "Parents"
-msgstr ""
-
 #: templates/genealogy/people/list.html:8
 #, python-format
 msgid "%(counter)s person in your family tree"
@@ -4800,39 +4871,39 @@ msgstr ""
 msgid "No one found. People who chose not to be found by name can still be found by their exact username or e-mail."
 msgstr ""
 
-#: templates/network/_hub.html:29
+#: templates/network/_hub.html:30
 msgid "Requests to you"
 msgstr ""
 
-#: templates/network/_hub.html:33
+#: templates/network/_hub.html:34
 msgid "wants to follow you"
 msgstr ""
 
-#: templates/network/_hub.html:35
+#: templates/network/_hub.html:36
 msgid "Allow"
 msgstr ""
 
-#: templates/network/_hub.html:36 templates/network/answer.html:26
+#: templates/network/_hub.html:37 templates/network/answer.html:26
 msgid "Decline"
 msgstr ""
 
-#: templates/network/_hub.html:51
+#: templates/network/_hub.html:52
 msgid "Relatives and friends I am connected with"
 msgstr ""
 
-#: templates/network/_hub.html:57 templates/network/profile.html:26
+#: templates/network/_hub.html:58 templates/network/profile.html:26
 msgid "Compare trees"
 msgstr ""
 
-#: templates/network/_hub.html:64 templates/network/profile.html:15
+#: templates/network/_hub.html:65 templates/network/profile.html:15
 msgid "following"
 msgstr ""
 
-#: templates/network/_hub.html:67 templates/network/profile.html:14
+#: templates/network/_hub.html:68 templates/network/profile.html:14
 msgid "followers"
 msgstr ""
 
-#: templates/network/_hub.html:78
+#: templates/network/_hub.html:79
 msgid "Find your parents, brothers, sisters and cousins by name. Follow them to see their family tree, or connect as relatives: your family trees are then joined and you can take over what each knows."
 msgstr ""
 
@@ -4985,23 +5056,36 @@ msgstr ""
 msgid "This is my relative"
 msgstr ""
 
-#: templates/network/profile.html:40
+#: templates/network/profile.html:41
+#, python-format
+msgid "Take %(name)s’s family tree into yours"
+msgstr ""
+
+#: templates/network/profile.html:42
+msgid "Everyone in their tree who is missing from yours is copied with their links. What you have already built stays; where the two trees differ, you see it before anything changes. Every step can be undone in History."
+msgstr ""
+
+#: templates/network/profile.html:44
+msgid "See what will be added"
+msgstr ""
+
+#: templates/network/profile.html:50
 msgid "About"
 msgstr ""
 
-#: templates/network/profile.html:47
+#: templates/network/profile.html:57
 msgid "Read the whole life story"
 msgstr ""
 
-#: templates/network/profile.html:51
+#: templates/network/profile.html:61
 msgid "This family tree is not shared with you"
 msgstr ""
 
-#: templates/network/profile.html:52
+#: templates/network/profile.html:62
 msgid "Follow, and when they allow it you will see what they share with their followers."
 msgstr ""
 
-#: templates/network/profile.html:52
+#: templates/network/profile.html:62
 msgid "Follow to see what they share with their followers."
 msgstr ""
 

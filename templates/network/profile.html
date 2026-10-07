@@ -3,7 +3,7 @@
 {% block title %}{{ other.display_name }}{% endblock %}
 {% block main_class %}narrow{% endblock %}
 {% block content %}
-<div class="card profile-card">
+<div class="card profile-card" data-live-reload>
   <div class="profile-top">
     {% if record %}{% include "partials/avatar.html" with person=record size="lg" branch="own" %}{% else %}{% include "partials/user_avatar.html" with account=other size="lg" %}{% endif %}
     <div class="spacer">
@@ -34,6 +34,16 @@
     {% if in_my_tree %}<a class="btn btn-ghost" href="{{ in_my_tree.get_absolute_url }}">{% translate "In my family tree" %}</a>{% endif %}
   </div>
 </div>
+
+{% if can_take %}
+<section class="card take-tree">
+  <div class="spacer">
+    <h2>{% include "partials/icon.html" with name="merge" %}{% blocktranslate with name=other.first_name|default:other.username %}Take {{ name }}’s family tree into yours{% endblocktranslate %}</h2>
+    <p class="muted">{% translate "Everyone in their tree who is missing from yours is copied with their links. What you have already built stays; where the two trees differ, you see it before anything changes. Every step can be undone in History." %}</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'network:merge' %}?from={{ other.username|urlencode }}&to={{ mine.username|urlencode }}">{% translate "See what will be added" %}</a>
+</section>
+{% endif %}
 
 {% if record %}
 <section class="card">

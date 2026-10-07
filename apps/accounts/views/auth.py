@@ -15,7 +15,7 @@ from apps.core.languages import normalize_language
 
 from .. import signup
 
-from ..forms import CompleteProfileForm, LoginForm, PasswordResetForm, RegisterForm, SetPasswordForm
+from ..forms import CompleteProfileForm, FamilyStartForm, LoginForm, PasswordResetForm, RegisterForm, SetPasswordForm
 
 logger = logging.getLogger(__name__)
 
@@ -163,3 +163,60 @@ def complete_profile(request):
         messages.success(request, _("Welcome! Your account has been created."))
         return redirect(_after_sign_in(request))
     return render(request, "accounts/auth/complete_profile.html", {"form": form})
+
+
+@login_required
+def family_start(request):
+    """Before the first look around: who are your father, mother and grandparents? The tree starts from them."""
+    from django.db import transaction
+
+    from apps.genealogy import history
+    from apps.genealogy.models import Change, Marriage, Person
+    from apps.genealogy.relations import attach
+
+    user = request.user
+    me = Person.objects.filter(pk=user.home_person_id, owner=user).first()
+    target = request.GET.get("next") or request.POST.get("next") or ""
+    done = target if target and url_has_allowed_host_and_scheme(target, {request.get_host()}, request.is_secure()) \
+        else reverse("genealogy:tree")
+    if user.family_started or me is None or me.father_id or me.mother_id:
+        if not user.family_started:
+            user.family_started = True
+            user.save(update_fields=["family_started"])
+        return redirect(done)
+    form = FamilyStartForm(request.POST or None)
+    if request.method == "POST" and request.POST.get("skip"):
+        user.family_started = True
+        user.save(update_fields=["family_started"])
+        return redirect(done)
+    if request.method == "POST" and form.is_valid():
+        data = form.cleaned_data
+        with transaction.atomic():
+            def add(anchor, name, last, gender, relation):
+                if not name:
+                    return None
+                person = Person.objects.create(owner=user, first_name=name, last_name=last, gender=gender)
+                attach(anchor, person, relation, user)
+                history.record(user, user, Change.Action.CREATED, person,
+                               details={"relation": relation, "to": anchor.short_name})
+                return person
+
+            def couple(husband, wife):
+                if husband and wife:
+                    Marriage.objects.get_or_create(owner=user, husband=husband, wife=wife)
+
+            father = add(me, data["father"], data["father_last"], "male", "father")
+            me.refresh_from_db()
+            mother = add(me, data["mother"], data["mother_last"], "female", "mother")
+            couple(father, mother)
+            if father:
+                couple(add(father, data["grandfather"], "", "male", "father"),
+                       add(Person.objects.get(pk=father.pk), data["grandmother"], "", "female", "mother"))
+            if mother:
+                couple(add(mother, data["mother_father"], "", "male", "father"),
+                       add(Person.objects.get(pk=mother.pk), data["mother_mother"], "", "female", "mother"))
+            user.family_started = True
+            user.save(update_fields=["family_started"])
+        messages.success(request, _("Your family tree has started. Add brothers, sisters and others from here."))
+        return redirect(done)
+    return render(request, "accounts/auth/family_start.html", {"form": form, "next": target, "me": me})

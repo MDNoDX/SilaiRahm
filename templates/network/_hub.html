@@ -25,6 +25,7 @@
     {% endfor %}
   {% endif %}
 
+  <div data-live-part="people-lists">
   {% if follow_requests or incoming %}
   <h3 class="subhead">{% translate "Requests to you" %}</h3>
   {% for f in follow_requests %}
@@ -77,4 +78,5 @@
   {% if not people_query and not follow_requests and not incoming and not connected and not following and not followers %}
   <p class="muted small" style="margin:12px 0 0">{% translate "Find your parents, brothers, sisters and cousins by name. Follow them to see their family tree, or connect as relatives: your family trees are then joined and you can take over what each knows." %}</p>
   {% endif %}
+  </div>
 </section>

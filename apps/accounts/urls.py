@@ -13,6 +13,7 @@ urlpatterns = [
     path("royxatdan-otish/", views.register, name="register"),
     path("royxatdan-otish/tasdiqlash/", views.verify_email, name="verify_email"),
     path("profilni-toldirish/", views.complete_profile, name="complete_profile"),
+    path("oilangiz/", views.family_start, name="family_start"),
     path("parol/tiklash/", views.password_reset, name="password_reset"),
     path("parol/tiklash/yuborildi/", views.password_reset_done, name="password_reset_done"),
     path("parol/tiklash/<uidb64>/<token>/", views.password_reset_confirm, name="password_reset_confirm"),

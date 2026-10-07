@@ -79,7 +79,7 @@ def confirm(request, code):
         return _("This username was taken in the meantime. Start signing up again.")
     if User.objects.filter(email__iexact=data["email"]).exists():
         return _("An account with this email address already exists.")
-    user = User(**data, preferred_language=item["language"])
+    user = User(**data, preferred_language=item["language"], family_started=False)
     user.password = item["password"]
     user.save()
     user.person = Person.objects.create(owner=user, first_name=user.first_name, last_name=user.last_name,

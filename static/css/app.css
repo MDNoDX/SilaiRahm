@@ -946,3 +946,7 @@ a.spacer { color: var(--ink); }
 .ai-field { display: flex; flex-direction: column; gap: 4px; font-size: .88rem; font-weight: 600; }
 .ai-field input { font-weight: 400; }
 .ai-recording .ai-error { margin: 0; }
+.live-toast { color: var(--bg); text-decoration: none; }
+.live-toast small { opacity: .85; font-weight: 400; }
+.take-tree { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; border-color: var(--gold-bright); background: var(--gold-soft); }
+.take-tree h2 { display: flex; align-items: center; gap: 8px; }

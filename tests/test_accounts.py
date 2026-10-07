@@ -20,6 +20,10 @@ class GoogleAndAppLoginTests(TestCase):
                                     {"first_name": "Nodir", "last_name": "Madaminov", "gender": "male"})
         user.refresh_from_db()
         self.assertEqual((user.person.first_name, user.person.gender), ("Nodir", "male"))
+        # Next: who the parents and grandparents are (or "Later").
+        self.assertRedirects(self.client.get(reverse("home")), reverse("accounts:family_start") + "?next=/",
+                             fetch_redirect_response=False)
+        self.client.post(reverse("accounts:family_start"), {"skip": "1"})
         self.assertEqual(self.client.get(reverse("home")).status_code, 200)
 
     def test_app_login_bridge(self):

@@ -4,7 +4,7 @@ from django.urls import reverse
 from .sharing import role_in
 
 # Paths a user without a profile may still open.
-ALLOWED_PREFIXES = ("/profilni-toldirish/", "/chiqish/", "/til/", "/static/", "/media/",
+ALLOWED_PREFIXES = ("/profilni-toldirish/", "/oilangiz/", "/chiqish/", "/til/", "/static/", "/media/",
                     "/accounts/", "/admin/", "/salomatlik/", "/cron/", "/telegram/", "/ilova/", "/taklif/",
                     "/sw.js", "/sozlamalar/oila/")
 
@@ -46,4 +46,8 @@ class ProfileCompletionMiddleware:
         if (user is not None and user.is_authenticated and not user.person_id and not user.active_archive_id
                 and not user.is_staff and not request.path.startswith(ALLOWED_PREFIXES)):
             return redirect(f"{reverse('accounts:complete_profile')}?next={request.get_full_path()}")
+        # A new account first says who its father, mother and grandfather are: the tree starts from them.
+        if (user is not None and user.is_authenticated and user.person_id and not user.family_started
+                and not user.active_archive_id and not request.path.startswith(ALLOWED_PREFIXES)):
+            return redirect(f"{reverse('accounts:family_start')}?next={request.get_full_path()}")
         return self.get_response(request)

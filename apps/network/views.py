@@ -102,6 +102,7 @@ def profile(request, username):
         "people": Person.objects.filter(owner=other).count() if sees_tree else None,
         "connection": services.between(request.user, other),
         "in_my_tree": in_my_tree, "label": services.label_in_tree(mine, in_my_tree, request.user),
+        "mine": mine, "can_take": sees_tree and can_edit(request.user, mine),
     })
 
 
@@ -277,18 +278,19 @@ def merge_view(request):
         if a and b:
             merge.link_match(a, b, request.user)
         return redirect(back)
+    me_source, me_target = services.self_record(request.user, source), services.self_record(request.user, target)
+    # The user is in both trees (their own record, and the one the other owner made for them): start from there.
+    anchors = [(me_source.pk, me_target.pk)] if me_source and me_target else []
     if request.method == "POST":
-        done = merge.apply(source, target, keys=request.POST.getlist("item"), actor=request.user,
+        done = merge.apply(source, target, keys=request.POST.getlist("item"), actor=request.user, anchors=anchors,
                            with_stories=can_see_stories(request.user, source))
         messages.success(request, _("Done: {added} added, {matched} matched, {filled} details filled in, "
                                     "{linked} family links made. Every change can be undone in History.")
                          .format(**done))
         return redirect(reverse("genealogy:tree") if target.pk == request.archive.pk else back)
-    plan = merge.analyse(source, target, with_stories=can_see_stories(request.user, source))
+    plan = merge.analyse(source, target, anchors=anchors, with_stories=can_see_stories(request.user, source))
     return render(request, "network/merge.html", {
-        "plan": plan, "source": source, "target": target,
-        "me_source": services.self_record(request.user, source),
-        "me_target": services.self_record(request.user, target),
+        "plan": plan, "source": source, "target": target, "me_source": me_source, "me_target": me_target,
     })
 
 

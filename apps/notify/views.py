@@ -38,12 +38,21 @@ def notification_open(request, pk):
 @login_required
 def status(request):
     """Unread reminders for the desktop app (dock badge, system notifications)."""
-    unread = request.user.notifications.filter(read_at=None)[:20]
-    return JsonResponse({
-        "unread": request.user.notifications.filter(read_at=None).count(),
-        "items": [{"id": n.pk, "url": request.build_absolute_uri(reverse("notify:open", args=[n.pk])),
-                   **{k: n.text[k] for k in ("title", "body", "icon")}} for n in unread],
+    from django.db.models import Count, Q
+
+    unread = request.user.notifications.filter(read_at=None)
+    counts = unread.aggregate(total=Count("id"), connections=Count("id", filter=Q(kind__in=PEOPLE_KINDS)))
+    response = JsonResponse({
+        "unread": counts["total"], "connections": counts["connections"],
+        "items": [{"id": n.pk, "kind": n.kind, "url": request.build_absolute_uri(reverse("notify:open", args=[n.pk])),
+                   **{k: n.text[k] for k in ("title", "body", "icon")}} for n in unread[:20]],
     })
+    response["Cache-Control"] = "no-store"
+    return response
+
+
+# Requests and answers between people: they change the Friends page, so it refreshes itself.
+PEOPLE_KINDS = ["connection_request", "connection_accepted", "follow_request", "new_follower", "follow_accepted"]
 
 
 @require_POST

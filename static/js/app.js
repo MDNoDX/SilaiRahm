@@ -824,4 +824,76 @@
         .then(function () { textBtn.disabled = false; textBtn.innerHTML = label; });
     });
   });
+  // ---- Live updates: new notifications, requests and answers appear without reloading ----
+  var live = $("[data-live-status]");
+  if (live && window.fetch) {
+    var statusUrl = live.getAttribute("data-live-status"), seenKey = "live-seen", seen = 0, first = true, busyLive = false;
+    try { seen = parseInt(sessionStorage.getItem(seenKey), 10) || 0; } catch (e) { /* private mode */ }
+    var PEOPLE = ["connection_request", "connection_accepted", "follow_request", "new_follower", "follow_accepted"];
+    var setBadge = function (name, count) {
+      $all('[data-live="' + name + '"]').forEach(function (b) { b.textContent = count; b.hidden = !count; });
+    };
+    var toastBox = function () {
+      var box = $(".toasts");
+      if (!box) {
+        box = document.createElement("div");
+        box.className = "toasts";
+        box.setAttribute("role", "status");
+        box.setAttribute("aria-live", "polite");
+        document.body.appendChild(box);
+      }
+      return box;
+    };
+    var announce = function (item) {
+      var toast = document.createElement("a");
+      toast.className = "toast live-toast";
+      toast.href = item.url;
+      toast.innerHTML = "<span><b></b><br><small></small></span>";
+      toast.querySelector("b").textContent = (item.icon ? item.icon + " " : "") + item.title;
+      toast.querySelector("small").textContent = item.body || "";
+      toastBox().appendChild(toast);
+      window.setTimeout(function () { toast.classList.add("hide"); window.setTimeout(function () { toast.remove(); }, 350); }, 9000);
+    };
+    var typing = function () {
+      var el = document.activeElement;
+      return el && (el.tagName === "TEXTAREA" || (el.tagName === "INPUT" && el.type !== "submit" && el.type !== "button"));
+    };
+    var refreshParts = function () {
+      if ($("[data-live-reload]") && !typing()) { window.location.reload(); return; }
+      var parts = $all("[data-live-part]");
+      if (!parts.length) return;
+      fetch(window.location.href, { credentials: "same-origin" }).then(function (r) { return r.text(); }).then(function (html) {
+        var doc = new DOMParser().parseFromString(html, "text/html");
+        parts.forEach(function (part) {
+          var fresh = doc.querySelector('[data-live-part="' + part.getAttribute("data-live-part") + '"]');
+          if (fresh) part.innerHTML = fresh.innerHTML;
+        });
+      }).catch(function () {});
+    };
+    var check = function () {
+      if (busyLive || document.hidden) return;
+      busyLive = true;
+      fetch(statusUrl, { credentials: "same-origin", headers: { Accept: "application/json" } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          if (!data) return;
+          setBadge("unread", data.unread);
+          setBadge("connections", data.connections);
+          var fresh = (data.items || []).filter(function (n) { return n.id > seen; });
+          var top = (data.items || []).reduce(function (m, n) { return Math.max(m, n.id); }, seen);
+          // The first look only remembers what is there; the Mac app shows its own system notifications.
+          if ((!first || seen) && !/SilaiRahmMac/.test(navigator.userAgent)) fresh.slice(0, 3).forEach(announce);
+          if (fresh.some(function (n) { return PEOPLE.indexOf(n.kind) !== -1; }) && !first) refreshParts();
+          seen = top;
+          first = false;
+          try { sessionStorage.setItem(seenKey, String(seen)); } catch (e) { /* private mode */ }
+        })
+        .catch(function () {})
+        .then(function () { busyLive = false; });
+    };
+    check();
+    window.setInterval(check, 15000);
+    document.addEventListener("visibilitychange", function () { if (!document.hidden) check(); });
+    window.addEventListener("focus", check);
+  }
 })();

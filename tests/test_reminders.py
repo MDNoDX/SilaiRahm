@@ -87,7 +87,8 @@ class ReminderTests(TestCase):
         data = self.client.get(reverse("notify:status"), HTTP_ACCEPT_LANGUAGE="uz").json()
         self.assertEqual(data["unread"], 1)
         item = data["items"][0]
-        self.assertEqual(set(item), {"id", "url", "title", "body", "icon"})
+        self.assertEqual(set(item), {"id", "kind", "url", "title", "body", "icon"})
+        self.assertEqual(data["connections"], 0)
         self.assertTrue(item["url"].startswith("http"))
 
 

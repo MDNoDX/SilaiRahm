@@ -56,12 +56,12 @@
       <a href="{% url 'genealogy:people' %}" {% if nav == "people" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="people" %}<span>{% translate "Relatives" %}</span></a>
       <a href="{% url 'genealogy:upcoming' %}" {% if nav == "events" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="calendar" %}<span>{% translate "Events" %}</span></a>
       <a href="{% url 'genealogy:timeline' %}" {% if nav == "timeline" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="timeline" %}<span>{% translate "Timeline" %}</span></a>
-      <a href="{% url 'friends:list' %}" {% if nav == "friends" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="friends" %}<span>{% translate "Friends" %}</span>{% if unread_connections %}<span class="badge sb-badge">{{ unread_connections }}</span>{% endif %}</a>
+      <a href="{% url 'friends:list' %}" {% if nav == "friends" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="friends" %}<span>{% translate "Friends" %}</span><span class="badge sb-badge" data-live="connections"{% if not unread_connections %} hidden{% endif %}>{{ unread_connections }}</span></a>
       <a href="{% url 'genealogy:calculator' %}" {% if nav == "calculator" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="link" %}<span>{% translate "Who is who?" %}</span></a>
       <a href="{% url 'assistant:chat' %}" {% if nav == "assistant" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="sparkle" %}<span>{% translate "Assistant" %}</span></a>
     </nav>
     <div class="sb-bottom">
-      <a class="sb-link" href="{% url 'notify:list' %}" {% if nav == "notifications" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="bell" %}<span>{% translate "Notifications" %}</span>{% if unread_count %}<span class="badge sb-badge">{{ unread_count }}</span>{% endif %}</a>
+      <a class="sb-link" href="{% url 'notify:list' %}" {% if nav == "notifications" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="bell" %}<span>{% translate "Notifications" %}</span><span class="badge sb-badge" data-live="unread"{% if not unread_count %} hidden{% endif %}>{{ unread_count }}</span></a>
       <a class="sb-link" href="{% url 'genealogy:history' %}" {% if nav == "history" %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="history" %}<span>{% translate "History" %}</span></a>
       <a class="sb-link" href="{% url 'accounts:settings' %}" {% if settings_tab %}aria-current="page"{% endif %}>{% include "partials/icon.html" with name="settings" %}<span>{% translate "Settings" %}</span></a>
       <details class="dropdown sb-user">
@@ -81,7 +81,7 @@
       </a>
       <span class="spacer"></span>
       <button class="icon-btn" type="button" data-cmdk-open aria-label="{% translate 'Search' %}">{% include "partials/icon.html" with name="search" %}</button>
-      <a class="icon-btn" href="{% url 'notify:list' %}" aria-label="{% translate 'Notifications' %}">{% include "partials/icon.html" with name="bell" %}{% if unread_count %}<span class="dot-badge">{{ unread_count }}</span>{% endif %}</a>
+      <a class="icon-btn" href="{% url 'notify:list' %}" aria-label="{% translate 'Notifications' %}">{% include "partials/icon.html" with name="bell" %}<span class="dot-badge" data-live="unread"{% if not unread_count %} hidden{% endif %}>{{ unread_count }}</span></a>
       <details class="dropdown usermenu">
         <summary aria-label="{% translate 'Account' %}">{% include "partials/avatar.html" with person=user.person size="sm" branch="own" %}</summary>
         {% include "partials/user_menu.html" %}
@@ -173,6 +173,7 @@
 {% endif %}
 {% endwith %}
 
+{% if user.is_authenticated %}<div hidden data-live-status="{% url 'notify:status' %}"></div>{% endif %}
 {% if messages %}
   <div class="toasts" role="status" aria-live="polite">
     {% for message in messages %}

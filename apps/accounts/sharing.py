@@ -113,6 +113,9 @@ def accept_invite(invite, user):
     invite.accepted_by = user
     invite.accepted_at = timezone.now()
     invite.save(update_fields=["accepted_by", "accepted_at"])
+    if not user.family_started:  # joined a family tree that already has their relatives
+        user.family_started = True
+        user.save(update_fields=["family_started"])
     user.__dict__.pop("_roles", None)
     own = user.home_person_id
     switch_archive(user, invite.owner)
