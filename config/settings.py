@@ -30,16 +30,19 @@ def _env_list(name, default=""):
 
 ALLOWED_HOSTS = _env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,[::1]")
 CSRF_TRUSTED_ORIGINS = _env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
-for _var in ("VERCEL_PROJECT_PRODUCTION_URL", "VERCEL_URL", "VERCEL_BRANCH_URL"):
-    if os.environ.get(_var):
-        ALLOWED_HOSTS.append(os.environ[_var])
-        CSRF_TRUSTED_ORIGINS.append(f"https://{os.environ[_var]}")
+# The site's Vercel addresses: the current one and the one from before the rename (still in use).
+PRODUCTION_HOSTS = ["silairahm.vercel.app", "shajara-liard.vercel.app"]
+_hosts = [os.environ.get(v, "") for v in ("VERCEL_PROJECT_PRODUCTION_URL", "VERCEL_URL", "VERCEL_BRANCH_URL")]
+for _host in filter(None, _hosts + (PRODUCTION_HOSTS if ON_VERCEL else [])):
+    if _host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(_host)
+        CSRF_TRUSTED_ORIGINS.append(f"https://{_host}")
 # The name of the project (a brand: the same in every language).
 SITE_NAME = "Silai Rahm"
 
 # The public address of the site (used in links sent by Telegram and e-mail).
 SITE_URL = os.environ.get("SITE_URL", "").rstrip("/") or (
-    f"https://{os.environ['VERCEL_PROJECT_PRODUCTION_URL']}" if os.environ.get("VERCEL_PROJECT_PRODUCTION_URL")
+    f"https://{PRODUCTION_HOSTS[0]}" if ON_VERCEL
     else "http://localhost:8000")
 
 INSTALLED_APPS = [
