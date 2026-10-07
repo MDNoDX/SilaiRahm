@@ -140,6 +140,11 @@ class Plan:
         return {x.key for x in self.matches + self.additions + self.fills}
 
     @property
+    def in_both(self):
+        """How many people are known to be in both trees."""
+        return len(self.anchors) + len(self.matches)
+
+    @property
     def empty(self):
         return not (self.matches or self.additions or self.fills)
 

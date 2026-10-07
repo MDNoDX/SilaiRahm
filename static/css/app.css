@@ -950,3 +950,20 @@ a.spacer { color: var(--ink); }
 .live-toast small { opacity: .85; font-weight: 400; }
 .take-tree { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; border-color: var(--gold-bright); background: var(--gold-soft); }
 .take-tree h2 { display: flex; align-items: center; gap: 8px; }
+
+/* ---- Merging family trees -------------------------------------------- */
+.merge-steps { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; padding: 0; list-style: none; }
+.merge-steps li { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+.merge-steps b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--line); color: var(--ink-2); font-size: .8rem; }
+.merge-steps .now { color: var(--ink); border-color: var(--accent); }
+.merge-steps .now b { background: var(--accent); color: var(--accent-ink); }
+.merge-steps .done b { background: var(--ok); color: #fff; }
+.merge-facts { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 10px; }
+.merge-facts li { display: flex; gap: 10px; align-items: flex-start; }
+.merge-facts .ico { flex: none; width: 20px; height: 20px; color: var(--accent); margin-top: 1px; }
+.merge-conflicts { display: block; }
+.merge-conflicts ul { margin: 6px 0 0; padding-left: 20px; font-size: .92rem; }
+.merge-details summary { cursor: pointer; display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.ai-proposal.is-danger { border-color: var(--danger); background: var(--danger-soft); }
+.ai-msg a { color: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.merge-start { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; padding: 10px 12px; border-radius: var(--r-md); background: var(--surface-2); border: 1px solid var(--line); }

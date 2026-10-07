@@ -131,7 +131,8 @@ Kim nimani koʻradi (ochiq/yopiq hisob, shajara va hikoyalar auditoriyasi) — `
 |---|---|
 | `gemini.py` | Google Gemini REST mijozi; ovozni matnga aylantirish |
 | `context.py` | Yordamchiga beriladigan maʼlumot: faqat foydalanuvchi koʻra oladigan arxiv, qoidalar, sayt boʻlimlari |
-| `actions.py` | Yordamchi taklif qila oladigan amallar (voqea, qarindosh, maʼlumot) va ularni tasdiqdan keyin bajarish |
+| `actions.py` | Yordamchi taklif qila oladigan amallar (voqea qoʻshish/tahrirlash/oʻchirish, qarindosh qoʻshish/bogʻlash/oʻchirish, maʼlumot, ajrashgan, xabar qoldirish) va ularni tasdiqdan keyin saytning oʻz qoidalari bilan bajarish |
+| `models.py` | `Note` — bir qarindosh yordamchi orqali boshqasiga qoldirgan xabar (keyingi suhbatda soʻzma-soʻz yetkaziladi) |
 | `views.py` | Suhbat sahifasi, xabar, saqlash (imzolangan taklif), ovozni matnga; shablon `templates/assistant/chat.html`, JS `static/js/assistant.js` |
 
 ## 3. `templates/` — sahifalar

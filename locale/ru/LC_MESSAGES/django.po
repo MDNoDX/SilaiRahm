@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: shajara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-07 08:41+0500\n"
+"POT-Creation-Date: 2026-10-07 09:27+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Shajara team\n"
 "Language-Team: Russian\n"
@@ -365,11 +365,11 @@ msgstr "Ссылка-приглашение больше не действует
 msgid "Access has been removed."
 msgstr "Доступ закрыт."
 
-#: apps/accounts/views/family.py:66 apps/accounts/views/profile.py:34 apps/accounts/views/profile.py:45 apps/core/views.py:276 apps/friends/views.py:79 apps/genealogy/views/album.py:93 apps/genealogy/views/people.py:217 apps/genealogy/views/people.py:317 apps/genealogy/views/people.py:331 apps/genealogy/views/people.py:365 apps/network/views.py:308 apps/notify/views.py:74
+#: apps/accounts/views/family.py:66 apps/accounts/views/profile.py:34 apps/accounts/views/profile.py:45 apps/core/views.py:276 apps/friends/views.py:79 apps/genealogy/views/album.py:93 apps/genealogy/views/people.py:217 apps/genealogy/views/people.py:317 apps/genealogy/views/people.py:331 apps/genealogy/views/people.py:365 apps/network/views.py:320 apps/notify/views.py:74
 msgid "The information has been saved."
 msgstr "Сохранено."
 
-#: apps/accounts/views/family.py:80 apps/assistant/actions.py:178 apps/assistant/views.py:138 apps/genealogy/access.py:34 apps/genealogy/access.py:52 apps/genealogy/views/events.py:40 apps/genealogy/views/people.py:341 apps/genealogy/views/people.py:355 apps/genealogy/views/people.py:358 apps/network/services.py:280 apps/network/views.py:183 apps/network/views.py:273 apps/network/views.py:306 templates/errors/403.html:3 templates/errors/403.html:6 templates/errors/403_csrf.html:3
+#: apps/accounts/views/family.py:80 apps/assistant/actions.py:395 apps/assistant/views.py:152 apps/genealogy/access.py:34 apps/genealogy/access.py:52 apps/genealogy/views/events.py:40 apps/genealogy/views/people.py:341 apps/genealogy/views/people.py:355 apps/genealogy/views/people.py:358 apps/network/services.py:280 apps/network/views.py:183 apps/network/views.py:273 apps/network/views.py:318 templates/errors/403.html:3 templates/errors/403.html:6 templates/errors/403_csrf.html:3
 msgid "Access denied."
 msgstr "Доступ запрещён."
 
@@ -430,86 +430,173 @@ msgstr "Сначала установите пароль, иначе вы не �
 msgid "Google has been disconnected from your account."
 msgstr "Google отключён от вашего аккаунта."
 
-#: apps/assistant/actions.py:87 apps/genealogy/access.py:32
+#: apps/assistant/actions.py:139 apps/genealogy/access.py:32
 msgid "Person not found."
 msgstr "Человек не найден."
 
-#: apps/assistant/actions.py:104
+#: apps/assistant/actions.py:147
+msgid "The event was not found."
+msgstr "Событие не найдено."
+
+#: apps/assistant/actions.py:220
 #, python-brace-format
 msgid "Add the event “{title}” ({who})."
 msgstr "Добавить событие «{title}» ({who})."
 
-#: apps/assistant/actions.py:106
+#: apps/assistant/actions.py:225
+#, python-brace-format
+msgid "Change the event “{title}”: {fields}."
+msgstr "Изменить событие «{title}»: {fields}."
+
+#: apps/assistant/actions.py:229
+#, python-brace-format
+msgid "Delete the event “{title}”."
+msgstr "Удалить событие «{title}»."
+
+#: apps/assistant/actions.py:231
 #, python-brace-format
 msgid "Add {name} as {relation} of {anchor}."
 msgstr "Добавить {name}: {relation} для {anchor}."
 
-#: apps/assistant/actions.py:112
+#: apps/assistant/actions.py:235
+#, python-brace-format
+msgid "Make {other} the {relation} of {person}."
+msgstr "{other} — для {person}: {relation}."
+
+#: apps/assistant/actions.py:239
 #, python-brace-format
 msgid "Update {name}: {fields}."
 msgstr "Обновить данные {name}: {fields}."
 
-#: apps/assistant/actions.py:141 apps/network/forms.py:55
+#: apps/assistant/actions.py:241
+#, python-brace-format
+msgid "Delete {name} from the family tree (can be restored from History)."
+msgstr "Удалить {name} из древа (можно восстановить в «Истории»)."
+
+#: apps/assistant/actions.py:243
+#, python-brace-format
+msgid "Mark the marriage of {husband} and {wife} as divorced."
+msgstr "Отметить брак {husband} и {wife} как расторгнутый."
+
+#: apps/assistant/actions.py:244
+#, python-brace-format
+msgid "Mark the marriage of {husband} and {wife} as not divorced."
+msgstr "Отметить брак {husband} и {wife} как действующий."
+
+#: apps/assistant/actions.py:247
+#, python-brace-format
+msgid "Leave a message for @{recipient}: “{text}”"
+msgstr "Оставить сообщение для @{recipient}: «{text}»"
+
+#: apps/assistant/actions.py:299 apps/assistant/actions.py:324 apps/network/forms.py:55
 msgid "Choose the relation."
 msgstr "Выберите родство."
 
-#: apps/assistant/actions.py:150 apps/genealogy/forms.py:236
+#: apps/assistant/actions.py:308 apps/genealogy/forms.py:236
 msgid "Choose an existing person or enter the new person's first name."
 msgstr "Выберите человека из древа или введите имя нового."
 
-#: apps/assistant/views.py:71 apps/assistant/views.py:156 templates/assistant/chat.html:16
-msgid "The assistant is not set up yet."
-msgstr "Помощник ещё не настроен."
+#: apps/assistant/actions.py:361 apps/genealogy/views/people.py:233
+msgid "Your own record cannot be deleted."
+msgstr "Свою запись удалить нельзя."
 
-#: apps/assistant/views.py:75
+#: apps/assistant/actions.py:364 apps/genealogy/views/people.py:236
+msgid "This record belongs to a relative who has an account, so it cannot be deleted."
+msgstr "Эта запись принадлежит родственнику с аккаунтом, поэтому удалить её нельзя."
+
+#: apps/assistant/actions.py:373
+msgid "This marriage was not found."
+msgstr "Этот брак не найден."
+
+#: apps/assistant/actions.py:376 apps/genealogy/forms.py:345
+msgid "She has another marriage now: it cannot be active again."
+msgstr "Сейчас у неё другой брак: этот нельзя снова сделать действующим."
+
+#: apps/assistant/actions.py:389
+msgid "This person cannot be reached: they need an account linked to your family."
+msgstr "Этому человеку нельзя передать сообщение: нужен аккаунт, связанный с вашей семьёй."
+
+#: apps/assistant/actions.py:391 apps/assistant/views.py:75
 msgid "Write a message."
 msgstr "Напишите сообщение."
 
-#: apps/assistant/views.py:77 apps/assistant/views.py:165
+#: apps/assistant/views.py:71 apps/assistant/views.py:173 templates/assistant/chat.html:16
+msgid "The assistant is not set up yet."
+msgstr "Помощник ещё не настроен."
+
+#: apps/assistant/views.py:77 apps/assistant/views.py:182
 msgid "That is enough for this hour. Please try again a little later."
 msgstr "На этот час достаточно. Попробуйте чуть позже."
 
-#: apps/assistant/views.py:100
+#: apps/assistant/views.py:104
 msgid "The assistant is busy. Please try again in a minute."
 msgstr "Помощник занят. Попробуйте через минуту."
 
-#: apps/assistant/views.py:101 apps/assistant/views.py:106
+#: apps/assistant/views.py:105 apps/assistant/views.py:110
 msgid "The assistant could not answer. Please try again."
 msgstr "Помощник не смог ответить. Попробуйте ещё раз."
 
-#: apps/assistant/views.py:105
-msgid "Here is what I suggest. Check it and press “Add” to save it."
-msgstr "Вот что я предлагаю. Проверьте и нажмите «Добавить», чтобы сохранить."
+#: apps/assistant/views.py:109
+msgid "Here is my proposal. Check it and press the button under it."
+msgstr "Вот моё предложение. Проверьте и нажмите кнопку под ним."
 
-#: apps/assistant/views.py:136
+#: apps/assistant/views.py:137 templates/friends/contact_form.html:24 templates/genealogy/confirm_delete.html:3 templates/genealogy/events/detail.html:22 templates/genealogy/people/detail.html:104 templates/genealogy/people/detail.html:121 templates/genealogy/people/detail.html:240
+msgid "Delete"
+msgstr "Удалить"
+
+#: apps/assistant/views.py:137 templates/assistant/chat.html:40
+msgid "Send"
+msgstr "Отправить"
+
+#: apps/assistant/views.py:138 templates/friends/_groups.html:4
+msgid "Add"
+msgstr "Добавить"
+
+#: apps/assistant/views.py:138 templates/accounts/auth/password_reset_confirm.html:11 templates/accounts/settings/general.html:15 templates/accounts/settings/general.html:52 templates/accounts/settings/security.html:10 templates/friends/contact_form.html:22 templates/genealogy/events/form.html:36 templates/genealogy/people/detail.html:72 templates/genealogy/people/form.html:22 templates/genealogy/people/marriage_form.html:16 templates/genealogy/people/relative_form.html:25 templates/genealogy/tree.html:113 templates/notify/settings.html:93
+msgid "Save"
+msgstr "Сохранить"
+
+#: apps/assistant/views.py:150
 msgid "This proposal has expired. Ask again."
 msgstr "Срок этого предложения истёк. Спросите ещё раз."
 
-#: apps/assistant/views.py:146 apps/assistant/views.py:213
+#: apps/assistant/views.py:161
+msgid "Deleted. It can be restored from History."
+msgstr "Удалено. Можно восстановить в «Истории»."
+
+#: apps/assistant/views.py:161
+msgid "Deleted."
+msgstr "Удалено."
+
+#: apps/assistant/views.py:162
+msgid "The message will be passed on."
+msgstr "Сообщение будет передано."
+
+#: apps/assistant/views.py:162 apps/assistant/views.py:230
 msgid "Saved."
 msgstr "Сохранено."
 
-#: apps/assistant/views.py:159 apps/assistant/views.py:192 apps/genealogy/recordings.py:41
+#: apps/assistant/views.py:176 apps/assistant/views.py:209 apps/genealogy/recordings.py:41
 msgid "This is not a voice or video recording."
 msgstr "Это не аудио- или видеозапись."
 
-#: apps/assistant/views.py:170
+#: apps/assistant/views.py:187
 msgid "The recording could not be turned into text. Please try again."
 msgstr "Не удалось превратить запись в текст. Попробуйте ещё раз."
 
-#: apps/assistant/views.py:172
+#: apps/assistant/views.py:189
 msgid "No words were heard in the recording."
 msgstr "В записи не слышно слов."
 
-#: apps/assistant/views.py:189
+#: apps/assistant/views.py:206
 msgid "Write a title for the recording."
 msgstr "Напишите заголовок для записи."
 
-#: apps/assistant/views.py:204
+#: apps/assistant/views.py:221
 msgid "The recording is saved, but it could not be turned into text now."
 msgstr "Запись сохранена, но сейчас её не удалось превратить в текст."
 
-#: apps/assistant/views.py:206
+#: apps/assistant/views.py:223
 msgid "The recording is saved; turning it into text can be done a little later."
 msgstr "Запись сохранена; превратить её в текст можно чуть позже."
 
@@ -1283,10 +1370,6 @@ msgstr "В разводе"
 msgid "The marriage stays in the family tree, shown as ended."
 msgstr "Брак остаётся в древе и показывается как завершённый."
 
-#: apps/genealogy/forms.py:345
-msgid "She has another marriage now: it cannot be active again."
-msgstr "Сейчас у неё другой брак: этот нельзя снова сделать действующим."
-
 #: apps/genealogy/forms.py:359
 msgid "Voice or video message"
 msgstr "Голосовое или видеосообщение"
@@ -1295,7 +1378,7 @@ msgstr "Голосовое или видеосообщение"
 msgid "Remove the recording"
 msgstr "Удалить запись"
 
-#: apps/genealogy/forms.py:367 templates/accounts/invite/who_am_i.html:14 templates/genealogy/book.html:14 templates/genealogy/calculator.html:14 templates/genealogy/calculator.html:24 templates/genealogy/people/detail.html:217 templates/network/_place_fields.html:8 templates/network/merge.html:20 templates/network/merge.html:29 templates/partials/person_picker.html:6
+#: apps/genealogy/forms.py:367 templates/accounts/invite/who_am_i.html:14 templates/genealogy/book.html:14 templates/genealogy/calculator.html:14 templates/genealogy/calculator.html:24 templates/genealogy/people/detail.html:217 templates/network/_place_fields.html:8 templates/network/merge.html:25 templates/network/merge.html:34 templates/partials/person_picker.html:6
 msgid "Type a name…"
 msgstr "Введите имя…"
 
@@ -2494,14 +2577,6 @@ msgstr "Кончина"
 msgid "The person has been added to the family tree."
 msgstr "Человек добавлен в древо."
 
-#: apps/genealogy/views/people.py:233
-msgid "Your own record cannot be deleted."
-msgstr "Свою запись удалить нельзя."
-
-#: apps/genealogy/views/people.py:236
-msgid "This record belongs to a relative who has an account, so it cannot be deleted."
-msgstr "Эта запись принадлежит родственнику с аккаунтом, поэтому удалить её нельзя."
-
 #: apps/genealogy/views/people.py:241
 msgid "The record has been deleted. It can be restored from the history."
 msgstr "Запись удалена. Её можно восстановить из истории."
@@ -2556,7 +2631,7 @@ msgstr "Добавить в моё древо"
 msgid "Not in my family tree"
 msgstr "Нет в моём древе"
 
-#: apps/network/forms.py:21 templates/network/merge.html:27
+#: apps/network/forms.py:21 templates/network/merge.html:32
 msgid "In your family tree"
 msgstr "В вашем древе"
 
@@ -2606,47 +2681,47 @@ msgstr "Друг"
 msgid "A few words (optional)"
 msgstr "Несколько слов (необязательно)"
 
-#: apps/network/merge.py:165
+#: apps/network/merge.py:170
 #, python-brace-format
 msgid "{name}: the father differs — {here} here, {there} there."
 msgstr "{name}: отец разный — здесь {here}, там {there}."
 
-#: apps/network/merge.py:166
+#: apps/network/merge.py:171
 #, python-brace-format
 msgid "{name}: the mother differs — {here} here, {there} there."
 msgstr "{name}: мать разная — здесь {here}, там {there}."
 
-#: apps/network/merge.py:221
+#: apps/network/merge.py:226
 #, python-brace-format
 msgid "Father of {name}"
 msgstr "Отец: {name}"
 
-#: apps/network/merge.py:221
+#: apps/network/merge.py:226
 #, python-brace-format
 msgid "Mother of {name}"
 msgstr "Мать: {name}"
 
-#: apps/network/merge.py:236
+#: apps/network/merge.py:241
 #, python-brace-format
 msgid "Spouse of {name}"
 msgstr "Супруг(а): {name}"
 
-#: apps/network/merge.py:251
+#: apps/network/merge.py:256
 #, python-brace-format
 msgid "Child of {name}"
 msgstr "Ребёнок: {name}"
 
-#: apps/network/merge.py:269
+#: apps/network/merge.py:274
 #, python-brace-format
 msgid "{name}: {field} is {here} here, {there} there."
 msgstr "{name}: {field} здесь {here}, там {there}."
 
-#: apps/network/merge.py:273
+#: apps/network/merge.py:278
 #, python-brace-format
 msgid "{name}: passed away according to the other family tree."
 msgstr "{name}: в другом древе отмечен(а) как умерший(ая)."
 
-#: apps/network/merge.py:275
+#: apps/network/merge.py:280
 #, python-brace-format
 msgid "{name}: recorded as passed away here, alive in the other family tree."
 msgstr "{name}: здесь отмечен(а) как умерший(ая), а в другом древе — как живой(ая)."
@@ -2749,7 +2824,7 @@ msgstr "Вы связаны с: {name}."
 msgid "The connection has ended. The people stay in both family trees."
 msgstr "Связь прекращена. Люди остаются в обоих древах."
 
-#: apps/network/views.py:287
+#: apps/network/views.py:293
 #, python-brace-format
 msgid "Done: {added} added, {matched} matched, {filled} details filled in, {linked} family links made. Every change can be undone in History."
 msgstr "Готово: добавлено — {added}, сопоставлено — {matched}, заполнено сведений — {filled}, семейных связей — {linked}. Любое изменение можно отменить в «Истории»."
@@ -3164,7 +3239,7 @@ msgstr "Введите адрес электронной почты вашего
 msgid "Send the link"
 msgstr "Отправить ссылку"
 
-#: templates/accounts/auth/password_reset.html:13 templates/accounts/settings/delete_account.html:18 templates/accounts/settings/family.html:35 templates/accounts/settings/two_factor_setup.html:19 templates/friends/contact_form.html:23 templates/genealogy/confirm_delete.html:12 templates/genealogy/events/form.html:37 templates/genealogy/people/detail.html:73 templates/genealogy/people/form.html:23 templates/genealogy/people/marriage_form.html:17 templates/genealogy/people/relative_form.html:26 templates/network/merge.html:92 templates/network/request.html:23
+#: templates/accounts/auth/password_reset.html:13 templates/accounts/settings/delete_account.html:18 templates/accounts/settings/family.html:35 templates/accounts/settings/two_factor_setup.html:19 templates/friends/contact_form.html:23 templates/genealogy/confirm_delete.html:12 templates/genealogy/events/form.html:37 templates/genealogy/people/detail.html:73 templates/genealogy/people/form.html:23 templates/genealogy/people/marriage_form.html:17 templates/genealogy/people/relative_form.html:26 templates/network/merge.html:78 templates/network/request.html:23
 msgid "Cancel"
 msgstr "Отмена"
 
@@ -3179,10 +3254,6 @@ msgstr "Новый пароль сохранён. Теперь можно вой
 #: templates/accounts/auth/password_reset_confirm.html:3 templates/accounts/auth/password_reset_confirm.html:6
 msgid "Set a new password"
 msgstr "Новый пароль"
-
-#: templates/accounts/auth/password_reset_confirm.html:11 templates/accounts/settings/general.html:15 templates/accounts/settings/general.html:52 templates/accounts/settings/security.html:10 templates/friends/contact_form.html:22 templates/genealogy/events/form.html:36 templates/genealogy/people/detail.html:72 templates/genealogy/people/form.html:22 templates/genealogy/people/marriage_form.html:16 templates/genealogy/people/relative_form.html:25 templates/genealogy/tree.html:113 templates/notify/settings.html:93
-msgid "Save"
-msgstr "Сохранить"
 
 #: templates/accounts/auth/password_reset_confirm.html:14
 msgid "This link is no longer valid, possibly because it has already been used. Please request a new one."
@@ -3768,10 +3839,6 @@ msgstr "Записать голосовое сообщение"
 msgid "Send a voice or video recording"
 msgstr "Отправить аудио- или видеозапись"
 
-#: templates/assistant/chat.html:40
-msgid "Send"
-msgstr "Отправить"
-
 #: templates/assistant/chat.html:42
 msgid "Answers are written by Google Gemini from the family information you can see here. It can make mistakes — check before saving. Do not write passwords or card numbers."
 msgstr "Ответы пишет Google Gemini на основе семейных данных, которые вы здесь видите. Он может ошибаться — проверяйте перед сохранением. Не пишите пароли и номера карт."
@@ -4177,10 +4244,6 @@ msgstr "Мои друзья"
 msgid "Friends of %(name)s"
 msgstr "Друзья: %(name)s"
 
-#: templates/friends/_groups.html:4
-msgid "Add"
-msgstr "Добавить"
-
 #: templates/friends/_groups.html:10 templates/genealogy/people/detail.html:200
 msgid "on Silai Rahm"
 msgstr "на Silai Rahm"
@@ -4204,10 +4267,6 @@ msgstr "Добавьте своих друзей, а также друзей р�
 #: templates/friends/contact_form.html:17
 msgid "The day and month are enough for a birthday reminder."
 msgstr "Для напоминания о дне рождения достаточно дня и месяца."
-
-#: templates/friends/contact_form.html:24 templates/genealogy/confirm_delete.html:3 templates/genealogy/events/detail.html:22 templates/genealogy/people/detail.html:104 templates/genealogy/people/detail.html:121 templates/genealogy/people/detail.html:240
-msgid "Delete"
-msgstr "Удалить"
 
 #: templates/friends/list.html:8
 msgid "People on Silai Rahm you follow and are connected with, and the friends of everyone in your family."
@@ -4659,7 +4718,7 @@ msgstr "Сравнить"
 msgid "The same person in your family tree"
 msgstr "Тот же человек в вашем древе"
 
-#: templates/genealogy/people/detail.html:223 templates/network/merge.html:36
+#: templates/genealogy/people/detail.html:223
 msgid "This is the same person"
 msgstr "Это тот же человек"
 
@@ -5000,7 +5059,7 @@ msgstr "В моём древе"
 msgid "Our family trees side by side"
 msgstr "Наши древа рядом"
 
-#: templates/network/connection.html:21 templates/network/merge.html:3 templates/network/merge.html:6
+#: templates/network/connection.html:21
 msgid "Compare and merge"
 msgstr "Сравнить и объединить"
 
@@ -5016,47 +5075,140 @@ msgstr "Древа больше не будут видны через эту с�
 msgid "End this connection?"
 msgstr "Прекратить эту связь?"
 
+#: templates/network/merge.html:3 templates/network/merge.html:6
+msgid "Merge family trees"
+msgstr "Объединить древа"
+
 #: templates/network/merge.html:7
 #, python-format
-msgid "What %(source)s’s family tree knows, taken over into the family tree of %(target)s. Nothing that differs is overwritten, and every change can be undone in History."
-msgstr "Сведения из древа (%(source)s) переносятся в древо (%(target)s). Различающиеся сведения не перезаписываются, любое изменение можно отменить в «Истории»."
+msgid "What %(source)s’s family tree knows is added to yours. Nothing you already have is changed, and every step can be undone in History."
+msgstr "Всё, что знает древо (%(source)s), добавляется в ваше. То, что у вас уже есть, не меняется, каждый шаг можно отменить в «Истории»."
 
-#: templates/network/merge.html:15
+#: templates/network/merge.html:11
+msgid "Someone in both trees"
+msgstr "Человек в обоих древах"
+
+#: templates/network/merge.html:12
+msgid "Check what is added"
+msgstr "Проверить, что добавится"
+
+#: templates/network/merge.html:13
+msgid "Merge"
+msgstr "Объединить"
+
+#: templates/network/merge.html:19
 msgid "Who is in both family trees?"
 msgstr "Кто есть в обоих древах?"
 
-#: templates/network/merge.html:18
+#: templates/network/merge.html:20
+msgid "Choose one person who is in both trees — for example yourself, your father or your grandfather. Everyone else is found from there."
+msgstr "Выберите одного человека, который есть в обоих древах, — например себя, отца или деда. Остальные найдутся от него."
+
+#: templates/network/merge.html:23
 #, python-format
 msgid "In %(name)s’s family tree"
 msgstr "В древе (%(name)s)"
 
-#: templates/network/merge.html:42
-msgid "Differences"
-msgstr "Различия"
+#: templates/network/merge.html:41
+msgid "This is the same person — continue"
+msgstr "Это один человек — продолжить"
 
-#: templates/network/merge.html:52
-msgid "The same person in both trees"
-msgstr "Одни и те же люди в обоих древах"
+#: templates/network/merge.html:47
+msgid "Your family tree already has everything"
+msgstr "В вашем древе уже всё есть"
+
+#: templates/network/merge.html:48
+#, python-format
+msgid "Everyone and everything in %(source)s’s tree that is related to you is already in yours."
+msgstr "Все люди и сведения из древа (%(source)s), связанные с вами, уже есть в вашем."
+
+#: templates/network/merge.html:49
+msgid "Open my family tree"
+msgstr "Открыть моё древо"
+
+#: templates/network/merge.html:58
+msgid "Starting point"
+msgstr "Отправная точка"
+
+#: templates/network/merge.html:59
+msgid "Not the same person — choose again"
+msgstr "Это разные люди — выбрать заново"
+
+#: templates/network/merge.html:62
+msgid "What will happen"
+msgstr "Что произойдёт"
+
+#: templates/network/merge.html:64
+#, python-format
+msgid "<b>%(counter)s</b> relative you do not have yet is added, with their family links"
+msgid_plural "<b>%(counter)s</b> relatives you do not have yet are added, with their family links"
+msgstr[0] "Добавится <b>%(counter)s</b> родственник, которого у вас нет, со связями"
+msgstr[1] "Добавятся <b>%(counter)s</b> родственника, которых у вас нет, со связями"
+msgstr[2] "Добавятся <b>%(counter)s</b> родственников, которых у вас нет, со связями"
 
 #: templates/network/merge.html:65
+#, python-format
+msgid "<b>%(counter)s</b> empty detail is filled in (dates, places, work…)"
+msgid_plural "<b>%(counter)s</b> empty details are filled in (dates, places, work…)"
+msgstr[0] "Заполнится <b>%(counter)s</b> пустое поле (даты, места, работа…)"
+msgstr[1] "Заполнятся <b>%(counter)s</b> пустых поля (даты, места, работа…)"
+msgstr[2] "Заполнятся <b>%(counter)s</b> пустых полей (даты, места, работа…)"
+
+#: templates/network/merge.html:66
+#, python-format
+msgid "<b>%(counter)s</b> person is recognised as the same in both trees"
+msgid_plural "<b>%(counter)s</b> people are recognised as the same in both trees"
+msgstr[0] "<b>%(counter)s</b> человек будет отмечен как один и тот же в обоих древах"
+msgstr[1] "<b>%(counter)s</b> человека будут отмечены как одни и те же в обоих древах"
+msgstr[2] "<b>%(counter)s</b> человек будут отмечены как одни и те же в обоих древах"
+
+#: templates/network/merge.html:67
+msgid "Nothing already in your tree is deleted or overwritten."
+msgstr "Ничего из вашего древа не удаляется и не перезаписывается."
+
+#: templates/network/merge.html:71
+#, python-format
+msgid "In %(counter)s place the trees differ"
+msgid_plural "In %(counter)s places the trees differ"
+msgstr[0] "В %(counter)s месте древа расходятся"
+msgstr[1] "В %(counter)s местах древа расходятся"
+msgstr[2] "В %(counter)s местах древа расходятся"
+
+#: templates/network/merge.html:72
+msgid "These stay as they are in your tree. Check them yourself later:"
+msgstr "Здесь остаётся так, как в вашем древе. Проверьте потом сами:"
+
+#: templates/network/merge.html:77
+msgid "Add all of it to my tree"
+msgstr "Добавить всё в моё древо"
+
+#: templates/network/merge.html:83
+msgid "Choose one by one"
+msgstr "Выбрать по одному"
+
+#: templates/network/merge.html:83
+msgid "Untick what you do not want, then press the button above."
+msgstr "Снимите отметки с ненужного и нажмите кнопку выше."
+
+#: templates/network/merge.html:85
 msgid "Relatives you do not have yet"
 msgstr "Родственники, которых у вас ещё нет"
 
-#: templates/network/merge.html:78
+#: templates/network/merge.html:96
 msgid "Details to fill in"
 msgstr "Сведения для дополнения"
 
-#: templates/network/merge.html:88
+#: templates/network/merge.html:105
+msgid "The same person in both trees"
+msgstr "Одни и те же люди в обоих древах"
+
+#: templates/network/merge.html:117
 #, python-format
 msgid "%(counter)s person of the other family tree is not related to anyone in both trees and stays out."
 msgid_plural "%(counter)s people of the other family tree are not related to anyone in both trees and stay out."
 msgstr[0] "%(counter)s человек из другого древа не связан ни с кем из общих людей и не переносится."
 msgstr[1] "%(counter)s человека из другого древа не связаны ни с кем из общих людей и не переносятся."
 msgstr[2] "%(counter)s человек из другого древа не связаны ни с кем из общих людей и не переносятся."
-
-#: templates/network/merge.html:91
-msgid "Merge what is ticked"
-msgstr "Объединить отмеченное"
 
 #: templates/network/profile.html:11
 msgid "Private account"

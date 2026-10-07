@@ -1,18 +1,23 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% translate "Compare and merge" %}{% endblock %}
+{% block title %}{% translate "Merge family trees" %}{% endblock %}
 {% block content %}
 <div class="pagehead"><div>
-  <h1>{% translate "Compare and merge" %}</h1>
-  <p>{% blocktranslate with source=source.display_name target=target.display_name %}What {{ source }}’s family tree knows, taken over into the family tree of {{ target }}. Nothing that differs is overwritten, and every change can be undone in History.{% endblocktranslate %}</p>
+  <h1>{% translate "Merge family trees" %}</h1>
+  <p>{% blocktranslate with source=source.display_name %}What {{ source }}’s family tree knows is added to yours. Nothing you already have is changed, and every step can be undone in History.{% endblocktranslate %}</p>
 </div></div>
 
-<section class="card">{% include "network/_plan_summary.html" %}</section>
+<ol class="merge-steps">
+  <li class="{% if plan.anchors or plan.matches %}done{% else %}now{% endif %}"><b>1</b>{% translate "Someone in both trees" %}</li>
+  <li class="{% if plan.anchors or plan.matches %}now{% endif %}"><b>2</b>{% translate "Check what is added" %}</li>
+  <li><b>3</b>{% translate "Merge" %}</li>
+</ol>
 
 {% if not plan.anchors and not plan.matches %}
 <form class="card" method="post" novalidate>{% csrf_token %}
   <input type="hidden" name="from" value="{{ source.username }}"><input type="hidden" name="to" value="{{ target.username }}">
   <h2>{% translate "Who is in both family trees?" %}</h2>
+  <p class="muted">{% translate "Choose one person who is in both trees — for example yourself, your father or your grandfather. Everyone else is found from there." %}</p>
   <div class="grid grid-2">
     <div class="field">
       <label for="anchor-source-name">{% blocktranslate with name=source.display_name %}In {{ name }}’s family tree{% endblocktranslate %}</label>
@@ -33,36 +38,51 @@
       <input type="hidden" name="target_person" id="anchor-target" value="{{ me_target.pk|default:'' }}">
     </div>
   </div>
-  <div class="form-actions"><button class="btn btn-primary" type="submit" name="anchor" value="1">{% translate "This is the same person" %}</button></div>
+  <div class="form-actions"><button class="btn btn-primary" type="submit" name="anchor" value="1">{% translate "This is the same person — continue" %}</button></div>
 </form>
-{% endif %}
 
-{% if plan.conflicts %}
-<section class="card">
-  <h2>{% include "partials/icon.html" with name="sparkle" %}{% translate "Differences" %}</h2>
-  <ul class="plan-warnings">{% for text in plan.conflicts %}<li>{{ text }}</li>{% endfor %}</ul>
-</section>
-{% endif %}
+{% elif plan.empty %}
+<div class="empty">
+  <div class="ornament">{% include "partials/icon.html" with name="check" %}</div>
+  <h3>{% translate "Your family tree already has everything" %}</h3>
+  <p>{% blocktranslate with source=source.display_name %}Everyone and everything in {{ source }}’s tree that is related to you is already in yours.{% endblocktranslate %}</p>
+  <a class="btn" href="{% url 'genealogy:tree' %}">{% include "partials/icon.html" with name="tree" %}{% translate "Open my family tree" %}</a>
+</div>
 
-{% if not plan.empty %}
+{% else %}
 <form method="post" novalidate data-no-busy>{% csrf_token %}
   <input type="hidden" name="from" value="{{ source.username }}"><input type="hidden" name="to" value="{{ target.username }}">
-  {% if plan.matches %}
-  <section class="card">
-    <h2>{% translate "The same person in both trees" %}</h2>
-    {% for m in plan.matches %}
-    <label class="plan-item">
-      <input type="checkbox" name="item" value="{{ m.key }}" checked>
-      {% include "partials/avatar.html" with person=m.target size="sm" branch="own" %}
-      <span class="spacer"><b>{{ m.target.short_name }}</b>{% if m.target.lifespan %} <span class="muted small">{{ m.target.lifespan }}</span>{% endif %}
-        <span class="muted small"> = {{ m.source.short_name }}{% if m.source.lifespan %} ({{ m.source.lifespan }}){% endif %} · {{ m.why }}</span></span>
-    </label>
-    {% endfor %}
+  <section class="card merge-summary">
+    {% if start %}
+    <div class="merge-start">
+      <span>{% translate "Starting point" %}: <b>{{ start.source.short_name }}</b> = <b>{{ start.target.short_name }}</b></span>
+      {% if start.chosen %}<button class="btn btn-sm btn-ghost" type="submit" name="reset" value="1" form="merge-reset">{% translate "Not the same person — choose again" %}</button>{% endif %}
+    </div>
+    {% endif %}
+    <h2>{% translate "What will happen" %}</h2>
+    <ul class="merge-facts">
+      {% if plan.additions %}<li>{% include "partials/icon.html" with name="plus" %}<span>{% blocktranslate count counter=plan.additions|length %}<b>{{ counter }}</b> relative you do not have yet is added, with their family links{% plural %}<b>{{ counter }}</b> relatives you do not have yet are added, with their family links{% endblocktranslate %}</span></li>{% endif %}
+      {% if plan.fills %}<li>{% include "partials/icon.html" with name="pencil" %}<span>{% blocktranslate count counter=plan.fills|length %}<b>{{ counter }}</b> empty detail is filled in (dates, places, work…){% plural %}<b>{{ counter }}</b> empty details are filled in (dates, places, work…){% endblocktranslate %}</span></li>{% endif %}
+      {% if plan.matches %}<li>{% include "partials/icon.html" with name="link" %}<span>{% blocktranslate count counter=plan.matches|length %}<b>{{ counter }}</b> person is recognised as the same in both trees{% plural %}<b>{{ counter }}</b> people are recognised as the same in both trees{% endblocktranslate %}</span></li>{% endif %}
+      <li>{% include "partials/icon.html" with name="shield" %}<span>{% translate "Nothing already in your tree is deleted or overwritten." %}</span></li>
+    </ul>
+    {% if plan.conflicts %}
+    <div class="notice warn merge-conflicts">
+      <div><b>{% blocktranslate count counter=plan.conflicts|length %}In {{ counter }} place the trees differ{% plural %}In {{ counter }} places the trees differ{% endblocktranslate %}</b>
+        <p>{% translate "These stay as they are in your tree. Check them yourself later:" %}</p>
+        <ul>{% for text in plan.conflicts %}<li>{{ text }}</li>{% endfor %}</ul></div>
+    </div>
+    {% endif %}
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">{% include "partials/icon.html" with name="merge" %}{% translate "Add all of it to my tree" %}</button>
+      <a class="btn btn-ghost" href="{% url 'friends:list' %}#people">{% translate "Cancel" %}</a>
+    </div>
   </section>
-  {% endif %}
-  {% if plan.additions %}
-  <section class="card">
-    <h2>{% translate "Relatives you do not have yet" %} <span class="muted">{{ plan.additions|length }}</span></h2>
+
+  <details class="card merge-details">
+    <summary><b>{% translate "Choose one by one" %}</b> <span class="muted small">{% translate "Untick what you do not want, then press the button above." %}</span></summary>
+    {% if plan.additions %}
+    <h3 class="subhead">{% translate "Relatives you do not have yet" %} <span class="muted">{{ plan.additions|length }}</span></h3>
     {% for a in plan.additions %}
     <label class="plan-item">
       <input type="checkbox" name="item" value="{{ a.key }}" checked>
@@ -71,26 +91,37 @@
         <span class="muted small"> · {{ a.relation_label }} — {{ a.anchor_name }}</span></span>
     </label>
     {% endfor %}
-  </section>
-  {% endif %}
-  {% if plan.fills %}
-  <section class="card">
-    <h2>{% translate "Details to fill in" %}</h2>
+    {% endif %}
+    {% if plan.fills %}
+    <h3 class="subhead">{% translate "Details to fill in" %}</h3>
     {% for f in plan.fills %}
     <label class="plan-item">
       <input type="checkbox" name="item" value="{{ f.key }}" checked>
       <span class="spacer"><b>{{ f.target.short_name }}</b> <span class="muted small">· {{ f.label|capfirst }}{% if f.field != "photo" %}: {{ f.value|truncatechars:80 }}{% endif %}</span></span>
     </label>
     {% endfor %}
-  </section>
-  {% endif %}
+    {% endif %}
+    {% if plan.matches %}
+    <h3 class="subhead">{% translate "The same person in both trees" %}</h3>
+    {% for m in plan.matches %}
+    <label class="plan-item">
+      <input type="checkbox" name="item" value="{{ m.key }}" checked>
+      {% include "partials/avatar.html" with person=m.target size="sm" branch="own" %}
+      <span class="spacer"><b>{{ m.target.short_name }}</b>{% if m.target.lifespan %} <span class="muted small">{{ m.target.lifespan }}</span>{% endif %}
+        <span class="muted small"> = {{ m.source.short_name }}{% if m.source.lifespan %} ({{ m.source.lifespan }}){% endif %} · {{ m.why }}</span></span>
+    </label>
+    {% endfor %}
+    {% endif %}
+  </details>
   {% if plan.unreached %}
   <p class="muted small">{% blocktranslate count counter=plan.unreached %}{{ counter }} person of the other family tree is not related to anyone in both trees and stays out.{% plural %}{{ counter }} people of the other family tree are not related to anyone in both trees and stay out.{% endblocktranslate %}</p>
   {% endif %}
-  <div class="form-actions sticky-actions">
-    <button class="btn btn-primary" type="submit">{% include "partials/icon.html" with name="merge" %}{% translate "Merge what is ticked" %}</button>
-    <a class="btn btn-ghost" href="{% url 'network:index' %}">{% translate "Cancel" %}</a>
-  </div>
+</form>
+{% endif %}
+{% if start and start.chosen %}
+<form id="merge-reset" method="post" hidden>{% csrf_token %}
+  <input type="hidden" name="from" value="{{ source.username }}"><input type="hidden" name="to" value="{{ target.username }}">
+  <input type="hidden" name="source_person" value="{{ start.source.pk }}"><input type="hidden" name="target_person" value="{{ start.target.pk }}">
 </form>
 {% endif %}
 {% endblock %}

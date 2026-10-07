@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: shajara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-07 08:41+0500\n"
+"POT-Creation-Date: 2026-10-07 09:27+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Shajara team\n"
 "Language-Team: Uzbek (Cyrillic)\n"
@@ -361,11 +361,11 @@ msgstr "Таклиф ҳаволаси энди ишламайди."
 msgid "Access has been removed."
 msgstr "Рухсат олиб ташланди."
 
-#: apps/accounts/views/family.py:66 apps/accounts/views/profile.py:34 apps/accounts/views/profile.py:45 apps/core/views.py:276 apps/friends/views.py:79 apps/genealogy/views/album.py:93 apps/genealogy/views/people.py:217 apps/genealogy/views/people.py:317 apps/genealogy/views/people.py:331 apps/genealogy/views/people.py:365 apps/network/views.py:308 apps/notify/views.py:74
+#: apps/accounts/views/family.py:66 apps/accounts/views/profile.py:34 apps/accounts/views/profile.py:45 apps/core/views.py:276 apps/friends/views.py:79 apps/genealogy/views/album.py:93 apps/genealogy/views/people.py:217 apps/genealogy/views/people.py:317 apps/genealogy/views/people.py:331 apps/genealogy/views/people.py:365 apps/network/views.py:320 apps/notify/views.py:74
 msgid "The information has been saved."
 msgstr "Маълумотлар сақланди."
 
-#: apps/accounts/views/family.py:80 apps/assistant/actions.py:178 apps/assistant/views.py:138 apps/genealogy/access.py:34 apps/genealogy/access.py:52 apps/genealogy/views/events.py:40 apps/genealogy/views/people.py:341 apps/genealogy/views/people.py:355 apps/genealogy/views/people.py:358 apps/network/services.py:280 apps/network/views.py:183 apps/network/views.py:273 apps/network/views.py:306 templates/errors/403.html:3 templates/errors/403.html:6 templates/errors/403_csrf.html:3
+#: apps/accounts/views/family.py:80 apps/assistant/actions.py:395 apps/assistant/views.py:152 apps/genealogy/access.py:34 apps/genealogy/access.py:52 apps/genealogy/views/events.py:40 apps/genealogy/views/people.py:341 apps/genealogy/views/people.py:355 apps/genealogy/views/people.py:358 apps/network/services.py:280 apps/network/views.py:183 apps/network/views.py:273 apps/network/views.py:318 templates/errors/403.html:3 templates/errors/403.html:6 templates/errors/403_csrf.html:3
 msgid "Access denied."
 msgstr "Кириш тақиқланган."
 
@@ -426,86 +426,173 @@ msgstr "Аввал парол ўрнатинг, акс ҳолда тизимга
 msgid "Google has been disconnected from your account."
 msgstr "Google ҳисобингиздан узилди."
 
-#: apps/assistant/actions.py:87 apps/genealogy/access.py:32
+#: apps/assistant/actions.py:139 apps/genealogy/access.py:32
 msgid "Person not found."
 msgstr "Қариндош топилмади."
 
-#: apps/assistant/actions.py:104
+#: apps/assistant/actions.py:147
+msgid "The event was not found."
+msgstr "Воқеа топилмади."
+
+#: apps/assistant/actions.py:220
 #, python-brace-format
 msgid "Add the event “{title}” ({who})."
 msgstr "«{title}» воқеасини қўшиш ({who})."
 
-#: apps/assistant/actions.py:106
+#: apps/assistant/actions.py:225
+#, python-brace-format
+msgid "Change the event “{title}”: {fields}."
+msgstr "«{title}» воқеасини ўзгартириш: {fields}."
+
+#: apps/assistant/actions.py:229
+#, python-brace-format
+msgid "Delete the event “{title}”."
+msgstr "«{title}» воқеасини ўчириш."
+
+#: apps/assistant/actions.py:231
 #, python-brace-format
 msgid "Add {name} as {relation} of {anchor}."
 msgstr "{name}ни {anchor} учун қўшиш: {relation}."
 
-#: apps/assistant/actions.py:112
+#: apps/assistant/actions.py:235
+#, python-brace-format
+msgid "Make {other} the {relation} of {person}."
+msgstr "{other} — {person} учун: {relation}."
+
+#: apps/assistant/actions.py:239
 #, python-brace-format
 msgid "Update {name}: {fields}."
 msgstr "{name} маълумотларини янгилаш: {fields}."
 
-#: apps/assistant/actions.py:141 apps/network/forms.py:55
+#: apps/assistant/actions.py:241
+#, python-brace-format
+msgid "Delete {name} from the family tree (can be restored from History)."
+msgstr "{name}ни шажарадан ўчириш («Тарих»дан тиклаш мумкин)."
+
+#: apps/assistant/actions.py:243
+#, python-brace-format
+msgid "Mark the marriage of {husband} and {wife} as divorced."
+msgstr "{husband} ва {wife} никоҳини «ажрашган» деб белгилаш."
+
+#: apps/assistant/actions.py:244
+#, python-brace-format
+msgid "Mark the marriage of {husband} and {wife} as not divorced."
+msgstr "{husband} ва {wife} никоҳини «ажрашмаган» деб белгилаш."
+
+#: apps/assistant/actions.py:247
+#, python-brace-format
+msgid "Leave a message for @{recipient}: “{text}”"
+msgstr "@{recipient} учун хабар қолдириш: «{text}»"
+
+#: apps/assistant/actions.py:299 apps/assistant/actions.py:324 apps/network/forms.py:55
 msgid "Choose the relation."
 msgstr "Қариндошликни танланг."
 
-#: apps/assistant/actions.py:150 apps/genealogy/forms.py:236
+#: apps/assistant/actions.py:308 apps/genealogy/forms.py:236
 msgid "Choose an existing person or enter the new person's first name."
 msgstr "Мавжуд одамни танланг ёки янги одамнинг исмини киритинг."
 
-#: apps/assistant/views.py:71 apps/assistant/views.py:156 templates/assistant/chat.html:16
-msgid "The assistant is not set up yet."
-msgstr "Ёрдамчи ҳали созланмаган."
+#: apps/assistant/actions.py:361 apps/genealogy/views/people.py:233
+msgid "Your own record cannot be deleted."
+msgstr "Ўз ёзувингизни ўчириб бўлмайди."
 
-#: apps/assistant/views.py:75
+#: apps/assistant/actions.py:364 apps/genealogy/views/people.py:236
+msgid "This record belongs to a relative who has an account, so it cannot be deleted."
+msgstr "Бу ёзув сайтда ҳисоби бор қариндошга тегишли, шунинг учун уни ўчириб бўлмайди."
+
+#: apps/assistant/actions.py:373
+msgid "This marriage was not found."
+msgstr "Бу никоҳ топилмади."
+
+#: apps/assistant/actions.py:376 apps/genealogy/forms.py:345
+msgid "She has another marriage now: it cannot be active again."
+msgstr "Ҳозир унинг бошқа никоҳи бор: бу никоҳни қайта фаол қилиб бўлмайди."
+
+#: apps/assistant/actions.py:389
+msgid "This person cannot be reached: they need an account linked to your family."
+msgstr "Бу одамга хабар етказиб бўлмайди: унинг оилангизга боғланган ҳисоби бўлиши керак."
+
+#: apps/assistant/actions.py:391 apps/assistant/views.py:75
 msgid "Write a message."
 msgstr "Хабар ёзинг."
 
-#: apps/assistant/views.py:77 apps/assistant/views.py:165
+#: apps/assistant/views.py:71 apps/assistant/views.py:173 templates/assistant/chat.html:16
+msgid "The assistant is not set up yet."
+msgstr "Ёрдамчи ҳали созланмаган."
+
+#: apps/assistant/views.py:77 apps/assistant/views.py:182
 msgid "That is enough for this hour. Please try again a little later."
 msgstr "Бу соат учун етарли. Бироздан сўнг яна уриниб кўринг."
 
-#: apps/assistant/views.py:100
+#: apps/assistant/views.py:104
 msgid "The assistant is busy. Please try again in a minute."
 msgstr "Ёрдамчи банд. Бир дақиқадан сўнг қайта уриниб кўринг."
 
-#: apps/assistant/views.py:101 apps/assistant/views.py:106
+#: apps/assistant/views.py:105 apps/assistant/views.py:110
 msgid "The assistant could not answer. Please try again."
 msgstr "Ёрдамчи жавоб бера олмади. Қайтадан уриниб кўринг."
 
-#: apps/assistant/views.py:105
-msgid "Here is what I suggest. Check it and press “Add” to save it."
-msgstr "Мана таклифим. Текшириб кўринг ва сақлаш учун «Қўшиш»ни босинг."
+#: apps/assistant/views.py:109
+msgid "Here is my proposal. Check it and press the button under it."
+msgstr "Мана таклифим. Текшириб кўринг ва остидаги тугмани босинг."
 
-#: apps/assistant/views.py:136
+#: apps/assistant/views.py:137 templates/friends/contact_form.html:24 templates/genealogy/confirm_delete.html:3 templates/genealogy/events/detail.html:22 templates/genealogy/people/detail.html:104 templates/genealogy/people/detail.html:121 templates/genealogy/people/detail.html:240
+msgid "Delete"
+msgstr "Ўчириш"
+
+#: apps/assistant/views.py:137 templates/assistant/chat.html:40
+msgid "Send"
+msgstr "Юбориш"
+
+#: apps/assistant/views.py:138 templates/friends/_groups.html:4
+msgid "Add"
+msgstr "Қўшиш"
+
+#: apps/assistant/views.py:138 templates/accounts/auth/password_reset_confirm.html:11 templates/accounts/settings/general.html:15 templates/accounts/settings/general.html:52 templates/accounts/settings/security.html:10 templates/friends/contact_form.html:22 templates/genealogy/events/form.html:36 templates/genealogy/people/detail.html:72 templates/genealogy/people/form.html:22 templates/genealogy/people/marriage_form.html:16 templates/genealogy/people/relative_form.html:25 templates/genealogy/tree.html:113 templates/notify/settings.html:93
+msgid "Save"
+msgstr "Сақлаш"
+
+#: apps/assistant/views.py:150
 msgid "This proposal has expired. Ask again."
 msgstr "Бу таклифнинг муддати ўтган. Қайтадан сўранг."
 
-#: apps/assistant/views.py:146 apps/assistant/views.py:213
+#: apps/assistant/views.py:161
+msgid "Deleted. It can be restored from History."
+msgstr "Ўчирилди. «Тарих»дан тиклаш мумкин."
+
+#: apps/assistant/views.py:161
+msgid "Deleted."
+msgstr "Ўчирилди."
+
+#: apps/assistant/views.py:162
+msgid "The message will be passed on."
+msgstr "Хабар етказилади."
+
+#: apps/assistant/views.py:162 apps/assistant/views.py:230
 msgid "Saved."
 msgstr "Сақланди."
 
-#: apps/assistant/views.py:159 apps/assistant/views.py:192 apps/genealogy/recordings.py:41
+#: apps/assistant/views.py:176 apps/assistant/views.py:209 apps/genealogy/recordings.py:41
 msgid "This is not a voice or video recording."
 msgstr "Бу овозли ёки видео ёзув эмас."
 
-#: apps/assistant/views.py:170
+#: apps/assistant/views.py:187
 msgid "The recording could not be turned into text. Please try again."
 msgstr "Ёзувни матнга айлантириб бўлмади. Қайтадан уриниб кўринг."
 
-#: apps/assistant/views.py:172
+#: apps/assistant/views.py:189
 msgid "No words were heard in the recording."
 msgstr "Ёзувда сўз эшитилмади."
 
-#: apps/assistant/views.py:189
+#: apps/assistant/views.py:206
 msgid "Write a title for the recording."
 msgstr "Ёзувга сарлавҳа ёзинг."
 
-#: apps/assistant/views.py:204
+#: apps/assistant/views.py:221
 msgid "The recording is saved, but it could not be turned into text now."
 msgstr "Ёзув сақланди, лекин ҳозир уни матнга айлантириб бўлмади."
 
-#: apps/assistant/views.py:206
+#: apps/assistant/views.py:223
 msgid "The recording is saved; turning it into text can be done a little later."
 msgstr "Ёзув сақланди; уни матнга бироздан кейин айлантириш мумкин."
 
@@ -1269,10 +1356,6 @@ msgstr "Ажрашган"
 msgid "The marriage stays in the family tree, shown as ended."
 msgstr "Никоҳ шажарада қолади, тугаган деб кўрсатилади."
 
-#: apps/genealogy/forms.py:345
-msgid "She has another marriage now: it cannot be active again."
-msgstr "Ҳозир унинг бошқа никоҳи бор: бу никоҳни қайта фаол қилиб бўлмайди."
-
 #: apps/genealogy/forms.py:359
 msgid "Voice or video message"
 msgstr "Овозли ёки видео хабар"
@@ -1281,7 +1364,7 @@ msgstr "Овозли ёки видео хабар"
 msgid "Remove the recording"
 msgstr "Ёзувни олиб ташлаш"
 
-#: apps/genealogy/forms.py:367 templates/accounts/invite/who_am_i.html:14 templates/genealogy/book.html:14 templates/genealogy/calculator.html:14 templates/genealogy/calculator.html:24 templates/genealogy/people/detail.html:217 templates/network/_place_fields.html:8 templates/network/merge.html:20 templates/network/merge.html:29 templates/partials/person_picker.html:6
+#: apps/genealogy/forms.py:367 templates/accounts/invite/who_am_i.html:14 templates/genealogy/book.html:14 templates/genealogy/calculator.html:14 templates/genealogy/calculator.html:24 templates/genealogy/people/detail.html:217 templates/network/_place_fields.html:8 templates/network/merge.html:25 templates/network/merge.html:34 templates/partials/person_picker.html:6
 msgid "Type a name…"
 msgstr "Исмни ёзинг…"
 
@@ -2470,14 +2553,6 @@ msgstr "Вафот этган"
 msgid "The person has been added to the family tree."
 msgstr "Қариндош шажарага қўшилди."
 
-#: apps/genealogy/views/people.py:233
-msgid "Your own record cannot be deleted."
-msgstr "Ўз ёзувингизни ўчириб бўлмайди."
-
-#: apps/genealogy/views/people.py:236
-msgid "This record belongs to a relative who has an account, so it cannot be deleted."
-msgstr "Бу ёзув сайтда ҳисоби бор қариндошга тегишли, шунинг учун уни ўчириб бўлмайди."
-
 #: apps/genealogy/views/people.py:241
 msgid "The record has been deleted. It can be restored from the history."
 msgstr "Ёзув ўчирилди. Уни тарихдан тиклаш мумкин."
@@ -2532,7 +2607,7 @@ msgstr "Шажарамга қўшилсин"
 msgid "Not in my family tree"
 msgstr "Шажарамда йўқ"
 
-#: apps/network/forms.py:21 templates/network/merge.html:27
+#: apps/network/forms.py:21 templates/network/merge.html:32
 msgid "In your family tree"
 msgstr "Шажарангизда"
 
@@ -2582,47 +2657,47 @@ msgstr "Дўстим"
 msgid "A few words (optional)"
 msgstr "Бир неча сўз (ихтиёрий)"
 
-#: apps/network/merge.py:165
+#: apps/network/merge.py:170
 #, python-brace-format
 msgid "{name}: the father differs — {here} here, {there} there."
 msgstr "{name}: отаси турлича — бу ерда {here}, у ерда {there}."
 
-#: apps/network/merge.py:166
+#: apps/network/merge.py:171
 #, python-brace-format
 msgid "{name}: the mother differs — {here} here, {there} there."
 msgstr "{name}: онаси турлича — бу ерда {here}, у ерда {there}."
 
-#: apps/network/merge.py:221
+#: apps/network/merge.py:226
 #, python-brace-format
 msgid "Father of {name}"
 msgstr "{name}нинг отаси"
 
-#: apps/network/merge.py:221
+#: apps/network/merge.py:226
 #, python-brace-format
 msgid "Mother of {name}"
 msgstr "{name}нинг онаси"
 
-#: apps/network/merge.py:236
+#: apps/network/merge.py:241
 #, python-brace-format
 msgid "Spouse of {name}"
 msgstr "{name}нинг турмуш ўртоғи"
 
-#: apps/network/merge.py:251
+#: apps/network/merge.py:256
 #, python-brace-format
 msgid "Child of {name}"
 msgstr "{name}нинг фарзанди"
 
-#: apps/network/merge.py:269
+#: apps/network/merge.py:274
 #, python-brace-format
 msgid "{name}: {field} is {here} here, {there} there."
 msgstr "{name}: {field} бу ерда {here}, у ерда {there}."
 
-#: apps/network/merge.py:273
+#: apps/network/merge.py:278
 #, python-brace-format
 msgid "{name}: passed away according to the other family tree."
 msgstr "{name}: бошқа шажарада вафот этган деб ёзилган."
 
-#: apps/network/merge.py:275
+#: apps/network/merge.py:280
 #, python-brace-format
 msgid "{name}: recorded as passed away here, alive in the other family tree."
 msgstr "{name}: бу ерда вафот этган, бошқа шажарада эса ҳаёт деб ёзилган."
@@ -2725,7 +2800,7 @@ msgstr "Сиз {name} билан боғландингиз."
 msgid "The connection has ended. The people stay in both family trees."
 msgstr "Боғланиш тугатилди. Одамлар иккала шажарада ҳам қолади."
 
-#: apps/network/views.py:287
+#: apps/network/views.py:293
 #, python-brace-format
 msgid "Done: {added} added, {matched} matched, {filled} details filled in, {linked} family links made. Every change can be undone in History."
 msgstr "Тайёр: {added} киши қўшилди, {matched} киши мосланди, {filled} та маълумот тўлдирилди, {linked} та оилавий боғланиш қилинди. Ҳар бир ўзгаришни «Тарих»да ортга қайтариш мумкин."
@@ -3136,7 +3211,7 @@ msgstr "Ҳисобингизга боғланган электрон почта 
 msgid "Send the link"
 msgstr "Ҳаволани юбориш"
 
-#: templates/accounts/auth/password_reset.html:13 templates/accounts/settings/delete_account.html:18 templates/accounts/settings/family.html:35 templates/accounts/settings/two_factor_setup.html:19 templates/friends/contact_form.html:23 templates/genealogy/confirm_delete.html:12 templates/genealogy/events/form.html:37 templates/genealogy/people/detail.html:73 templates/genealogy/people/form.html:23 templates/genealogy/people/marriage_form.html:17 templates/genealogy/people/relative_form.html:26 templates/network/merge.html:92 templates/network/request.html:23
+#: templates/accounts/auth/password_reset.html:13 templates/accounts/settings/delete_account.html:18 templates/accounts/settings/family.html:35 templates/accounts/settings/two_factor_setup.html:19 templates/friends/contact_form.html:23 templates/genealogy/confirm_delete.html:12 templates/genealogy/events/form.html:37 templates/genealogy/people/detail.html:73 templates/genealogy/people/form.html:23 templates/genealogy/people/marriage_form.html:17 templates/genealogy/people/relative_form.html:26 templates/network/merge.html:78 templates/network/request.html:23
 msgid "Cancel"
 msgstr "Бекор қилиш"
 
@@ -3151,10 +3226,6 @@ msgstr "Янги паролингиз сақланди. Энди тизимга 
 #: templates/accounts/auth/password_reset_confirm.html:3 templates/accounts/auth/password_reset_confirm.html:6
 msgid "Set a new password"
 msgstr "Янги парол ўрнатиш"
-
-#: templates/accounts/auth/password_reset_confirm.html:11 templates/accounts/settings/general.html:15 templates/accounts/settings/general.html:52 templates/accounts/settings/security.html:10 templates/friends/contact_form.html:22 templates/genealogy/events/form.html:36 templates/genealogy/people/detail.html:72 templates/genealogy/people/form.html:22 templates/genealogy/people/marriage_form.html:16 templates/genealogy/people/relative_form.html:25 templates/genealogy/tree.html:113 templates/notify/settings.html:93
-msgid "Save"
-msgstr "Сақлаш"
 
 #: templates/accounts/auth/password_reset_confirm.html:14
 msgid "This link is no longer valid, possibly because it has already been used. Please request a new one."
@@ -3728,10 +3799,6 @@ msgstr "Овозли хабар ёзиш"
 msgid "Send a voice or video recording"
 msgstr "Овозли ёки видео ёзув юбориш"
 
-#: templates/assistant/chat.html:40
-msgid "Send"
-msgstr "Юбориш"
-
 #: templates/assistant/chat.html:42
 msgid "Answers are written by Google Gemini from the family information you can see here. It can make mistakes — check before saving. Do not write passwords or card numbers."
 msgstr "Жавобларни Google Gemini сиз бу ерда кўра оладиган оилавий маълумотлар асосида ёзади. У хато қилиши мумкин — сақлашдан олдин текширинг. Парол ёки карта рақамларини ёзманг."
@@ -4129,10 +4196,6 @@ msgstr "Дўстларим"
 msgid "Friends of %(name)s"
 msgstr "Дўстлари: %(name)s"
 
-#: templates/friends/_groups.html:4
-msgid "Add"
-msgstr "Қўшиш"
-
 #: templates/friends/_groups.html:10 templates/genealogy/people/detail.html:200
 msgid "on Silai Rahm"
 msgstr "Silai Rahm сайтида"
@@ -4156,10 +4219,6 @@ msgstr "Ўз дўстларингизни, ота-онангиз ва бобо-�
 #: templates/friends/contact_form.html:17
 msgid "The day and month are enough for a birthday reminder."
 msgstr "Туғилган кун эслатмаси учун кун ва ой кифоя."
-
-#: templates/friends/contact_form.html:24 templates/genealogy/confirm_delete.html:3 templates/genealogy/events/detail.html:22 templates/genealogy/people/detail.html:104 templates/genealogy/people/detail.html:121 templates/genealogy/people/detail.html:240
-msgid "Delete"
-msgstr "Ўчириш"
 
 #: templates/friends/list.html:8
 msgid "People on Silai Rahm you follow and are connected with, and the friends of everyone in your family."
@@ -4601,7 +4660,7 @@ msgstr "Солиштириш"
 msgid "The same person in your family tree"
 msgstr "Шажарангиздаги айнан шу одам"
 
-#: templates/genealogy/people/detail.html:223 templates/network/merge.html:36
+#: templates/genealogy/people/detail.html:223
 msgid "This is the same person"
 msgstr "Бу ўша одам"
 
@@ -4936,7 +4995,7 @@ msgstr "Менинг шажарамда"
 msgid "Our family trees side by side"
 msgstr "Шажараларимиз ёнма-ён"
 
-#: templates/network/connection.html:21 templates/network/merge.html:3 templates/network/merge.html:6
+#: templates/network/connection.html:21
 msgid "Compare and merge"
 msgstr "Солиштириш ва бирлаштириш"
 
@@ -4952,45 +5011,130 @@ msgstr "Шажаралар энди бу боғланиш орқали кўри�
 msgid "End this connection?"
 msgstr "Бу боғланиш тугатилсинми?"
 
+#: templates/network/merge.html:3 templates/network/merge.html:6
+msgid "Merge family trees"
+msgstr "Шажараларни бирлаштириш"
+
 #: templates/network/merge.html:7
 #, python-format
-msgid "What %(source)s’s family tree knows, taken over into the family tree of %(target)s. Nothing that differs is overwritten, and every change can be undone in History."
-msgstr "%(source)s шажарасидаги маълумотлар %(target)s шажарасига олинади. Фарқ қиладиган маълумотлар устидан ёзилмайди, ҳар бир ўзгаришни «Тарих»да ортга қайтариш мумкин."
+msgid "What %(source)s’s family tree knows is added to yours. Nothing you already have is changed, and every step can be undone in History."
+msgstr "%(source)s шажарасидаги маълумотлар сизнинг шажарангизга қўшилади. Сизда бор нарсалар ўзгармайди, ҳар бир қадамни «Тарих»да қайтариш мумкин."
 
-#: templates/network/merge.html:15
+#: templates/network/merge.html:11
+msgid "Someone in both trees"
+msgstr "Иккала шажарада бор одам"
+
+#: templates/network/merge.html:12
+msgid "Check what is added"
+msgstr "Нима қўшилишини кўриш"
+
+#: templates/network/merge.html:13
+msgid "Merge"
+msgstr "Бирлаштириш"
+
+#: templates/network/merge.html:19
 msgid "Who is in both family trees?"
 msgstr "Иккала шажарада ким бор?"
 
-#: templates/network/merge.html:18
+#: templates/network/merge.html:20
+msgid "Choose one person who is in both trees — for example yourself, your father or your grandfather. Everyone else is found from there."
+msgstr "Иккала шажарада ҳам бор битта одамни танланг — масалан, ўзингизни, отангизни ёки бобонгизни. Қолганлар шундан топилади."
+
+#: templates/network/merge.html:23
 #, python-format
 msgid "In %(name)s’s family tree"
 msgstr "%(name)s шажарасида"
 
-#: templates/network/merge.html:42
-msgid "Differences"
-msgstr "Фарқлар"
+#: templates/network/merge.html:41
+msgid "This is the same person — continue"
+msgstr "Бу битта одам — давом этиш"
 
-#: templates/network/merge.html:52
-msgid "The same person in both trees"
-msgstr "Иккала шажарадаги бир хил одамлар"
+#: templates/network/merge.html:47
+msgid "Your family tree already has everything"
+msgstr "Шажарангизда ҳаммаси бор"
+
+#: templates/network/merge.html:48
+#, python-format
+msgid "Everyone and everything in %(source)s’s tree that is related to you is already in yours."
+msgstr "%(source)s шажарасидаги сизга алоқадор ҳамма одам ва маълумот сизнинг шажарангизда аллақачон бор."
+
+#: templates/network/merge.html:49
+msgid "Open my family tree"
+msgstr "Шажарамни очиш"
+
+#: templates/network/merge.html:58
+msgid "Starting point"
+msgstr "Бошланиш нуқтаси"
+
+#: templates/network/merge.html:59
+msgid "Not the same person — choose again"
+msgstr "Бу бошқа одам — қайтадан танлаш"
+
+#: templates/network/merge.html:62
+msgid "What will happen"
+msgstr "Нима бўлади"
+
+#: templates/network/merge.html:64
+#, python-format
+msgid "<b>%(counter)s</b> relative you do not have yet is added, with their family links"
+msgid_plural "<b>%(counter)s</b> relatives you do not have yet are added, with their family links"
+msgstr[0] "Сизда йўқ <b>%(counter)s</b> та қариндош оилавий боғланишлари билан қўшилади"
 
 #: templates/network/merge.html:65
+#, python-format
+msgid "<b>%(counter)s</b> empty detail is filled in (dates, places, work…)"
+msgid_plural "<b>%(counter)s</b> empty details are filled in (dates, places, work…)"
+msgstr[0] "<b>%(counter)s</b> та бўш маълумот тўлдирилади (саналар, жойлар, иш…)"
+
+#: templates/network/merge.html:66
+#, python-format
+msgid "<b>%(counter)s</b> person is recognised as the same in both trees"
+msgid_plural "<b>%(counter)s</b> people are recognised as the same in both trees"
+msgstr[0] "<b>%(counter)s</b> та одам иккала шажарада битта одам деб белгиланади"
+
+#: templates/network/merge.html:67
+msgid "Nothing already in your tree is deleted or overwritten."
+msgstr "Шажарангизда бор ҳеч нарса ўчирилмайди ва устидан ёзилмайди."
+
+#: templates/network/merge.html:71
+#, python-format
+msgid "In %(counter)s place the trees differ"
+msgid_plural "In %(counter)s places the trees differ"
+msgstr[0] "%(counter)s та жойда шажаралар фарқ қилади"
+
+#: templates/network/merge.html:72
+msgid "These stay as they are in your tree. Check them yourself later:"
+msgstr "Улар шажарангизда қандай бўлса, шундай қолади. Кейин ўзингиз текшириб чиқинг:"
+
+#: templates/network/merge.html:77
+msgid "Add all of it to my tree"
+msgstr "Ҳаммасини шажарамга қўшиш"
+
+#: templates/network/merge.html:83
+msgid "Choose one by one"
+msgstr "Битталаб танлаш"
+
+#: templates/network/merge.html:83
+msgid "Untick what you do not want, then press the button above."
+msgstr "Керак бўлмаганларини белгидан чиқаринг, сўнг юқоридаги тугмани босинг."
+
+#: templates/network/merge.html:85
 msgid "Relatives you do not have yet"
 msgstr "Сизда ҳали йўқ қариндошлар"
 
-#: templates/network/merge.html:78
+#: templates/network/merge.html:96
 msgid "Details to fill in"
 msgstr "Тўлдириладиган маълумотлар"
 
-#: templates/network/merge.html:88
+#: templates/network/merge.html:105
+msgid "The same person in both trees"
+msgstr "Иккала шажарадаги бир хил одамлар"
+
+#: templates/network/merge.html:117
 #, python-format
 msgid "%(counter)s person of the other family tree is not related to anyone in both trees and stays out."
 msgid_plural "%(counter)s people of the other family tree are not related to anyone in both trees and stay out."
 msgstr[0] "Бошқа шажарадаги %(counter)s киши иккала шажарадаги ҳеч кимга боғланмаган, шунинг учун қўшилмайди."
-
-#: templates/network/merge.html:91
-msgid "Merge what is ticked"
-msgstr "Белгиланганларни бирлаштириш"
 
 #: templates/network/profile.html:11
 msgid "Private account"

@@ -1,6 +1,6 @@
 {% load i18n %}
 <div class="plan-stats">
-  <div><b>{{ plan.matches|length|add:plan.anchors|length }}</b><span>{% translate "people in both trees" %}</span></div>
+  <div><b>{{ plan.in_both }}</b><span>{% translate "people in both trees" %}</span></div>
   <div><b>{{ plan.additions|length }}</b><span>{% translate "relatives you do not have yet" %}</span></div>
   <div><b>{{ plan.fills|length }}</b><span>{% translate "details to fill in" %}</span></div>
   <div class="{% if plan.conflicts %}warn{% endif %}"><b>{{ plan.conflicts|length }}</b><span>{% translate "differences" %}</span></div>

@@ -39,6 +39,8 @@
     });
     if (list) html.push("<ul><li>" + list.join("</li><li>") + "</li></ul>");
     return html.join("")
+      // Links only to pages of this site ([Name](/qarindoshlar/12/)).
+      .replace(/\[([^\]]+)\]\((\/(?!\/)[^)\s"'<>]*)\)/g, '<a href="$2">$1</a>')
       .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
       .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<i>$2</i>");
   }
@@ -61,7 +63,8 @@
     card.querySelector(".ai-proposal-title").textContent = p.summary;
     if (p.story) card.querySelector(".ai-proposal-story").innerHTML = render(p.story);
     var yes = card.querySelector("[data-yes]"), no = card.querySelector("[data-no]");
-    yes.textContent = gettext("Add");
+    yes.textContent = p.button || gettext("Add");
+    if (p.danger) { card.classList.add("is-danger"); yes.classList.remove("btn-primary"); yes.classList.add("btn-danger"); }
     no.textContent = gettext("No, thanks");
     yes.addEventListener("click", function () {
       yes.disabled = no.disabled = true;

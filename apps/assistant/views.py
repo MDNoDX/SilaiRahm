@@ -8,7 +8,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils import translation
+from django.utils import timezone, translation
 from django.utils.translation import get_language
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
@@ -76,10 +76,14 @@ def message(request):
     if not _spend(request):
         return JsonResponse({"error": _("That is enough for this hour. Please try again a little later.")}, status=429)
 
+    from .models import Note
+
     contents = _history(list(data.get("history") or []) + [{"role": "user", "text": text}])
     editing = can_edit(request.user, request.archive)
-    system = describe(request)
-    archive = request.archive
+    notes = list(Note.objects.filter(recipient=request.user, delivered_at=None).select_related("author")[:5])
+    system = describe(request, notes)
+    archive, user = request.archive, request.user
+    tools = actions.tools_for(editing)
     language = get_language()
 
     def lines():
@@ -90,20 +94,22 @@ def message(request):
         """One JSON object per line: {"t": text piece} …, then {"done": true, "proposals": […]} or {"error": …}."""
         written, proposals = [], []
         try:
-            for kind, value in gemini.stream(system, contents, tools=actions.TOOLS if editing else None):
+            for kind, value in gemini.stream(system, contents, tools=tools):
                 if kind == "text":
                     written.append(value)
                     yield json.dumps({"t": value}) + "\n"
-                elif editing:
-                    proposals = _proposals(archive, value)
+                else:
+                    proposals = _proposals(archive, value, {t["name"] for t in tools}, user)
         except gemini.AIError as exc:
             message = (_("The assistant is busy. Please try again in a minute.") if str(exc) == "busy"
                        else _("The assistant could not answer. Please try again."))
             yield json.dumps({"error": message}) + "\n"
             return
         if not "".join(written).strip():
-            yield json.dumps({"t": _("Here is what I suggest. Check it and press “Add” to save it.") if proposals
+            yield json.dumps({"t": _("Here is my proposal. Check it and press the button under it.") if proposals
                               else _("The assistant could not answer. Please try again.")}) + "\n"
+        if notes and "".join(written).strip():  # passed on: the messages left for this user are delivered
+            Note.objects.filter(pk__in=[n.pk for n in notes], recipient=user).update(delivered_at=timezone.now())
         yield json.dumps({"done": True, "proposals": proposals}) + "\n"
 
     response = StreamingHttpResponse(lines(), content_type="application/x-ndjson; charset=utf-8")
@@ -112,16 +118,24 @@ def message(request):
     return response
 
 
-def _proposals(archive, calls):
+def _proposals(archive, calls, allowed, user):
     out = []
     for call in calls[:5]:
         name, args = call.get("name"), call.get("args") or {}
-        if name not in {t["name"] for t in actions.TOOLS} or not isinstance(args, dict):
+        if name not in allowed or not isinstance(args, dict):
             continue
         args = actions.clean_args(args)
+        if name == "leave_message":  # the name the model heard → the real account
+            found = actions.resolve_recipient(user, archive, args.get("recipient"))
+            if found is None:
+                continue
+            args["recipient"] = found.username
         out.append({
             "summary": actions.describe(archive, name, args),
-            "story": str(args.get("story") or args.get("life_story_append") or "")[:MAX_TEXT],
+            "story": str(args.get("story") or args.get("story_append") or args.get("life_story_append") or "")[:MAX_TEXT],
+            "danger": name in actions.DELETING,
+            "button": (_("Delete") if name in actions.DELETING else _("Send") if name == "leave_message"
+                       else _("Add") if name.startswith("add_") else _("Save")),
             "token": signing.dumps({"o": archive.pk, "n": name, "a": args}, salt=SALT),
         })
     return out
@@ -137,13 +151,16 @@ def apply(request):
     if proposal.get("o") != request.archive.pk:
         return JsonResponse({"error": _("Access denied.")}, status=403)
     try:
-        owner = require_edit(request)
+        owner = require_edit(request) if proposal["n"] in actions.EDITING else request.archive
         result = actions.run(owner, request.user, proposal["n"], proposal["a"])
     except PermissionDenied as exc:
         return JsonResponse({"error": str(exc)}, status=403)
     except actions.Refused as exc:
         return JsonResponse({"error": str(exc)}, status=400)
-    return JsonResponse({"ok": True, "message": _("Saved."), "url": result.get_absolute_url()})
+    url = reverse(result) if isinstance(result, str) else result.get_absolute_url()
+    message = {"delete_person": _("Deleted. It can be restored from History."), "delete_event": _("Deleted."),
+               "leave_message": _("The message will be passed on.")}.get(proposal["n"], _("Saved."))
+    return JsonResponse({"ok": True, "message": message, "url": url})
 
 
 @login_required

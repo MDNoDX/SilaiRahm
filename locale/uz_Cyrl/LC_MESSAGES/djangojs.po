@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: shajara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-07 08:30+0500\n"
+"POT-Creation-Date: 2026-10-07 09:24+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Shajara team\n"
 "Language-Team: Uzbek (Cyrillic)\n"
@@ -34,7 +34,7 @@ msgstr "Қоронғи"
 msgid "Colour theme"
 msgstr "Ранг мавзуси"
 
-#: static/js/app.js:130 static/js/assistant.js:68 static/js/assistant.js:247
+#: static/js/app.js:130 static/js/assistant.js:71 static/js/assistant.js:250
 msgid "Saving…"
 msgstr "Сақланмоқда…"
 
@@ -46,7 +46,7 @@ msgstr "Файл танлаш"
 msgid "No file chosen"
 msgstr "Файл танланмаган"
 
-#: static/js/app.js:201 static/js/assistant.js:217
+#: static/js/app.js:201 static/js/assistant.js:220
 msgid "Remove"
 msgstr "Олиб ташлаш"
 
@@ -78,7 +78,7 @@ msgstr "Браузер созламаларида блокланган"
 msgid "Off for this device"
 msgstr "Бу қурилмада ўчирилган"
 
-#: static/js/app.js:715 static/js/app.js:795 static/js/assistant.js:197
+#: static/js/app.js:715 static/js/app.js:795 static/js/assistant.js:200
 msgid "The recording is too long: up to 4 MB (about 25 minutes of voice or 1 minute of video)."
 msgstr "Ёзув жуда узун: 4 MB гача (тахминан 25 дақиқа овоз ёки 1 дақиқа видео)."
 
@@ -90,71 +90,71 @@ msgstr "Бу браузер ёзувни бириктира олмайди. Ун
 msgid "The camera could not be turned on. Allow access to the camera and the microphone in the browser."
 msgstr "Камерани ёқиб бўлмади. Браузерда камера ва микрофонга рухсат беринг."
 
-#: static/js/app.js:784 static/js/assistant.js:328
+#: static/js/app.js:784 static/js/assistant.js:331
 msgid "The microphone could not be turned on. Allow access to the microphone in the browser."
 msgstr "Микрофонни ёқиб бўлмади. Браузерда микрофонга рухсат беринг."
 
-#: static/js/app.js:811 static/js/assistant.js:278
+#: static/js/app.js:811 static/js/assistant.js:281
 msgid "Writing it down…"
 msgstr "Матнга ёзилмоқда…"
 
-#: static/js/app.js:823 static/js/assistant.js:96 static/js/assistant.js:151
+#: static/js/app.js:823 static/js/assistant.js:99 static/js/assistant.js:154
 msgid "Something went wrong. Please try again."
 msgstr "Нимадир хато кетди. Қайтадан уриниб кўринг."
 
-#: static/js/assistant.js:64
+#: static/js/assistant.js:66
 msgid "Add"
 msgstr "Қўшиш"
 
-#: static/js/assistant.js:65
+#: static/js/assistant.js:68
 msgid "No, thanks"
 msgstr "Йўқ, раҳмат"
 
-#: static/js/assistant.js:73 static/js/assistant.js:258
+#: static/js/assistant.js:76 static/js/assistant.js:261
 msgid "Open"
 msgstr "Очиш"
 
-#: static/js/assistant.js:74 static/js/assistant.js:272
+#: static/js/assistant.js:77 static/js/assistant.js:275
 msgid "Saved"
 msgstr "Сақланди"
 
-#: static/js/assistant.js:84
+#: static/js/assistant.js:87
 msgid "Not saved"
 msgstr "Сақланмади"
 
-#: static/js/assistant.js:98 static/js/assistant.js:166 static/js/assistant.js:235
+#: static/js/assistant.js:101 static/js/assistant.js:169 static/js/assistant.js:238
 msgid "No connection. Check the internet and try again."
 msgstr "Алоқа йўқ. Интернетни текшириб, қайтадан уриниб кўринг."
 
-#: static/js/assistant.js:137
+#: static/js/assistant.js:140
 msgid "Proposed"
 msgstr "Таклиф қилинди"
 
-#: static/js/assistant.js:216 static/js/assistant.js:282
+#: static/js/assistant.js:219 static/js/assistant.js:285
 msgid "Turn into text and send"
 msgstr "Матнга айлантириб юбориш"
 
-#: static/js/assistant.js:219
+#: static/js/assistant.js:222
 msgid "Title"
 msgstr "Сарлавҳа"
 
-#: static/js/assistant.js:220
+#: static/js/assistant.js:223
 msgid "For example: Grandfather tells about his childhood"
 msgstr "Масалан: Бобом болалиги ҳақида сўзлайди"
 
-#: static/js/assistant.js:221
+#: static/js/assistant.js:224
 msgid "Also write it down as text"
 msgstr "Матн қилиб ҳам ёзилсин"
 
-#: static/js/assistant.js:222 static/js/assistant.js:251
+#: static/js/assistant.js:225 static/js/assistant.js:254
 msgid "Save as an event"
 msgstr "Воқеа сифатида сақлаш"
 
-#: static/js/assistant.js:241
+#: static/js/assistant.js:244
 msgid "Write a title for the recording."
 msgstr "Ёзувга сарлавҳа ёзинг."
 
-#: static/js/assistant.js:260
+#: static/js/assistant.js:263
 msgid "Edit"
 msgstr "Таҳрирлаш"
 

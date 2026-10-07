@@ -272,6 +272,12 @@ def merge_view(request):
     if not can_view(request.user, source) or not can_edit(request.user, target):
         raise PermissionDenied(_("Access denied."))
     back = reverse("network:merge") + f"?from={source.username}&to={target.username}"
+    if request.method == "POST" and "reset" in request.POST:  # the starting pair was wrong: forget it
+        a = Person.objects.filter(pk=request.POST.get("source_person"), owner=source).first()
+        b = Person.objects.filter(pk=request.POST.get("target_person"), owner=target).first()
+        if a and b:
+            merge.link_match(a, b, request.user, rejected=True)
+        return redirect(back)
     if request.method == "POST" and "anchor" in request.POST:
         a = Person.objects.filter(pk=request.POST.get("source_person"), owner=source).first()
         b = Person.objects.filter(pk=request.POST.get("target_person"), owner=target).first()
@@ -289,8 +295,14 @@ def merge_view(request):
                          .format(**done))
         return redirect(reverse("genealogy:tree") if target.pk == request.archive.pk else back)
     plan = merge.analyse(source, target, anchors=anchors, with_stories=can_see_stories(request.user, source))
+    start = None
+    if plan.anchors:
+        s_pk, t_pk = plan.anchors[0]
+        start = {"source": Person.objects.filter(pk=s_pk).first(), "target": Person.objects.filter(pk=t_pk).first(),
+                 "chosen": (s_pk, t_pk) not in anchors}  # chosen on this page (can be undone), not the user's own pair
     return render(request, "network/merge.html", {
         "plan": plan, "source": source, "target": target, "me_source": me_source, "me_target": me_target,
+        "start": start,
     })
 
 

@@ -265,6 +265,96 @@ class AssistantTests(TestCase):
         self.assertEqual(part["mimeType"], "video/webm")
 
 
+@override_settings(GEMINI_API_KEY="test-key")
+class AssistantPowersTests(TestCase):
+    """Deleting, correcting, linking and messages — always through a confirmed proposal."""
+
+    def setUp(self):
+        self.user, self.p = make_family()
+        self.client.force_login(self.user)
+
+    def propose(self, name, args, text=""):
+        with mock.patch("apps.assistant.gemini.requests.post", return_value=_answer(text, [{"name": name, "args": args}])):
+            response = self.client.post(reverse("assistant:message"), json.dumps({"message": "x", "history": []}),
+                                        content_type="application/json")
+            return read_stream(response)["proposals"]  # the answer is written while it is read
+
+    def apply(self, proposal):
+        return self.client.post(reverse("assistant:apply"), json.dumps({"token": proposal["token"]}),
+                                content_type="application/json")
+
+    def test_delete_person_and_restore_rules(self):
+        aunt = self.p["aunt"]
+        proposal = self.propose("delete_person", {"person_id": aunt.pk})[0]
+        self.assertTrue(proposal["danger"])
+        self.assertTrue(Person.objects.filter(pk=aunt.pk).exists())  # nothing happens before the button
+        self.assertTrue(self.apply(proposal).json()["ok"])
+        self.assertFalse(Person.objects.filter(pk=aunt.pk).exists())
+        from apps.genealogy.models import Change
+        self.assertTrue(Change.objects.filter(action="deleted", subject__contains=aunt.first_name).exists())
+        own = self.propose("delete_person", {"person_id": self.p["me"].pk})[0]
+        self.assertEqual(self.apply(own).status_code, 400)
+        self.assertTrue(Person.objects.filter(pk=self.p["me"].pk).exists())
+
+    def test_update_and_delete_event(self):
+        event = Event.objects.create(owner=self.user, kind="other", title="Eski", description="Bir kun")
+        self.apply(self.propose("update_event", {"event_id": event.pk, "title": "Yangi", "story_append": "Davomi"})[0])
+        event.refresh_from_db()
+        self.assertEqual((event.title, event.description), ("Yangi", "Bir kun\n\nDavomi"))
+        self.apply(self.propose("delete_event", {"event_id": event.pk})[0])
+        self.assertFalse(Event.objects.filter(pk=event.pk).exists())
+
+    def test_link_and_divorce(self):
+        lone = Person.objects.create(owner=self.user, first_name="Zarina", gender="female")
+        self.apply(self.propose("link_relatives", {"person_id": self.p["father"].pk, "relation": "spouse",
+                                                   "other_id": lone.pk})[0])
+        from apps.genealogy.models import Marriage
+        self.assertTrue(Marriage.objects.filter(husband=self.p["father"], wife=lone).exists())
+        self.apply(self.propose("set_divorced", {"husband_id": self.p["father"].pk, "wife_id": lone.pk,
+                                                 "divorced": True})[0])
+        self.assertTrue(Marriage.objects.get(husband=self.p["father"], wife=lone).is_divorced)
+
+    def test_viewer_cannot_change(self):
+        viewer = account("koruvchi")
+        from apps.accounts.models import Membership
+        Membership.objects.create(owner=self.user, member=viewer, role="viewer")
+        viewer.active_archive = self.user
+        viewer.save()
+        self.client.force_login(viewer)
+        self.assertEqual(self.propose("delete_person", {"person_id": self.p["aunt"].pk}), [])  # not offered
+
+    def test_message_left_and_passed_on(self):
+        brother = account("Mukhammadkodir", "Muhammadqodir")
+        self.p["father"].linked_user = brother  # an account linked in the tree
+        self.p["father"].save()
+        proposal = self.propose("leave_message", {"recipient": "Muhammadqodir", "text": "UFC'ni mendan yaxshi bilmaysan"})[0]
+        self.assertIn("@Mukhammadkodir", proposal["summary"])
+        self.apply(proposal)
+        from apps.assistant.models import Note
+        note = Note.objects.get()
+        self.assertEqual((note.author, note.recipient), (self.user, brother))
+        self.client.force_login(brother)
+        with mock.patch("apps.assistant.gemini.requests.post", return_value=_answer("Ukangiz aytdi: …")) as post:
+            self.client.post(reverse("assistant:message"), json.dumps({"message": "Salom", "history": []}),
+                             content_type="application/json").getvalue()
+        system = post.call_args.kwargs["json"]["systemInstruction"]["parts"][0]["text"]
+        self.assertIn("UFC'ni mendan yaxshi bilmaysan", system)
+        note.refresh_from_db()
+        self.assertIsNotNone(note.delivered_at)
+
+    def test_message_to_a_stranger_is_not_offered(self):
+        account("begona", "Begona")
+        self.assertEqual(self.propose("leave_message", {"recipient": "begona", "text": "salom"}), [])
+
+    def test_secrets_rule_in_instructions(self):
+        with mock.patch("apps.assistant.gemini.requests.post", return_value=_answer("…")) as post:
+            self.client.post(reverse("assistant:message"), json.dumps({"message": "Qaysi modelsan?", "history": []}),
+                             content_type="application/json").getvalue()
+        system = post.call_args.kwargs["json"]["systemInstruction"]["parts"][0]["text"]
+        self.assertIn("Never say which company, model or technology", system)
+        self.assertIn("What is missing in the tree", system)
+
+
 class FamilyStartTests(TestCase):
     """A new account says who its parents and grandparents are before anything else."""
 
@@ -319,6 +409,21 @@ class TakeTreeTests(TestCase):
         mine = Person.objects.get(pk=brother.person_id)
         self.assertEqual(mine.father.first_name, p["father"].first_name)
         self.assertGreater(Person.objects.filter(owner=brother).count(), 5)
+
+
+    def test_wrong_starting_pair_can_be_undone(self):
+        owner, p = make_family()
+        owner.tree_audience = "public"
+        owner.save()
+        other = account("boshqa", "Boshqa")
+        self.client.force_login(other)
+        url = reverse("network:merge") + f"?from={owner.username}&to={other.username}"
+        pair = {"from": owner.username, "to": other.username, "source_person": p["grandpa"].pk,
+                "target_person": other.person_id}
+        self.client.post(url, {**pair, "anchor": "1"})
+        self.assertContains(self.client.get(url), 'name="reset"')
+        self.client.post(url, {**pair, "reset": "1"})
+        self.assertContains(self.client.get(url), 'name="anchor"')  # back to step one
 
 
 class LiveStatusTests(TestCase):
